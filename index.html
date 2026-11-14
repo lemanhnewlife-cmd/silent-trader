@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thư Viện Chiến Lược Silent Trader — Cổng Truy Cập Chính Thức</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #070b12;
+      color: #e6edf7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+    }
+    .loader-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(16, 185, 129, 0.2);
+      border-top-color: #10b981;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #10b981;
+      margin-bottom: 6px;
+    }
+    .sub {
+      font-size: 13px;
+      color: #7f91ad;
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-screen" id="loader">
+    <div class="spinner"></div>
+    <div class="title">THƯ VIỆN CHIẾN LƯỢC SILENT TRADER</div>
+    <div class="sub" id="status-msg">Đang kết nối tới Máy Chủ Định Lượng MT5 Thời Gian Thực...</div>
+  </div>
+
+  <script>
+    const GIST_API_URL = "https://api.github.com/gists/2bf53bd09bbb0594b5f9440c059b0a88";
+    const GIST_RAW_URL = "https://gist.githubusercontent.com/lemanhnewlife-cmd/2bf53bd09bbb0594b5f9440c059b0a88/raw/silent_trader_endpoint.json";
+
+    async function fetchEndpoint() {
+      try {
+        const res = await fetch(GIST_API_URL + "?t=" + Date.now(), { cache: "no-store" });
+        if (res.ok) {
+          const gist = await res.json();
+          const rawContent = gist.files && gist.files["silent_trader_endpoint.json"] && gist.files["silent_trader_endpoint.json"].content;
+          if (rawContent) {
+            return JSON.parse(rawContent);
+          }
+        }
+      } catch (_) {}
+
+      const rawRes = await fetch(GIST_RAW_URL + "?t=" + Date.now(), { cache: "no-store" });
+      if (!rawRes.ok) throw new Error("Gist unavailable");
+      return await rawRes.json();
+    }
+
+    async function connectToLiveArena() {
+      const statusMsg = document.getElementById("status-msg");
+      try {
+        const data = await fetchEndpoint();
+        if (data && data.public_url && data.public_url.startsWith("http")) {
+          window.location.replace(data.public_url);
+          return;
+        }
+      } catch (e) {
+        statusMsg.textContent = "Đang đồng bộ lại luồng dữ liệu MT5, tự động thử lại sau 3 giây...";
+      }
+      setTimeout(connectToLiveArena, 3000);
+    }
+
+    connectToLiveArena();
+  </script>
+</body>
+</html>
