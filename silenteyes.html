@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Silent Trader - Silent Eyes AI XAUUSD Forecast</title>
+  <title>Silent Trader - Silent Eyes XAUUSD Forecast</title>
   <style>
     :root {
       --bg: #070b12;
@@ -172,7 +172,7 @@
   <div class="topbar">
     <div class="brand">
       <span>SILENT TRADER</span>
-      <span id="engineBadge" class="badge-ai">SILENT EYES AI • XAUUSD</span>
+      <span id="engineBadge" class="badge-ai">SILENT EYES • XAUUSD</span>
       <div class="status">
         <span id="statusDot" class="dot"></span>
         <span id="statusText">Sẵn sàng</span>
@@ -194,7 +194,7 @@
       <input id="apiUrlInput" type="text" placeholder="URL Server / Tunnel" style="display:none;" />
       <button id="btnSettings" title="Cấu hình Server URL">⚙</button>
       <button id="btnLive" class="active">Live MT5</button>
-      <button id="btnForce">Chạy lại AI</button>
+      <button id="btnForce">Chạy lại</button>
       <button id="btnSim">Demo Sim</button>
     </div>
   </div>
@@ -409,7 +409,7 @@
         if (data.status === 'live') {
           failStreak = 0;
           const sym = cleanSymbol(data.symbol);
-          engineBadge.textContent = `${sym} • Silent Eyes AI`;
+          engineBadge.textContent = `${sym} • Silent Eyes`;
           setStatus('live', `LIVE • ${data.timeframe}`);
           updateHud(data);
         } else {
@@ -588,7 +588,7 @@
 
         ctx.fillStyle = '#d8b4fe';
         ctx.font = 'bold 11px sans-serif';
-        ctx.fillText('SILENT EYES AI FORECAST →', splitX + 8, PAD_TOP + 14);
+        ctx.fillText('SILENT EYES FORECAST →', splitX + 8, PAD_TOP + 14);
       }
 
       if (forecast.length > 0 && histSlice.length > 0) {
@@ -697,7 +697,7 @@
         } else if (idx >= histSlice.length && idx < totalBars) {
           const f = forecast[idx - histSlice.length];
           const dt = new Date(f.time * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-          ohlcBar.textContent = `[SILENT EYES AI ${dt}] O: ${f.open.toFixed(2)}  H: ${f.high.toFixed(2)}  L: ${f.low.toFixed(2)}  C: ${f.close.toFixed(2)}  |  Cone P10–P90: ${f.p10.toFixed(2)} – ${f.p90.toFixed(2)}`;
+          ohlcBar.textContent = `[SILENT EYES ${dt}] O: ${f.open.toFixed(2)}  H: ${f.high.toFixed(2)}  L: ${f.low.toFixed(2)}  C: ${f.close.toFixed(2)}  |  Cone P10–P90: ${f.p10.toFixed(2)} – ${f.p90.toFixed(2)}`;
         }
       }
     }
