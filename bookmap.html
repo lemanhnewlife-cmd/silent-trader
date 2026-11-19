@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silent Trader - XAUUSD / Gold Bookmap</title>
+  <style>
+    :root {
+      --bg: #070b12;
+      --panel: #0e1522;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --buy: #22c55e;
+      --sell: #ef4444;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 14px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+    }
+    .dot.live { background: var(--buy); box-shadow: 0 0 8px var(--buy); }
+    .dot.err { background: var(--sell); }
+    .price-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+    }
+    .bid-txt { color: var(--buy); font-weight: 700; }
+    .ask-txt { color: var(--sell); font-weight: 700; }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button, select, input[type="range"] {
+      background: #162033;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+    button.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .canvas-wrap {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .legend {
+      position: absolute;
+      left: 12px;
+      bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(7, 11, 18, 0.8);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .grad {
+      width: 90px;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #091326, #1d4ed8, #06b6d4, #eab308, #f97316, #ef4444);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <span>SILENT TRADER BOOKMAP</span>
+      <span class="badge">GOLD (PAXG / XAU Proxy)</span>
+      <div class="status">
+        <span id="statusDot" class="dot"></span>
+        <span id="statusText">Đang kết nối...</span>
+      </div>
+    </div>
+
+    <div class="price-box">
+      <span>BID: <span id="bidVal" class="bid-txt">--</span></span>
+      <span>ASK: <span id="askVal" class="ask-txt">--</span></span>
+      <span>SPREAD: <span id="spreadVal">--</span></span>
+    </div>
+
+    <div class="controls">
+      <button id="btnLive" class="active">Live Feed</button>
+      <button id="btnSim">Demo Sim</button>
+      <div class="ctrl-group">
+        <span>Zoom:</span>
+        <button id="zoomOut">-</button>
+        <button id="zoomIn">+</button>
+      </div>
+      <div class="ctrl-group">
+        <span>Heat:</span>
+        <input id="heatRange" type="range" min="1" max="30" value="8" style="width:70px;padding:0;" />
+      </div>
+      <button id="btnCenter">Center</button>
+      <button id="btnClear">Clear</button>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="bookmapCanvas"></canvas>
+    <div class="legend">
+      <span>Thanh khoản thấp</span>
+      <div class="grad"></div>
+      <span>Thanh khoản cao (Wall)</span>
+      <span>|</span>
+      <span style="color:#22c55e;">● Market Buy</span>
+      <span style="color:#ef4444;">● Market Sell</span>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bookmapCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const bidVal = document.getElementById('bidVal');
+    const askVal = document.getElementById('askVal');
+    const spreadVal = document.getElementById('spreadVal');
+    const heatRange = document.getElementById('heatRange');
+
+    const btnLive = document.getElementById('btnLive');
+    const btnSim = document.getElementById('btnSim');
+    const btnCenter = document.getElementById('btnCenter');
+    const btnClear = document.getElementById('btnClear');
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+
+    // Cấu hình hiển thị
+    let mode = 'live'; // 'live' | 'sim'
+    let ws = null;
+    let simTimer = null;
+
+    let priceRange = 16;      // Biên độ giá hiển thị trên trục Y (USD)
+    let centerPrice = null;   // Giá trung tâm trục Y
+    let autoCenter = true;
+    let heatCap = 8;          // Ngưỡng volume tối đa để lên màu đỏ
+
+    const DOM_WIDTH = 110;
+    const AXIS_WIDTH = 72;
+    const COL_WIDTH = 3;      // Độ rộng mỗi cột thời gian (px)
+
+    let currentBids = [];     // [[price, qty], ...]
+    let currentAsks = [];
+    let bestBid = 0;
+    let bestAsk = 0;
+
+    // Lưu lịch sử các cột (mỗi cột là 1 snapshot Order Book + các lệnh Market vừa khớp)
+    let history = [];
+    let pendingTrades = [];
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Bảng màu Heatmap chuẩn Bookmap
+    function getHeatColor(ratio) {
+      const t = Math.max(0, Math.min(1, ratio));
+      if (t < 0.05) return null;
+      if (t < 0.25) {
+        const k = (t - 0.05) / 0.20;
+        return `rgba(${Math.round(15 + 14 * k)}, ${Math.round(35 + 43 * k)}, ${Math.round(90 + 126 * k)}, ${0.4 + 0.4 * k})`;
+      } else if (t < 0.50) {
+        const k = (t - 0.25) / 0.25;
+        return `rgba(${Math.round(29 - 23 * k)}, ${Math.round(78 + 104 * k)}, ${Math.round(216 - 4 * k)}, 0.88)`;
+      } else if (t < 0.75) {
+        const k = (t - 0.50) / 0.25;
+        return `rgba(${Math.round(6 + 228 * k)}, ${Math.round(182 - 3 * k)}, ${Math.round(212 - 204 * k)}, 0.92)`;
+      } else {
+        const k = (t - 0.75) / 0.25;
+        return `rgba(${Math.round(234 + 15 * k)}, ${Math.round(179 - 111 * k)}, ${Math.round(8 + 60 * k)}, 0.98)`;
+      }
+    }
+
+    function setStatus(state, text) {
+      statusDot.className = 'dot ' + (state || '');
+      statusText.textContent = text;
+    }
+
+    function stopFeeds() {
+      if (ws) {
+        ws.onclose = null;
+        ws.close();
+        ws = null;
+      }
+      if (simTimer) {
+        clearInterval(simTimer);
+        simTimer = null;
+      }
+    }
+
+    // Kết nối WebSocket thật (Binance Public Market Data - PAXGUSDT)
+    function startLive() {
+      stopFeeds();
+      mode = 'live';
+      btnLive.classList.add('active');
+      btnSim.classList.remove('active');
+      setStatus('', 'Đang kết nối PAXGUSDT...');
+
+      const url = 'wss://data-stream.binance.vision/stream?streams=paxgusdt@depth20@100ms/paxgusdt@aggTrade';
+      ws = new WebSocket(url);
+
+      ws.onopen = () => setStatus('live', 'LIVE • PAXG/USDT Order Book');
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (!msg || !msg.data) return;
+
+        if (msg.stream.includes('@depth20')) {
+          const bids = (msg.data.bids || msg.data.b || []).map(([p, q]) => [parseFloat(p), parseFloat(q)]);
+          const asks = (msg.data.asks || msg.data.a || []).map(([p, q]) => [parseFloat(p), parseFloat(q)]);
+          if (!bids.length || !asks.length) return;
+
+          currentBids = bids;
+          currentAsks = asks;
+          bestBid = bids[0][0];
+          bestAsk = asks[0][0];
+          updateHeaderPrices();
+        } else if (msg.stream.includes('@aggTrade')) {
+          const price = parseFloat(msg.data.p);
+          const qty = parseFloat(msg.data.q);
+          const isSell = msg.data.m === true; // maker = buyer => Market Sell
+          pendingTrades.push({ price, qty, side: isSell ? 'sell' : 'buy' });
+        }
+      };
+
+      ws.onerror = () => setStatus('err', 'Lỗi kết nối (thử Demo Sim)');
+      ws.onclose = () => {
+        if (mode === 'live') {
+          setStatus('err', 'Mất kết nối, đang thử lại...');
+          setTimeout(() => { if (mode === 'live') startLive(); }, 3000);
+        }
+      };
+    }
+
+    // Chế độ mô phỏng XAUUSD để test giao diện offline
+    function startSim() {
+      stopFeeds();
+      mode = 'sim';
+      btnSim.classList.add('active');
+      btnLive.classList.remove('active');
+      setStatus('live', 'SIMULATION • XAUUSD');
+
+      let simPrice = centerPrice || 2650.00;
+      const wall1 = simPrice + 3.5;
+      const wall2 = simPrice - 4.0;
+
+      simTimer = setInterval(() => {
+        simPrice += (Math.random() - 0.5) * 0.6;
+        bestBid = +(simPrice - 0.15).toFixed(2);
+        bestAsk = +(simPrice + 0.15).toFixed(2);
+
+        currentBids = [];
+        currentAsks = [];
+        for (let i = 0; i < 20; i++) {
+          const bp = +(bestBid - i * 0.4).toFixed(2);
+          const ap = +(bestAsk + i * 0.4).toFixed(2);
+          let bq = Math.random() * 4 + 0.5;
+          let aq = Math.random() * 4 + 0.5;
+          if (Math.abs(bp - wall2) < 0.8) bq += 12;
+          if (Math.abs(ap - wall1) < 0.8) aq += 14;
+          currentBids.push([bp, bq]);
+          currentAsks.push([ap, aq]);
+        }
+
+        if (Math.random() < 0.65) {
+          const side = Math.random() > 0.5 ? 'buy' : 'sell';
+          pendingTrades.push({
+            price: side === 'buy' ? bestAsk : bestBid,
+            qty: +(Math.random() * 6 + 0.2).toFixed(2),
+            side
+          });
+        }
+        updateHeaderPrices();
+      }, 150);
+    }
+
+    function updateHeaderPrices() {
+      bidVal.textContent = bestBid.toFixed(2);
+      askVal.textContent = bestAsk.toFixed(2);
+      spreadVal.textContent = (bestAsk - bestBid).toFixed(2);
+
+      const mid = (bestBid + bestAsk) / 2;
+      if (centerPrice === null) {
+        centerPrice = mid;
+      } else if (autoCenter) {
+        // Kéo khung giá theo nhẹ nhàng nếu giá trôi gần mép
+        if (Math.abs(mid - centerPrice) > priceRange * 0.28) {
+          centerPrice += (mid - centerPrice) * 0.08;
+        }
+      }
+    }
+
+    // Ghi snapshot mỗi 180ms để tạo dòng chảy Heatmap mượt
+    setInterval(() => {
+      if (!bestBid || !bestAsk) return;
+
+      const levels = [];
+      for (const [p, q] of currentBids) levels.push([p, q]);
+      for (const [p, q] of currentAsks) levels.push([p, q]);
+
+      // Gom các lệnh cùng chiều trong 1 khung thời gian
+      let buyVol = 0, sellVol = 0, buyPrice = bestAsk, sellPrice = bestBid;
+      for (const t of pendingTrades) {
+        if (t.side === 'buy') { buyVol += t.qty; buyPrice = t.price; }
+        else { sellVol += t.qty; sellPrice = t.price; }
+      }
+      pendingTrades = [];
+
+      history.push({
+        bid: bestBid,
+        ask: bestAsk,
+        levels,
+        buyVol,
+        buyPrice,
+        sellVol,
+        sellPrice
+      });
+
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const chartW = Math.max(100, rect.width - DOM_WIDTH - AXIS_WIDTH);
+      const maxCols = Math.ceil(chartW / COL_WIDTH) + 5;
+      if (history.length > maxCols) {
+        history.splice(0, history.length - maxCols);
+      }
+    }, 180);
+
+    function priceToY(price, height) {
+      const topPrice = centerPrice + priceRange / 2;
+      return ((topPrice - price) / priceRange) * height;
+    }
+
+    function draw() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const W = rect.width;
+      const H = rect.height;
+      const chartW = W - DOM_WIDTH - AXIS_WIDTH;
+
+      ctx.fillStyle = '#070b12';
+      ctx.fillRect(0, 0, W, H);
+
+      if (centerPrice === null) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('Đang chờ dữ liệu Order Book...', 20, 40);
+        requestAnimationFrame(draw);
+        return;
+      }
+
+      // 1. Vẽ lưới giá ngang
+      const step = priceRange <= 6 ? 0.5 : priceRange <= 20 ? 1 : priceRange <= 50 ? 2 : 5;
+      const minP = centerPrice - priceRange / 2;
+      const maxP = centerPrice + priceRange / 2;
+      const firstTick = Math.ceil(minP / step) * step;
+
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.font = '11px ui-monospace, monospace';
+      ctx.fillStyle = '#94a3b8';
+
+      for (let p = firstTick; p <= maxP; p += step) {
+        const y = priceToY(p, H);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(chartW + DOM_WIDTH, y);
+        ctx.stroke();
+
+        ctx.fillText(p.toFixed(2), chartW + DOM_WIDTH + 8, y + 4);
+      }
+
+      // 2. Vẽ Heatmap từ lịch sử Order Book
+      const bandH = Math.max(3, (H / priceRange) * 0.55);
+      const startX = chartW - history.length * COL_WIDTH;
+
+      for (let i = 0; i < history.length; i++) {
+        const col = history[i];
+        const x = startX + i * COL_WIDTH;
+        if (x + COL_WIDTH < 0) continue;
+
+        for (let j = 0; j < col.levels.length; j++) {
+          const [p, q] = col.levels[j];
+          const y = priceToY(p, H);
+          if (y < -bandH || y > H + bandH) continue;
+          const color = getHeatColor(q / heatCap);
+          if (!color) continue;
+          ctx.fillStyle = color;
+          ctx.fillRect(x, y - bandH / 2, COL_WIDTH + 0.5, bandH);
+        }
+      }
+
+      // 3. Vẽ đường Best Bid & Best Ask
+      if (history.length > 1) {
+        ctx.lineWidth = 1.6;
+
+        // Bid line
+        ctx.strokeStyle = '#22c55e';
+        ctx.beginPath();
+        for (let i = 0; i < history.length; i++) {
+          const x = startX + i * COL_WIDTH;
+          const y = priceToY(history[i].bid, H);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Ask line
+        ctx.strokeStyle = '#ef4444';
+        ctx.beginPath();
+        for (let i = 0; i < history.length; i++) {
+          const x = startX + i * COL_WIDTH;
+          const y = priceToY(history[i].ask, H);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      // 4. Vẽ Bong bóng khối lượng (Market Buy / Sell Bubbles)
+      for (let i = 0; i < history.length; i++) {
+        const col = history[i];
+        const x = startX + i * COL_WIDTH;
+
+        if (col.buyVol > 0.05) {
+          const r = Math.min(22, Math.max(3.5, Math.sqrt(col.buyVol) * 4.5));
+          const y = priceToY(col.buyPrice, H);
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(34, 197, 94, 0.45)';
+          ctx.fill();
+          ctx.strokeStyle = '#4ade80';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+
+        if (col.sellVol > 0.05) {
+          const r = Math.min(22, Math.max(3.5, Math.sqrt(col.sellVol) * 4.5));
+          const y = priceToY(col.sellPrice, H);
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+          ctx.fill();
+          ctx.strokeStyle = '#f87171';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+      }
+
+      // 5. Vẽ Cột DOM hiện tại (Current Order Book Histogram) bên phải
+      ctx.fillStyle = '#0b1220';
+      ctx.fillRect(chartW, 0, DOM_WIDTH, H);
+      ctx.strokeStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(chartW, 0); ctx.lineTo(chartW, H);
+      ctx.moveTo(chartW + DOM_WIDTH, 0); ctx.lineTo(chartW + DOM_WIDTH, H);
+      ctx.stroke();
+
+      const maxDomQty = Math.max(
+        heatCap,
+        ...currentBids.map(b => b[1]),
+        ...currentAsks.map(a => a[1])
+      );
+
+      for (const [p, q] of currentBids) {
+        const y = priceToY(p, H);
+        if (y < 0 || y > H) continue;
+        const barW = Math.min(DOM_WIDTH - 6, (q / maxDomQty) * (DOM_WIDTH - 10));
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.65)';
+        ctx.fillRect(chartW + 2, y - 3, barW, 6);
+        if (q >= heatCap * 0.35) {
+          ctx.fillStyle = '#dcfce7';
+          ctx.font = '10px monospace';
+          ctx.fillText(q.toFixed(1), chartW + 6, y + 3);
+        }
+      }
+
+      for (const [p, q] of currentAsks) {
+        const y = priceToY(p, H);
+        if (y < 0 || y > H) continue;
+        const barW = Math.min(DOM_WIDTH - 6, (q / maxDomQty) * (DOM_WIDTH - 10));
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.65)';
+        ctx.fillRect(chartW + 2, y - 3, barW, 6);
+        if (q >= heatCap * 0.35) {
+          ctx.fillStyle = '#fee2e2';
+          ctx.font = '10px monospace';
+          ctx.fillText(q.toFixed(1), chartW + 6, y + 3);
+        }
+      }
+
+      // 6. Đánh dấu giá hiện tại trên trục Y
+      const midY = priceToY((bestBid + bestAsk) / 2, H);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(chartW + DOM_WIDTH + 2, midY - 9, AXIS_WIDTH - 4, 18);
+      ctx.fillStyle = '#070b12';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(((bestBid + bestAsk) / 2).toFixed(2), chartW + DOM_WIDTH + 8, midY + 4);
+
+      requestAnimationFrame(draw);
+    }
+
+    // Sự kiện nút bấm & kéo trục giá
+    btnLive.onclick = startLive;
+    btnSim.onclick = startSim;
+    btnCenter.onclick = () => {
+      if (bestBid && bestAsk) centerPrice = (bestBid + bestAsk) / 2;
+      autoCenter = true;
+    };
+    btnClear.onclick = () => { history = []; };
+    zoomIn.onclick = () => { priceRange = Math.max(2, priceRange * 0.75); };
+    zoomOut.onclick = () => { priceRange = Math.min(120, priceRange * 1.35); };
+    heatRange.oninput = (e) => { heatCap = parseFloat(e.target.value); };
+
+    // Lăn chuột để Zoom, kéo chuột lên/xuống để dịch khung giá
+    let isDragging = false, lastY = 0;
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      priceRange = e.deltaY > 0
+        ? Math.min(120, priceRange * 1.12)
+        : Math.max(2, priceRange * 0.88);
+    }, { passive: false });
+
+    canvas.addEventListener('mousedown', (e) => { isDragging = true; lastY = e.clientY; autoCenter = false; });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging || centerPrice === null) return;
+      const dy = e.clientY - lastY;
+      lastY = e.clientY;
+      const H = canvas.parentElement.getBoundingClientRect().height;
+      centerPrice += (dy / H) * priceRange;
+    });
+
+    // Khởi chạy
+    startLive();
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
