@@ -322,6 +322,107 @@
       margin-top: 8px;
       padding: 2px 4px;
     }
+    .history-box {
+      width: 100%;
+      max-width: 820px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #0e1522;
+      border: 1px solid #283852;
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: var(--text);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+    .hist-kpi {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .strat-banner {
+      background: rgba(168, 85, 247, 0.10);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #e9d5ff;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .modal-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .tab-btn {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .hist-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #09101d;
+    }
+    .hist-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .hist-table th, .hist-table td {
+      padding: 7px 9px;
+      border-bottom: 1px solid #162033;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .hist-table th {
+      background: #121c2e;
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .tag-buy { color: #22c55e; font-weight: 700; }
+    .tag-sell { color: #ef4444; font-weight: 700; }
+    .tag-tp {
+      background: rgba(34, 197, 94, 0.16);
+      color: #4ade80;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .tag-sl {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .tag-open {
+      background: rgba(56, 189, 248, 0.18);
+      color: #7dd3fc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .btn-hist {
+      background: #132238;
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -337,22 +438,24 @@
 
     <div class="controls">
       <select id="tfSelect" title="Khung thời gian">
-        <option value="M1">M1</option>
-        <option value="M5" selected>M5</option>
+        <option value="M1" selected>M1</option>
+        <option value="M5">M5</option>
         <option value="M15">M15</option>
         <option value="H1">H1</option>
       </select>
       <select id="horizonSelect" title="Số nến dự báo">
-        <option value="12">Dự báo 12 nến</option>
-        <option value="20" selected>Dự báo 20 nến</option>
+        <option value="12" selected>Dự báo 12 nến</option>
+        <option value="20">Dự báo 20 nến</option>
         <option value="30">Dự báo 30 nến</option>
       </select>
       <input id="apiUrlInput" type="text" placeholder="URL Server / Tunnel" style="display:none;" />
       <button id="btnSettings" title="Cấu hình Server URL">⚙</button>
       <button id="btnLive" class="active">Live MT5</button>
+      <button id="btnBoxes" class="active" title="Bật/tắt hộp Long/Short Position kiểu TradingView">📦 Hộp Lệnh</button>
+      <button id="btnHistory" class="btn-hist">📊 Lịch sử ($10k)</button>
       <button id="btnForce">Chạy lại</button>
       <button id="btnSim">Demo Sim</button>
-      <button id="btnCopyStrat" class="btn-copy-strat">⚡ Copy Chiến Lược (.mq5)</button>
+      <button id="btnCopyStrat" class="btn-copy-strat">⚡ Copy Chiến Lược (.ex5)</button>
     </div>
   </div>
 
@@ -377,6 +480,10 @@
       <div class="hud-label">GỢI Ý SL / TP THEO SILENT EYES</div>
       <div id="hudSltp" class="hud-val">--</div>
     </div>
+    <div class="hud-card" id="hudVirtualCard" style="cursor:pointer;" title="Bấm để xem lịch sử giao dịch MT5 Ảo $10,000">
+      <div class="hud-label">MT5 ẢO $10K • RISK 1%</div>
+      <div id="hudVirtual" class="hud-val bull">$10,000.00 (0%)</div>
+    </div>
   </div>
 
   <div class="canvas-wrap">
@@ -389,11 +496,11 @@
     </div>
   </div>
 
-  <!-- MODAL COPY CHIẾN LƯỢC (.MQ5) - THANH TOÁN MOMO 10.000Đ / 24H -->
+  <!-- MODAL COPY CHIẾN LƯỢC (.EX5) - THANH TOÁN MOMO 10.000Đ / 24H -->
   <div id="copyModal" class="modal-backdrop">
     <div class="modal-box">
       <div class="modal-head">
-        <div class="modal-title">⚡ Copy Chiến Lược Silent Eyes (.mq5)</div>
+        <div class="modal-title">⚡ Copy Chiến Lược Silent Eyes (.ex5)</div>
         <button id="btnCloseModal" class="modal-close">✕</button>
       </div>
 
@@ -407,16 +514,16 @@
           <div class="v cyan">24 Giờ</div>
         </div>
         <div class="stat-pill">
-          <div class="k">CHIẾN LƯỢC</div>
-          <div class="v purple">M1 • RR 1:1</div>
+          <div class="k">QUẢN LÝ VỐN</div>
+          <div class="v purple">Tự chọn 3 chế độ</div>
         </div>
       </div>
 
       <div id="payStepIntro" class="pay-card">
         <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
-          File mã nguồn sạch <strong>SilentEyes_Copier.mq5</strong> tự động nhận tín hiệu trực tiếp từ máy chủ Silent Eyes (<code>XAUUSD</code>, quản lý vốn <code>0.5%/lệnh</code>, <code>SL = 4×ATR</code>, <code>TP = 1:1</code>, khóa an toàn 1 tài khoản MT5 trong <strong>24 giờ</strong>).
+          Tải file <strong>SilentEyes_Copier.ex5</strong> đã biên dịch sẵn (<strong>ẩn mã nguồn, kéo thả vào MT5 chạy ngay không cần Compile</strong>). Tự do chọn 3 chế độ quản lý vốn trong Input: <code>% Tài khoản</code>, <code>USD cố định</code>, hoặc <code>Lot cố định</code> + tự đồng bộ chiến lược tối ưu 24h!
         </div>
-        <button id="btnCreateOrder" class="btn-primary-full">💳 Thanh toán 10.000đ qua MoMo để tải .mq5</button>
+        <button id="btnCreateOrder" class="btn-primary-full">💳 Thanh toán 10.000đ qua MoMo để tải .ex5</button>
         <div id="introErr" style="color:#f87171; font-size:12px; margin-top:8px;"></div>
       </div>
 
@@ -449,7 +556,7 @@
           Thời gian còn lại: <strong id="paidCountdown" class="cyan">24h 00m</strong>
         </div>
 
-        <button id="btnDownloadMq5" class="btn-primary-full">📥 Tải File SilentEyes_Copier.mq5</button>
+        <button id="btnDownloadEx5" class="btn-primary-full">📥 Tải SilentEyes_Copier.ex5 (Chạy ngay — Không cần Compile)</button>
 
         <div class="info-row" style="margin-top:10px;">
           <span style="overflow:hidden;">URL WebRequest: <code id="eaApiUrlText"></code></span>
@@ -457,14 +564,97 @@
         </div>
 
         <div class="steps-box">
-          <strong>Hướng dẫn cài vào MT5 PC (30 giây):</strong>
+          <strong>Hướng dẫn cài vào MT5 PC (20 giây):</strong>
           <ol>
             <li>Mở MT5 → <code>Tools → Options → Expert Advisors</code> → tick <strong>Allow WebRequest</strong> và dán URL ở trên.</li>
-            <li>Copy file <code>.mq5</code> vào <code>MQL5/Experts/</code> → mở file bằng MetaEditor bấm <strong>F7 (Compile)</strong>.</li>
-            <li>Kéo <strong>SilentEyes_Copier</strong> vào biểu đồ <code>XAUUSD</code> và bật <strong>Algo Trading</strong> (Key 24h đã gắn sẵn).</li>
+            <li>Copy file <code>.ex5</code> vào <code>MQL5/Experts/</code>, kéo thả lên biểu đồ <code>XAUUSD</code>, chọn mức quản lý vốn bạn muốn trong tab <strong>Inputs</strong> và bật <strong>Algo Trading</strong>!</li>
           </ol>
         </div>
         <button id="btnNewOrderPaid" class="link-reset">Gia hạn / Tạo đơn 24h mới</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LỊCH SỬ GIAO DỊCH MT5 ẢO $10,000 & TỐI ƯU 24H -->
+  <div id="historyModal" class="modal-backdrop">
+    <div class="history-box">
+      <div class="modal-head">
+        <div class="modal-title">📊 Tài Khoản MT5 Ảo $10,000 (Risk 1% / Lệnh) &amp; Tự Tối Ưu 24h</div>
+        <button id="btnCloseHistory" class="modal-close">✕</button>
+      </div>
+
+      <div class="hist-kpi">
+        <div class="stat-pill">
+          <div class="k">EQUITY ($10K GỐC)</div>
+          <div id="vEquity" class="v cyan">$10,000.00</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">LÃI / LỖ RÒNG</div>
+          <div id="vNetPnl" class="v bull">+$0.00 (0%)</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">WINRATE (W / L)</div>
+          <div id="vWinrate" class="v purple">0.0% (0/0)</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">PROFIT FACTOR</div>
+          <div id="vPf" class="v">0.00</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">MAX DRAWDOWN</div>
+          <div id="vMaxDd" class="v bear">0.0%</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">TỐI ƯU 24H SAU</div>
+          <div id="vNextOpt" class="v cyan">24h 00m</div>
+        </div>
+      </div>
+
+      <div id="vStratBanner" class="strat-banner">
+        <span id="vStratText">Chiến lược hiện hành: v1 • M1 • pred=12 • conf ≥ 70% • SL=4×ATR • TP=1.0R</span>
+        <span style="color:#94a3b8; font-size:11px;">Đồng bộ: Web $10k + EA Khách + MT5 Demo</span>
+      </div>
+
+      <div class="modal-tabs">
+        <button id="tabTradesBtn" class="tab-btn active">Lịch sử lệnh</button>
+        <button id="tabOptBtn" class="tab-btn">Nhật ký tự tối ưu 24h</button>
+      </div>
+
+      <div id="tabTradesView" class="hist-table-wrap">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Giờ mở → đóng</th>
+              <th>Lệnh</th>
+              <th>Lot</th>
+              <th>Vào → Đóng</th>
+              <th>SL / TP</th>
+              <th>Kết quả</th>
+              <th>PnL ($)</th>
+              <th>Số dư ($)</th>
+            </tr>
+          </thead>
+          <tbody id="vTradesBody">
+            <tr><td colspan="9" style="text-align:center; color:#64748b; padding:16px;">Đang tải dữ liệu MT5 ảo $10,000...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="tabOptView" class="hist-table-wrap" style="display:none;">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Thực tế 24h</th>
+              <th>Phiên bản</th>
+              <th>Quyết định &amp; Tóm tắt tối ưu</th>
+            </tr>
+          </thead>
+          <tbody id="vOptBody">
+            <tr><td colspan="4" style="text-align:center; color:#64748b; padding:16px;">Chưa tới mốc tự tối ưu 24h đầu tiên.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -782,6 +972,11 @@
         if (f.p10 < minP) minP = f.p10;
         if (f.p90 > maxP) maxP = f.p90;
       }
+      if (showBoxes && virtualSnapshot && virtualSnapshot.open_trade) {
+        const ot = virtualSnapshot.open_trade;
+        minP = Math.min(minP, ot.sl, ot.tp, ot.open_price);
+        maxP = Math.max(maxP, ot.sl, ot.tp, ot.open_price);
+      }
       const padPrice = Math.max(1.5, (maxP - minP) * 0.08);
       minP -= padPrice;
       maxP += padPrice;
@@ -861,6 +1056,10 @@
         ctx.fill();
       }
 
+      if (showBoxes && virtualSnapshot && histSlice.length > 0) {
+        drawTradingViewBoxes(histSlice, barSlot, splitX, chartW, priceToY);
+      }
+
       for (let i = 0; i < histSlice.length; i++) {
         const c = histSlice[i];
         const cx = (i + 0.5) * barSlot;
@@ -910,6 +1109,10 @@
       ctx.fillStyle = '#070b12';
       ctx.font = 'bold 11px monospace';
       ctx.fillText(midPrice.toFixed(2), chartW + 8, curY + 4);
+
+      if (showBoxes && virtualSnapshot && virtualSnapshot.open_trade && histSlice.length > 0) {
+        drawTradingViewOpenLabels(virtualSnapshot.open_trade, histSlice, barSlot, splitX, chartW, priceToY);
+      }
 
       if (mouseX >= 0 && mouseX <= chartW && mouseY >= PAD_TOP && mouseY <= PAD_TOP + chartH) {
         ctx.strokeStyle = 'rgba(226, 232, 240, 0.3)';
@@ -975,7 +1178,247 @@
     startLive();
     requestAnimationFrame(renderLoop);
 
-    // === PAYWALL MOMO 10.000Đ / 24H CHO FILE .MQ5 ===
+    let showBoxes = true;
+    let virtualSnapshot = null;
+
+    function findBarXForTime(histSlice, tsSec, barSlot, clampRight) {
+      if (!histSlice.length) return 0;
+      const firstT = histSlice[0].time;
+      const lastT = histSlice[histSlice.length - 1].time;
+      if (tsSec <= firstT) return 0.5 * barSlot;
+      if (tsSec >= lastT) return clampRight;
+      for (let i = histSlice.length - 1; i >= 0; i--) {
+        if (histSlice[i].time <= tsSec) {
+          return (i + 0.5) * barSlot;
+        }
+      }
+      return 0.5 * barSlot;
+    }
+
+    function drawSingleTvBox(x1, x2, entry, sl, tp, isOpen) {
+      const boxW = Math.max(18, x2 - x1);
+      const yEntry = entry;
+      const yTp = tp;
+      const ySl = sl;
+
+      const tpTop = Math.min(yEntry, yTp);
+      const tpH = Math.max(2, Math.abs(yTp - yEntry));
+      ctx.fillStyle = isOpen ? 'rgba(34, 197, 94, 0.16)' : 'rgba(34, 197, 94, 0.08)';
+      ctx.fillRect(x1, tpTop, boxW, tpH);
+      ctx.strokeStyle = isOpen ? 'rgba(34, 197, 94, 0.85)' : 'rgba(34, 197, 94, 0.35)';
+      ctx.lineWidth = isOpen ? 1.2 : 1;
+      ctx.strokeRect(x1, tpTop, boxW, tpH);
+
+      const slTop = Math.min(yEntry, ySl);
+      const slH = Math.max(2, Math.abs(ySl - yEntry));
+      ctx.fillStyle = isOpen ? 'rgba(239, 68, 68, 0.16)' : 'rgba(239, 68, 68, 0.08)';
+      ctx.fillRect(x1, slTop, boxW, slH);
+      ctx.strokeStyle = isOpen ? 'rgba(239, 68, 68, 0.85)' : 'rgba(239, 68, 68, 0.35)';
+      ctx.lineWidth = isOpen ? 1.2 : 1;
+      ctx.strokeRect(x1, slTop, boxW, slH);
+
+      ctx.strokeStyle = isOpen ? '#f8fafc' : 'rgba(226, 232, 240, 0.45)';
+      ctx.lineWidth = isOpen ? 1.5 : 1;
+      ctx.beginPath();
+      ctx.moveTo(x1, yEntry);
+      ctx.lineTo(x1 + boxW, yEntry);
+      ctx.stroke();
+    }
+
+    function drawTradingViewBoxes(histSlice, barSlot, splitX, chartW, priceToY) {
+      const firstT = histSlice[0].time;
+      const recent = (virtualSnapshot.recent_trades || []).slice(0, 4);
+      for (const tr of recent) {
+        if (!tr.close_time || tr.close_time < firstT) continue;
+        const x1 = findBarXForTime(histSlice, tr.open_time, barSlot, splitX - barSlot);
+        const x2 = findBarXForTime(histSlice, tr.close_time, barSlot, splitX);
+        drawSingleTvBox(x1, Math.max(x1 + 14, x2), priceToY(tr.open_price), priceToY(tr.sl), priceToY(tr.tp), false);
+      }
+
+      const ot = virtualSnapshot.open_trade;
+      if (ot) {
+        const x1 = findBarXForTime(histSlice, ot.open_time, barSlot, Math.max(0, splitX - barSlot * 3));
+        const x2 = Math.min(chartW - 4, splitX + Math.max(barSlot * 4, 48));
+        drawSingleTvBox(x1, Math.max(x1 + 48, x2), priceToY(ot.open_price), priceToY(ot.sl), priceToY(ot.tp), true);
+      }
+    }
+
+    function drawPill(x, y, text, bg, fg) {
+      ctx.font = 'bold 10.5px ui-monospace, monospace';
+      const w = ctx.measureText(text).width + 10;
+      const h = 16;
+      const rx = Math.max(4, Math.min(x, canvas.parentElement.getBoundingClientRect().width - 78 - w));
+      ctx.fillStyle = bg;
+      ctx.fillRect(rx, y - h / 2, w, h);
+      ctx.fillStyle = fg;
+      ctx.fillText(text, rx + 5, y + 3.5);
+    }
+
+    function drawTradingViewOpenLabels(ot, histSlice, barSlot, splitX, chartW, priceToY) {
+      const x1 = findBarXForTime(histSlice, ot.open_time, barSlot, Math.max(0, splitX - barSlot * 3));
+      const yEntry = priceToY(ot.open_price);
+      const yTp = priceToY(ot.tp);
+      const ySl = priceToY(ot.sl);
+
+      const pnl = Number(ot.floating_usd || 0);
+      const pnlSign = pnl >= 0 ? '+' : '';
+      const sideLabel = ot.side === 'BUY' ? 'LONG' : 'SHORT';
+      const rewardUsd = Number(ot.reward_usd || ot.risk_usd || 100);
+      const riskUsd = Number(ot.risk_usd || 100);
+
+      drawPill(x1 + 4, yTp, `TP ${Number(ot.tp).toFixed(2)} (+$${rewardUsd.toFixed(0)} • +${Number(ot.rr).toFixed(1)}R)`, 'rgba(22, 163, 74, 0.92)', '#fff');
+      drawPill(x1 + 4, ySl, `SL ${Number(ot.sl).toFixed(2)} (-$${riskUsd.toFixed(0)} • -1.0R)`, 'rgba(220, 38, 38, 0.92)', '#fff');
+      drawPill(x1 + 4, yEntry, `${sideLabel} ${Number(ot.lot).toFixed(2)} @ ${Number(ot.open_price).toFixed(2)} | ${pnlSign}$${pnl.toFixed(2)}`, pnl >= 0 ? 'rgba(14, 165, 233, 0.95)' : 'rgba(234, 88, 12, 0.95)', '#fff');
+    }
+
+    const hudVirtual = document.getElementById('hudVirtual');
+    const hudVirtualCard = document.getElementById('hudVirtualCard');
+    const btnBoxes = document.getElementById('btnBoxes');
+    const btnHistory = document.getElementById('btnHistory');
+    const historyModal = document.getElementById('historyModal');
+    const btnCloseHistory = document.getElementById('btnCloseHistory');
+    const tabTradesBtn = document.getElementById('tabTradesBtn');
+    const tabOptBtn = document.getElementById('tabOptBtn');
+    const tabTradesView = document.getElementById('tabTradesView');
+    const tabOptView = document.getElementById('tabOptView');
+    const vEquity = document.getElementById('vEquity');
+    const vNetPnl = document.getElementById('vNetPnl');
+    const vWinrate = document.getElementById('vWinrate');
+    const vPf = document.getElementById('vPf');
+    const vMaxDd = document.getElementById('vMaxDd');
+    const vNextOpt = document.getElementById('vNextOpt');
+    const vStratText = document.getElementById('vStratText');
+    const vTradesBody = document.getElementById('vTradesBody');
+    const vOptBody = document.getElementById('vOptBody');
+
+    function fmtShortTime(tsSec) {
+      if (!tsSec) return '--';
+      const d = new Date(tsSec * 1000);
+      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+        + ' ' + String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    }
+
+    function renderVirtualData(v) {
+      if (!v || !v.ok) return;
+      virtualSnapshot = v;
+      const acc = v.account;
+      const st = v.stats;
+      const strat = v.active_strategy || {};
+
+      const sign = acc.net_pnl_usd >= 0 ? '+' : '';
+      hudVirtual.className = 'hud-val ' + (acc.net_pnl_usd >= 0 ? 'bull' : 'bear');
+      hudVirtual.textContent = `$${acc.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${sign}${acc.net_pnl_pct.toFixed(2)}%) • WR ${st.winrate}%`;
+
+      vEquity.textContent = `$${acc.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      vNetPnl.className = 'v ' + (acc.net_pnl_usd >= 0 ? 'bull' : 'bear');
+      vNetPnl.textContent = `${sign}$${acc.net_pnl_usd.toFixed(2)} (${sign}${acc.net_pnl_pct.toFixed(2)}%)`;
+      vWinrate.textContent = `${st.winrate.toFixed(1)}% (${st.wins}/${st.losses})`;
+      vPf.textContent = Number(st.profit_factor || 0).toFixed(2);
+      vMaxDd.textContent = `${Number(acc.max_dd_pct || 0).toFixed(2)}%`;
+      vNextOpt.textContent = fmtCountdown(acc.next_opt_in_sec);
+      vStratText.textContent = `Chiến lược v${strat.version || 1}: ${strat.tf || 'M1'} • pred=${strat.pred_len || 12} • conf ≥ ${strat.min_conf || 70}% • ${strat.sl_mode || 'SL_4ATR'} / ${strat.tp_mode || 'RR_1.0'}`;
+
+      const rows = [];
+      if (v.open_trade) {
+        const ot = v.open_trade;
+        const ps = ot.floating_usd >= 0 ? '+' : '';
+        rows.push(`
+          <tr style="background:rgba(56,189,248,0.08);">
+            <td>#${ot.id}</td>
+            <td>${fmtShortTime(ot.open_time)} → Đang chạy</td>
+            <td class="${ot.side === 'BUY' ? 'tag-buy' : 'tag-sell'}">${ot.side}</td>
+            <td>${Number(ot.lot).toFixed(2)}</td>
+            <td>${Number(ot.open_price).toFixed(2)} → ${Number(ot.mark_price).toFixed(2)}</td>
+            <td>${Number(ot.sl).toFixed(2)} / ${Number(ot.tp).toFixed(2)}</td>
+            <td><span class="tag-open">OPEN (${ot.confidence}%)</span></td>
+            <td class="${ot.floating_usd >= 0 ? 'bull' : 'bear'}">${ps}$${Number(ot.floating_usd).toFixed(2)}</td>
+            <td>$${acc.equity.toFixed(2)}</td>
+          </tr>
+        `);
+      }
+
+      for (const tr of (v.recent_trades || [])) {
+        const ps = tr.pnl_usd >= 0 ? '+' : '';
+        const tagCls = tr.close_reason === 'TP' ? 'tag-tp' : 'tag-sl';
+        rows.push(`
+          <tr>
+            <td>#${tr.id}</td>
+            <td>${fmtShortTime(tr.open_time)} → ${fmtShortTime(tr.close_time)}</td>
+            <td class="${tr.side === 'BUY' ? 'tag-buy' : 'tag-sell'}">${tr.side}</td>
+            <td>${Number(tr.lot).toFixed(2)}</td>
+            <td>${Number(tr.open_price).toFixed(2)} → ${Number(tr.close_price).toFixed(2)}</td>
+            <td>${Number(tr.sl).toFixed(2)} / ${Number(tr.tp).toFixed(2)}</td>
+            <td><span class="${tagCls}">${tr.close_reason}</span></td>
+            <td class="${tr.pnl_usd >= 0 ? 'bull' : 'bear'}">${ps}$${Number(tr.pnl_usd).toFixed(2)}</td>
+            <td>$${Number(tr.balance_after).toFixed(2)}</td>
+          </tr>
+        `);
+      }
+
+      vTradesBody.innerHTML = rows.length
+        ? rows.join('')
+        : '<tr><td colspan="9" style="text-align:center; color:#64748b; padding:16px;">Tài khoản ảo $10,000 đang chờ tín hiệu đạt ngưỡng để khớp lệnh đầu tiên...</td></tr>';
+
+      const opts = v.optimization_history || [];
+      vOptBody.innerHTML = opts.length
+        ? opts.map((o) => `
+          <tr>
+            <td>${o.run_at}</td>
+            <td>${o.audit_24h_trades} lệnh • WR ${Number(o.audit_24h_wr).toFixed(1)}% • ${o.audit_24h_pnl >= 0 ? '+' : ''}$${Number(o.audit_24h_pnl).toFixed(2)}</td>
+            <td>v${o.old_version} → v${o.new_version} ${o.changed ? '<span class="tag-tp">ĐÃ ĐỔI</span>' : '<span class="tag-open">GIỮ</span>'}</td>
+            <td style="white-space:normal; max-width:340px;">${o.summary}</td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="4" style="text-align:center; color:#64748b; padding:16px;">Hệ thống tự động kiểm toán và điều chỉnh chiến lược sau mỗi 24 giờ.</td></tr>';
+
+      requestDraw();
+    }
+
+    async function fetchVirtual10k() {
+      if (mode !== 'live') return;
+      const base = await getApiBase();
+      if (!base) return;
+      try {
+        const res = await fetch(`${base}/api/silenteyes/virtual`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          renderVirtualData(data);
+        }
+      } catch (_) {}
+    }
+
+    btnBoxes.onclick = () => {
+      showBoxes = !showBoxes;
+      btnBoxes.classList.toggle('active', showBoxes);
+      requestDraw();
+    };
+    const openHistoryModal = () => {
+      historyModal.classList.add('open');
+      fetchVirtual10k();
+    };
+    btnHistory.onclick = openHistoryModal;
+    hudVirtualCard.onclick = openHistoryModal;
+    btnCloseHistory.onclick = () => historyModal.classList.remove('open');
+    historyModal.addEventListener('click', (e) => {
+      if (e.target === historyModal) historyModal.classList.remove('open');
+    });
+    tabTradesBtn.onclick = () => {
+      tabTradesBtn.classList.add('active');
+      tabOptBtn.classList.remove('active');
+      tabTradesView.style.display = 'block';
+      tabOptView.style.display = 'none';
+    };
+    tabOptBtn.onclick = () => {
+      tabOptBtn.classList.add('active');
+      tabTradesBtn.classList.remove('active');
+      tabOptView.style.display = 'block';
+      tabTradesView.style.display = 'none';
+    };
+
+    setInterval(fetchVirtual10k, 2500);
+    setTimeout(fetchVirtual10k, 600);
+
+    // === PAYWALL MOMO 10.000Đ / 24H CHO FILE .EX5 ===
     const copyModal = document.getElementById('copyModal');
     const btnCopyStrat = document.getElementById('btnCopyStrat');
     const btnCloseModal = document.getElementById('btnCloseModal');
@@ -991,7 +1434,7 @@
     const btnNewOrder = document.getElementById('btnNewOrder');
     const paidCodeText = document.getElementById('paidCodeText');
     const paidCountdown = document.getElementById('paidCountdown');
-    const btnDownloadMq5 = document.getElementById('btnDownloadMq5');
+    const btnDownloadEx5 = document.getElementById('btnDownloadEx5');
     const eaApiUrlText = document.getElementById('eaApiUrlText');
     const btnCopyApiUrl = document.getElementById('btnCopyApiUrl');
     const btnNewOrderPaid = document.getElementById('btnNewOrderPaid');
@@ -1052,7 +1495,7 @@
         const eaBase = data.api_base_url || apiBase;
         eaApiUrlText.textContent = eaBase;
         btnCopyApiUrl.onclick = () => copyTextWithFeedback(btnCopyApiUrl, eaBase);
-        activeDownloadUrl = `${apiBase}/api/silenteyes/download-mq5?code=${encodeURIComponent(activeOrderCode)}`;
+        activeDownloadUrl = `${apiBase}/api/silenteyes/download-ex5?code=${encodeURIComponent(activeOrderCode)}`;
         showPayView('paid');
         return;
       }
@@ -1118,7 +1561,7 @@
         showPayView('intro');
       } finally {
         btnCreateOrder.disabled = false;
-        btnCreateOrder.textContent = '💳 Thanh toán 10.000đ qua MoMo để tải .mq5';
+        btnCreateOrder.textContent = '💳 Thanh toán 10.000đ qua MoMo để tải .ex5';
       }
     }
 
@@ -1159,8 +1602,12 @@
       activeOrderCode = '';
       createNewOrder();
     };
-    btnDownloadMq5.onclick = () => {
-      if (activeDownloadUrl) window.location.href = activeDownloadUrl;
+    btnDownloadEx5.onclick = () => {
+      if (!activeDownloadUrl) return;
+      const orig = btnDownloadEx5.textContent;
+      btnDownloadEx5.textContent = '⏳ Đang đóng gói .ex5 (~5 giây)...';
+      window.location.href = activeDownloadUrl;
+      setTimeout(() => { btnDownloadEx5.textContent = orig; }, 6000);
     };
   </script>
 </body>
