@@ -166,6 +166,162 @@
       color: var(--muted);
       pointer-events: none;
     }
+    .btn-copy-strat {
+      background: linear-gradient(135deg, #a855f7, #0284c7);
+      border-color: rgba(168, 85, 247, 0.7);
+      color: #fff;
+      font-weight: 700;
+      padding: 4px 11px;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    }
+    .btn-copy-strat:hover {
+      filter: brightness(1.12);
+      border-color: #d8b4fe;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 14, 0.78);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 14px;
+      user-select: text;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 470px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #0e1522;
+      border: 1px solid #283852;
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: var(--text);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 15px; font-weight: 700; color: #f8fafc; }
+    .modal-close {
+      background: #162033;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 13px;
+    }
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-pill {
+      background: #09101d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 8px;
+      text-align: center;
+    }
+    .stat-pill .k { font-size: 10px; color: var(--muted); }
+    .stat-pill .v { font-size: 13px; font-weight: 700; font-family: ui-monospace, monospace; margin-top: 2px; }
+    .pay-card {
+      background: #09101d;
+      border: 1px solid #24324a;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+    .qr-wrap {
+      display: inline-block;
+      background: #fff;
+      padding: 8px;
+      border-radius: 10px;
+      margin: 8px 0;
+    }
+    .qr-wrap img { display: block; width: 196px; height: 196px; }
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #121c2e;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 10px;
+      margin-top: 7px;
+      font-size: 12px;
+      text-align: left;
+      gap: 8px;
+    }
+    .info-row code {
+      font-family: ui-monospace, monospace;
+      color: #38bdf8;
+      font-weight: 700;
+      word-break: break-all;
+    }
+    .mini-copy {
+      padding: 3px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pay-status {
+      margin-top: 10px;
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+    .pay-status.paid {
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
+    .btn-primary-full {
+      width: 100%;
+      padding: 10px 14px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+      border: none;
+      color: #041019;
+    }
+    .btn-primary-full:hover { filter: brightness(1.08); }
+    .steps-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #121c2e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: left;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+    .steps-box ol { padding-left: 18px; margin-top: 4px; }
+    .link-reset {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      text-decoration: underline;
+      margin-top: 8px;
+      padding: 2px 4px;
+    }
   </style>
 </head>
 <body>
@@ -196,6 +352,7 @@
       <button id="btnLive" class="active">Live MT5</button>
       <button id="btnForce">Chạy lại</button>
       <button id="btnSim">Demo Sim</button>
+      <button id="btnCopyStrat" class="btn-copy-strat">⚡ Copy Chiến Lược (.mq5)</button>
     </div>
   </div>
 
@@ -229,6 +386,86 @@
       <span style="color:#22c55e;">▮ Nến MT5 Thực tế</span>
       <span style="color:#a855f7;">▯ Nến Dự báo Silent Eyes</span>
       <span style="color:#38bdf8;">▒ Vùng Xác Suất P10–P90</span>
+    </div>
+  </div>
+
+  <!-- MODAL COPY CHIẾN LƯỢC (.MQ5) - THANH TOÁN MOMO 10.000Đ / 24H -->
+  <div id="copyModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="modal-title">⚡ Copy Chiến Lược Silent Eyes (.mq5)</div>
+        <button id="btnCloseModal" class="modal-close">✕</button>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat-pill">
+          <div class="k">PHÍ TRẢI NGHIỆM</div>
+          <div class="v bull">10.000đ</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">THỜI HẠN</div>
+          <div class="v cyan">24 Giờ</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">CHIẾN LƯỢC</div>
+          <div class="v purple">M1 • RR 1:1</div>
+        </div>
+      </div>
+
+      <div id="payStepIntro" class="pay-card">
+        <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
+          File mã nguồn sạch <strong>SilentEyes_Copier.mq5</strong> tự động nhận tín hiệu trực tiếp từ máy chủ Silent Eyes (<code>XAUUSD</code>, quản lý vốn <code>0.5%/lệnh</code>, <code>SL = 4×ATR</code>, <code>TP = 1:1</code>, khóa an toàn 1 tài khoản MT5 trong <strong>24 giờ</strong>).
+        </div>
+        <button id="btnCreateOrder" class="btn-primary-full">💳 Thanh toán 10.000đ qua MoMo để tải .mq5</button>
+        <div id="introErr" style="color:#f87171; font-size:12px; margin-top:8px;"></div>
+      </div>
+
+      <div id="payStepQr" class="pay-card" style="display:none;">
+        <div style="font-size:12px; color:#f9a8d4; font-weight:700;">QUÉT MÃ QR MOMO (TỰ ĐỘNG MỞ KHÓA SAU 3 GIÂY)</div>
+        <div class="qr-wrap"><img id="momoQrImg" src="" alt="MoMo QR" /></div>
+
+        <div class="info-row">
+          <span>Ví MoMo: <strong style="color:#f472b6;">0977098166</strong></span>
+          <button class="mini-copy" data-copy="0977098166">Copy SĐT</button>
+        </div>
+        <div class="info-row">
+          <span>Số tiền: <strong class="bull">10.000 VNĐ</strong></span>
+          <button class="mini-copy" data-copy="10000">Copy</button>
+        </div>
+        <div class="info-row">
+          <span>Lời nhắn (BẮT BUỘC): <code id="orderCodeText">DV------</code></span>
+          <button id="btnCopyCode" class="mini-copy">Copy Mã</button>
+        </div>
+
+        <div id="payStatusBanner" class="pay-status">⏳ Đang chờ MoMo 0977098166 xác nhận chuyển khoản...</div>
+        <button id="btnNewOrder" class="link-reset">Tạo mã đơn mới</button>
+      </div>
+
+      <div id="payStepPaid" class="pay-card" style="display:none;">
+        <div class="pay-status paid" style="margin-top:0;">
+          ✅ Đã xác nhận thanh toán! Bản quyền 24h đã kích hoạt cho mã <strong id="paidCodeText"></strong>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:var(--muted);">
+          Thời gian còn lại: <strong id="paidCountdown" class="cyan">24h 00m</strong>
+        </div>
+
+        <button id="btnDownloadMq5" class="btn-primary-full">📥 Tải File SilentEyes_Copier.mq5</button>
+
+        <div class="info-row" style="margin-top:10px;">
+          <span style="overflow:hidden;">URL WebRequest: <code id="eaApiUrlText"></code></span>
+          <button id="btnCopyApiUrl" class="mini-copy">Copy URL</button>
+        </div>
+
+        <div class="steps-box">
+          <strong>Hướng dẫn cài vào MT5 PC (30 giây):</strong>
+          <ol>
+            <li>Mở MT5 → <code>Tools → Options → Expert Advisors</code> → tick <strong>Allow WebRequest</strong> và dán URL ở trên.</li>
+            <li>Copy file <code>.mq5</code> vào <code>MQL5/Experts/</code> → mở file bằng MetaEditor bấm <strong>F7 (Compile)</strong>.</li>
+            <li>Kéo <strong>SilentEyes_Copier</strong> vào biểu đồ <code>XAUUSD</code> và bật <strong>Algo Trading</strong> (Key 24h đã gắn sẵn).</li>
+          </ol>
+        </div>
+        <button id="btnNewOrderPaid" class="link-reset">Gia hạn / Tạo đơn 24h mới</button>
+      </div>
     </div>
   </div>
 
@@ -737,6 +974,194 @@
 
     startLive();
     requestAnimationFrame(renderLoop);
+
+    // === PAYWALL MOMO 10.000Đ / 24H CHO FILE .MQ5 ===
+    const copyModal = document.getElementById('copyModal');
+    const btnCopyStrat = document.getElementById('btnCopyStrat');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const payStepIntro = document.getElementById('payStepIntro');
+    const payStepQr = document.getElementById('payStepQr');
+    const payStepPaid = document.getElementById('payStepPaid');
+    const btnCreateOrder = document.getElementById('btnCreateOrder');
+    const introErr = document.getElementById('introErr');
+    const momoQrImg = document.getElementById('momoQrImg');
+    const orderCodeText = document.getElementById('orderCodeText');
+    const btnCopyCode = document.getElementById('btnCopyCode');
+    const payStatusBanner = document.getElementById('payStatusBanner');
+    const btnNewOrder = document.getElementById('btnNewOrder');
+    const paidCodeText = document.getElementById('paidCodeText');
+    const paidCountdown = document.getElementById('paidCountdown');
+    const btnDownloadMq5 = document.getElementById('btnDownloadMq5');
+    const eaApiUrlText = document.getElementById('eaApiUrlText');
+    const btnCopyApiUrl = document.getElementById('btnCopyApiUrl');
+    const btnNewOrderPaid = document.getElementById('btnNewOrderPaid');
+
+    let payPollTimer = null;
+    let activeOrderCode = localStorage.getItem('silent_eyes_order_code') || '';
+    let activeDownloadUrl = '';
+
+    function stopPayPoll() {
+      if (payPollTimer) { clearInterval(payPollTimer); payPollTimer = null; }
+    }
+
+    function fmtCountdown(sec) {
+      if (!sec || sec <= 0) return 'Đã hết hạn';
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${h}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+    }
+
+    function copyTextWithFeedback(btn, text) {
+      if (!text) return;
+      navigator.clipboard?.writeText(text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Đã copy ✓';
+        setTimeout(() => { btn.textContent = old; }, 1400);
+      }).catch(() => {});
+    }
+
+    document.querySelectorAll('.mini-copy[data-copy]').forEach((btn) => {
+      btn.onclick = () => copyTextWithFeedback(btn, btn.getAttribute('data-copy'));
+    });
+
+    async function getApiBase() {
+      let base = apiUrlInput.value.trim().replace(/\/+$/, '');
+      if (!base) {
+        await resolveDefaultTunnel(true);
+        base = apiUrlInput.value.trim().replace(/\/+$/, '');
+      }
+      return base;
+    }
+
+    function showPayView(view) {
+      payStepIntro.style.display = view === 'intro' ? 'block' : 'none';
+      payStepQr.style.display = view === 'qr' ? 'block' : 'none';
+      payStepPaid.style.display = view === 'paid' ? 'block' : 'none';
+    }
+
+    function renderOrderState(data, apiBase) {
+      if (!data || !data.order_code) return;
+      activeOrderCode = data.order_code;
+      localStorage.setItem('silent_eyes_order_code', activeOrderCode);
+
+      if (data.status === 'PAID') {
+        stopPayPoll();
+        paidCodeText.textContent = activeOrderCode;
+        paidCountdown.textContent = fmtCountdown(data.remaining_sec);
+        const eaBase = data.api_base_url || apiBase;
+        eaApiUrlText.textContent = eaBase;
+        btnCopyApiUrl.onclick = () => copyTextWithFeedback(btnCopyApiUrl, eaBase);
+        activeDownloadUrl = `${apiBase}/api/silenteyes/download-mq5?code=${encodeURIComponent(activeOrderCode)}`;
+        showPayView('paid');
+        return;
+      }
+
+      if (data.status === 'EXPIRED') {
+        stopPayPoll();
+        localStorage.removeItem('silent_eyes_order_code');
+        activeOrderCode = '';
+        introErr.textContent = 'Mã bản quyền 24h trước đã hết hạn. Bấm bên trên để tạo đơn mới (10.000đ).';
+        showPayView('intro');
+        return;
+      }
+
+      orderCodeText.textContent = activeOrderCode;
+      momoQrImg.src = data.qr_url;
+      btnCopyCode.onclick = () => copyTextWithFeedback(btnCopyCode, activeOrderCode);
+      payStatusBanner.textContent = '⏳ Đang chờ MoMo 0977098166 xác nhận chuyển khoản 10.000đ...';
+      showPayView('qr');
+    }
+
+    async function pollOrderStatus() {
+      if (!activeOrderCode) return;
+      const base = await getApiBase();
+      if (!base) return;
+      try {
+        const res = await fetch(`${base}/api/silenteyes/order-status?code=${encodeURIComponent(activeOrderCode)}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.found) {
+          renderOrderState(data, base);
+        } else {
+          stopPayPoll();
+          localStorage.removeItem('silent_eyes_order_code');
+          activeOrderCode = '';
+          showPayView('intro');
+        }
+      } catch (_) {}
+    }
+
+    function startPayPoll() {
+      stopPayPoll();
+      payPollTimer = setInterval(pollOrderStatus, 3000);
+    }
+
+    async function createNewOrder() {
+      introErr.textContent = '';
+      btnCreateOrder.disabled = true;
+      btnCreateOrder.textContent = '⏳ Đang tạo mã QR MoMo...';
+      try {
+        const base = await getApiBase();
+        if (!base) throw new Error('Chưa kết nối được máy chủ.');
+        const res = await fetch(`${base}/api/silenteyes/create-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Không tạo được đơn.');
+        renderOrderState(data, base);
+        startPayPoll();
+      } catch (err) {
+        introErr.textContent = 'Lỗi: ' + (err.message || err);
+        showPayView('intro');
+      } finally {
+        btnCreateOrder.disabled = false;
+        btnCreateOrder.textContent = '💳 Thanh toán 10.000đ qua MoMo để tải .mq5';
+      }
+    }
+
+    btnCopyStrat.onclick = async () => {
+      copyModal.classList.add('open');
+      introErr.textContent = '';
+      if (activeOrderCode) {
+        await pollOrderStatus();
+        if (activeOrderCode && payStepQr.style.display === 'block') {
+          startPayPoll();
+        }
+      } else {
+        showPayView('intro');
+      }
+    };
+
+    btnCloseModal.onclick = () => {
+      copyModal.classList.remove('open');
+      stopPayPoll();
+    };
+    copyModal.addEventListener('click', (e) => {
+      if (e.target === copyModal) {
+        copyModal.classList.remove('open');
+        stopPayPoll();
+      }
+    });
+
+    btnCreateOrder.onclick = createNewOrder;
+    btnNewOrder.onclick = () => {
+      stopPayPoll();
+      localStorage.removeItem('silent_eyes_order_code');
+      activeOrderCode = '';
+      createNewOrder();
+    };
+    btnNewOrderPaid.onclick = () => {
+      stopPayPoll();
+      localStorage.removeItem('silent_eyes_order_code');
+      activeOrderCode = '';
+      createNewOrder();
+    };
+    btnDownloadMq5.onclick = () => {
+      if (activeDownloadUrl) window.location.href = activeDownloadUrl;
+    };
   </script>
 </body>
 </html>
