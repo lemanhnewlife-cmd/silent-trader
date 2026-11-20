@@ -74,7 +74,6 @@
         </div>
         <div class="head-actions">
           <input id="apiUrlInput" type="text" placeholder="URL Server / Tunnel" style="display:none;background:#0f172a;color:#e2e8f0;border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:12px;width:220px;" />
-          <button type="button" class="btn-sub" id="btnSettings" title="Cấu hình Server API">⚙ API</button>
           <button type="button" class="btn-sub" id="btnScrollHist">📜 Lịch sử ($10k)</button>
           <button type="button" class="btn-cta" id="btnOpenPay">⚡ TẢI ${esc(EA_NAME.toUpperCase())}.EX5</button>
         </div>
@@ -211,9 +210,6 @@
   const startedAt = performance.now();
 
   apiUrlInput.value = paramApi ? paramApi : (isHostedOnBackend ? window.location.origin : '');
-  document.getElementById('btnSettings').onclick = () => {
-    apiUrlInput.style.display = apiUrlInput.style.display === 'none' ? 'inline-block' : 'none';
-  };
   apiUrlInput.addEventListener('input', () => {
     customApiOverride = apiUrlInput.value.trim().length > 0;
   });
