@@ -20,14 +20,7 @@ window.SilentRenderers.ISING = function(ctx, w, h, st) {
     const topH = h - 2 * pad;
 
     // 1. Left: 5x3 Spin Matrix
-    const spinsRaw = tel.spins || '';
-    let spins = [];
-    try {
-        if (typeof spinsRaw === 'string' && spinsRaw.includes('sample=')) {
-            const jsonStr = spinsRaw.split('sample=')[1].replace(/'/g, '"');
-            spins = JSON.parse(jsonStr);
-        }
-    } catch(e) {}
+    const spins = Array.isArray(tel.spins) ? tel.spins : [];
 
     const cols = 5, rows = 3;
     const cellW = leftW / cols;
@@ -78,13 +71,7 @@ window.SilentRenderers.ISING = function(ctx, w, h, st) {
     ctx.strokeStyle = '#334155';
     ctx.strokeRect(num(rightX), num(pad), num(rightW), num(chartH));
     
-    const magRaw = tel.mag_series || '';
-    let magData = [];
-    try {
-        if (typeof magRaw === 'string' && magRaw.includes('sample=')) {
-            magData = JSON.parse(magRaw.split('sample=')[1].replace(/'/g, '"'));
-        }
-    } catch(e) {}
+    const magData = Array.isArray(tel.mag_series) ? tel.mag_series.map(v => num(v, 0)) : [];
 
     if (magData.length > 1) {
         ctx.beginPath();

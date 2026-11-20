@@ -33,32 +33,29 @@ window.SilentRenderers.VORTEX = function(ctx, w, h, st) {
     });
 
     // 2. Draw Orbit (Comet effect)
-    let ox = [], oy = [];
-    try {
-        if (typeof tel.orbit_x === 'string') {
-            ox = JSON.parse(tel.orbit_x.split('sample=')[1]);
-            oy = JSON.parse(tel.orbit_y.split('sample=')[1]);
-        }
-    } catch(e) {}
+    const ox = Array.isArray(tel.orbit_x) ? tel.orbit_x.map(v => num(v, 0)) : [];
+    const oy = Array.isArray(tel.orbit_y) ? tel.orbit_y.map(v => num(v, 0)) : [];
+    const nOrb = Math.min(ox.length, oy.length);
 
-    if (ox.length > 1) {
-        for (let i = 1; i < ox.length; i++) {
-            const alpha = i / ox.length;
+    if (nOrb > 1) {
+        const ptScale = scale * 0.5;
+        for (let i = 1; i < nOrb; i++) {
+            const alpha = i / nOrb;
             ctx.beginPath();
             ctx.strokeStyle = alpha > 0.8 ? '#22d3ee' : '#c084fc';
-            ctx.globalAlpha = alpha * 0.6;
-            ctx.lineWidth = 1 + alpha * 3;
-            ctx.moveTo(centerX + num(ox[i-1]) * scale, centerY - num(oy[i-1]) * scale);
-            ctx.lineTo(centerX + num(ox[i]) * scale, centerY - num(oy[i]) * scale);
+            ctx.globalAlpha = alpha * 0.75;
+            ctx.lineWidth = 1 + alpha * 2.5;
+            ctx.moveTo(centerX + clamp(ox[i - 1], -3.2, 3.2) * ptScale, centerY - clamp(oy[i - 1], -3.2, 3.2) * ptScale);
+            ctx.lineTo(centerX + clamp(ox[i], -3.2, 3.2) * ptScale, centerY - clamp(oy[i], -3.2, 3.2) * ptScale);
             ctx.stroke();
         }
         ctx.globalAlpha = 1.0;
         // Head vector
-        const lastX = centerX + num(ox[ox.length-1]) * scale;
-        const lastY = centerY - num(oy[oy.length-1]) * scale;
+        const lastX = centerX + clamp(ox[nOrb - 1], -3.2, 3.2) * ptScale;
+        const lastY = centerY - clamp(oy[nOrb - 1], -3.2, 3.2) * ptScale;
         ctx.fillStyle = '#22d3ee';
         ctx.beginPath();
-        ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+        ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
         ctx.fill();
     }
 
