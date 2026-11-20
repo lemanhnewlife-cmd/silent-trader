@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sơ Đồ Kiến Trúc Chuẩn - 01 Master Gốc & 1.000 Master Ảo Song Song</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background-color: #121316;
+      color: #e5e7eb;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+    }
+    .diagram-container {
+      width: 100%;
+      max-width: 1380px;
+      background-color: #16181d;
+      border: 1px solid #2d3139;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Kiến Trúc Hoàn Chỉnh: 01 MT5 Master (Cột Trái) &amp; 1.000 MT5 Master Ảo (Cột Phải) Chạy Song Song</h1>
+
+  <div class="diagram-container">
+    <pre class="mermaid">
+%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'background': '#121316', 'primaryColor': '#1e2028', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#3a3f4b', 'lineColor': '#8b949e', 'secondaryColor': '#16181d', 'tertiaryColor': '#1e2028'}}}%%
+flowchart TD
+    subgraph S1["1. NGUỒN CHIẾN LƯỢC GỐC (GITHUB STRATEGY POOL)"]
+        GH["<b>1.000 GitHub Trading Repos</b><br/>(Kho mã nguồn chiến lược gốc cấp cho các Đấu trường Agents)"]
+    end
+
+    subgraph S2["2. HỆ THỐNG 01 MT5 MASTER GỐC (CỘT TRÁI) & 1.000 MT5 MASTER ẢO (CỘT PHẢI) CHẠY SONG SONG"]
+        %% CỘT TRÁI: 01 MT5 MASTER GỐC
+        A_ORIG["<b>[NHÁNH A - CỘT TRÁI]<br/>Đấu trường của 01 MT5 Master Gốc</b><br/>(1.000 Agents chạy lệnh ảo Real-time)"]
+        B_ORIG["<b>Tính Balance & Lọc Top 200</b><br/>(Lấy 200 lệnh có Balance cao nhất)"]
+        M_ORIG["<b>01 MT5 MASTER GỐC (BLUEPRINT)</b><br/>(Copy Top 200 lệnh Balance cao nhất)"]
+
+        %% CỘT PHẢI: 1.000 MT5 MASTER ẢO
+        A_CLONE["<b>[NHÁNH B - CỘT PHẢI]<br/>1.000 Đấu trường riêng của 1.000 Master Ảo</b><br/>(Mỗi đấu trường chạy các biến thể tham số/cặp tiền)"]
+        B_CLONE["<b>Tính Balance trên từng Đấu trường riêng</b><br/>(ORDER BY balance DESC LIMIT 200 cho mỗi Master Ảo)"]
+        M_CLONE["<b>1.000 MT5 MASTER ẢO (ST-MASTER-0001 -> 1000)</b><br/>(Mỗi Master Ảo lấy 200 lệnh Balance cao nhất từ đấu trường riêng của nó)"]
+        DB_CLONE["<b>SQLite: multi_symbol_1000_arena.db</b><br/>(Tính Balance, Profit Factor, Winrate, MDD của 1.000 Master Ảo)"]
+
+        %% LUỒNG DỌC CỘT TRÁI
+        A_ORIG -->|Tính Balance thực tế| B_ORIG
+        B_ORIG -->|Nạp Top 200 lệnh| M_ORIG
+
+        %% LUỒNG DỌC CỘT PHẢI
+        A_CLONE -->|Tính Balance từng đấu trường| B_CLONE
+        B_CLONE -->|Lấy 200 lệnh/Master Ảo| M_CLONE
+        M_CLONE -->|Ghi nhận hiệu suất Real-time| DB_CLONE
+
+        %% MŨI TÊN NHÂN GIỐNG NỐI NGANG TỪ CỘT TRÁI SANG CỘT PHẢI
+        M_ORIG -.->|Nhân giống cấu trúc sang 1.000 Master Ảo| M_CLONE
+    end
+
+    subgraph S3["3. BỘ LỌC TUYỂN CHỌN TOP 100 PROFIT FACTOR"]
+        F100["<b>BỘ LỌC WEB: Top 100 MT5 Master Ảo có Profit Factor (PF) Cao Nhất</b><br/>(ORDER BY profit_factor DESC LIMIT 100)"]
+    end
+
+    subgraph S4["4. CỔNG WEB THƯ VIỆN CHIẾN LƯỢC SILENT TRADER"]
+        WS["<b>Web Server & Signal API (Port 3000)</b><br/>(server.py + REST API / WebSocket)"]
+        CF["<b>Cloudflare Public Tunnel</b><br/>(https://...trycloudflare.com)"]
+        UI["<b>GIAO DIỆN WEB CHO KHÁCH HÀNG (THƯ VIỆN CHIẾN LƯỢC SILENT TRADER)</b><br/>• Bảng Xếp Hạng Top 100 Master Ảo PF Cao Nhất Real-time (Sắp xếp ▲/▼ từng cột)<br/>• Khung vốn đề xuất: 5.000 USC Cent | $5.000 USD<br/>• Tải phần mềm riêng theo từng chiến lược trong Top 100 PF (.ZIP)"]
+
+        WS --> CF --> UI
+    end
+
+    subgraph S5["5. HỆ THỐNG CẤP PHÁT BẢN QUYỀN (LICENSE ENGINE)"]
+        LK["<b>license_keys.db</b><br/>(Lưu trữ Key, HWID, MT5_Login, Hạn 7 ngày)"]
+        AP["<b>Auto-Packager Engine</b><br/>(Đóng gói: Exe + JSON Profile ST-PRO-XXX ký HMAC + Key 7 ngày)"]
+    end
+
+    subgraph S6["6. PHẦN MỀM SAO CHÉP LỆNH (CLIENT COPIER)"]
+        EXE["<b>SilentAgentCopier.exe (Portable 23.58 MB)</b><br/>• Khóa cứng theo từng Master Ảo thuộc Top 100 PF (ST-PRO-XXX)<br/>• Mặc định TẮT COPY (Khách tự bật)<br/>• 4 Mức Risk: An toàn 0.05% (mặc định), 0.1%, 0.2%, 0.3%<br/>• Vốn đề xuất: 5.000 USC Cent / $5.000 USD"]
+    end
+
+    subgraph S7["7. TÀI KHOẢN GIAO DỊCH CỦA KHÁCH"]
+        MT5C["<b>MetaTrader 5 (MT5) của Khách</b><br/>(TK Cent Exness hoặc TK Standard)"]
+    end
+
+    %% PHÂN NHÁNH SONG SONG TỪ GITHUB REPOS
+    GH -->|Khởi tạo 1.000 Agents gốc| A_ORIG
+    GH -->|Khởi tạo 1.000 Đấu trường riêng| A_CLONE
+
+    %% LỌC TOP 100 PF ĐƯA LÊN WEB SERVER
+    DB_CLONE -->|ORDER BY profit_factor DESC LIMIT 100| F100
+    F100 -->|Cập nhật Top 100 Master Ảo PF cao nhất & Tín hiệu lệnh| WS
+
+    %% LUỒNG TẢI VỀ, ĐÓNG GÓI & BẢN QUYỀN
+    UI -->|Bấm tải về chiến lược ST-PRO-XXX| AP
+    WS -->|Tạo Key & Kiểm tra lịch sử Trial| LK
+    WS -->|Truyền cấu hình chiến lược| AP
+    AP -->|Cung cấp bản cài đặt riêng (.ZIP)| EXE
+    EXE -->|Xác thực Key + Khóa cứng HWID & MT5_Login qua /api/activate_key| WS
+
+    %% LUỒNG TÍN HIỆU SAO CHÉP QUA SERVER (ĐÃ KIỂM TRA KEY CÒN HẠN)
+    WS -.->|Truyền tín hiệu lệnh Real-time của Master Ảo thuộc Top 100 PF đã chọn| EXE
+    EXE -->|Tự tính Lot (min 0.01) & Khớp lệnh trực tiếp| MT5C
+    </pre>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      flowchart: {
+        curve: 'basis',
+        useMaxWidth: false
+      }
+    });
+  </script>
+</body>
+</html>

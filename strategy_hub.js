@@ -164,6 +164,14 @@ window.StrategyHub = (() => {
 
         return `
           <tr class="${isCur ? 'hub-row-active' : ''}">
+            <td>
+              <div style="display:flex;gap:5px;">
+                <button type="button" class="hub-act-btn hub-act-view"
+                  onclick="window.StrategyHub._navigate('${_esc(s.page)}', { manual: '1' })">👁 Xem</button>
+                <button type="button" class="hub-act-btn hub-act-copy"
+                  onclick="window.StrategyHub._triggerCopy('${_esc(s.page)}', ${isCur})">⚡ Tải .ex5</button>
+              </div>
+            </td>
             <td style="font-weight:800;">${_medal(s.rank)}</td>
             <td>
               <div style="font-weight:700;color:#f8fafc;">${_esc(s.icon)} ${_esc(s.short_name)} ${
@@ -185,14 +193,6 @@ window.StrategyHub = (() => {
             <td style="font-family:ui-monospace,monospace;">${Number(s.profit_factor || 0).toFixed(2)}</td>
             <td style="font-family:ui-monospace,monospace;color:#f87171;">${Number(s.max_dd_pct || 0).toFixed(2)}%</td>
             <td>${openBadge}</td>
-            <td>
-              <div style="display:flex;gap:5px;">
-                <button type="button" class="hub-act-btn hub-act-view"
-                  onclick="window.StrategyHub._navigate('${_esc(s.page)}', { manual: '1' })">👁 Xem</button>
-                <button type="button" class="hub-act-btn hub-act-copy"
-                  onclick="window.StrategyHub._triggerCopy('${_esc(s.page)}', ${isCur})">⚡ Tải .ex5</button>
-              </div>
-            </td>
           </tr>
         `;
       })
@@ -241,6 +241,7 @@ window.StrategyHub = (() => {
               <table class="hub-table">
                 <thead>
                   <tr>
+                    <th>Thao tác</th>
                     <th>Hạng</th>
                     <th>Chiến lược &amp; Công nghệ</th>
                     <th>Equity ($10k)</th>
@@ -249,7 +250,6 @@ window.StrategyHub = (() => {
                     <th>PF</th>
                     <th>MaxDD</th>
                     <th>Vị thế</th>
-                    <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="hubTableBody"></tbody>

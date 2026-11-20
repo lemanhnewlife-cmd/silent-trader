@@ -3,94 +3,3164 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thư Viện Chiến Lược Silent Trader — Cổng Truy Cập Chính Thức</title>
+  <title>Thư Viện Chiến Lược Silent Trader</title>
   <style>
-    body, html {
+    :root {
+      --bg-main: #070b12;
+      --bg-card: #0d1420;
+      --bg-row: #0f1726;
+      --bg-row-hover: #142036;
+      --border-color: #1c2940;
+      --text-main: #e6edf7;
+      --text-muted: #7f91ad;
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16, 185, 129, 0.12);
+      --accent-red: #f43f5e;
+      --accent-red-bg: rgba(244, 63, 94, 0.12);
+      --accent-gold: #f59e0b;
+      --accent-gold-bg: rgba(245, 158, 11, 0.14);
+      --accent-blue: #3b82f6;
+      --accent-blue-bg: rgba(59, 130, 246, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #070b12;
-      color: #e6edf7;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      overflow: hidden;
     }
-    .loader-screen {
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      font-size: 13px;
+      line-height: 1.35;
+      padding: 8px 14px;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    /* TOP HEADER */
+    .header-bar {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 6px 14px;
+      margin-bottom: 6px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .brand-logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #059669, #10b981);
+      display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      text-align: center;
-      padding: 20px;
-    }
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid rgba(16, 185, 129, 0.2);
-      border-top-color: #10b981;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 16px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .title {
-      font-size: 18px;
       font-weight: 800;
-      color: #10b981;
+      font-size: 12px;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .brand-title span {
+      color: var(--accent-green);
+    }
+
+    .engine-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #04130d;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 7px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.22);
+    }
+
+    .clock-box {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    .clock-box strong {
+      color: var(--text-main);
+    }
+
+    .clock-sub {
+      color: var(--accent-green);
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+
+    @media (min-width: 769px) and (max-width: 1440px) {
+      .header-bar {
+        padding: 5px 10px;
+        gap: 6px;
+        flex-wrap: nowrap;
+      }
+
+      .brand-title {
+        font-size: 13.5px;
+      }
+
+      .header-actions {
+        gap: 7px;
+        flex-wrap: nowrap;
+      }
+
+      .btn-download,
+      .btn-support-header {
+        font-size: 11px;
+        padding: 5px 9px;
+      }
+
+      .clock-box {
+        font-size: 10.5px;
+        white-space: nowrap;
+      }
+    }
+
+    /* MT5 LIVE TICK STREAM BAR (COMPACT QUANT STRIP) */
+    .mt5-verify-bar {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 9px;
+      padding: 5px 10px;
+      margin-bottom: 6px;
+      gap: 5px;
+    }
+
+    .mt5-top-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .mt5-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.38);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .mt5-status-pill.offline {
+      background: var(--accent-red-bg);
+      color: var(--accent-red);
+      border-color: rgba(244, 63, 94, 0.38);
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .ticker-open-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ticker-closed-strip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      width: 100%;
+      padding-top: 4px;
+      border-top: 1px dashed #1a263d;
+    }
+
+    .ticker-chip {
+      height: 26px;
+      background: #121c2d;
+      border: 1px solid #22324d;
+      border-radius: 6px;
+      padding: 0 8px;
+      font-size: 11px;
+      font-family: Consolas, monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .ticker-chip.open-pair {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.42);
+    }
+
+    .ticker-chip.closed-pair {
+      background: #0f1726;
+      border: 1px solid #1d2b44;
+      padding: 0 7px;
+      font-size: 11px;
+      opacity: 0.65;
+    }
+
+    .ticker-sym {
+      color: #60a5fa;
+      font-weight: 800;
+    }
+
+    .ticker-chip.open-pair .ticker-sym {
+      color: #34d399;
+    }
+
+    .ticker-price {
+      color: #f8fafc;
+      font-weight: 700;
+    }
+
+    .btn-toggle-closed {
+      height: 26px;
+      padding: 0 9px;
+      border-radius: 6px;
+      background: #111b2d;
+      border: 1px solid #283d60;
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+
+    .btn-toggle-closed:hover {
+      background: #182640;
+      color: #bfdbfe;
+    }
+
+    .mt5-time-tag {
+      font-size: 11px;
+      color: var(--accent-green);
+      font-weight: 600;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+
+    /* COMPACT ONBOARDING GUIDE STRIP (DESKTOP 1-ROW INLINE, MOBILE STACKED) */
+    .guide-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 10px;
+      margin-bottom: 6px;
+      padding: 6px 12px;
+      background: linear-gradient(90deg, rgba(16, 26, 46, 0.94), rgba(14, 23, 39, 0.94));
+      border: 1px solid rgba(56, 189, 248, 0.24);
+      border-radius: 8px;
+      font-size: 11.5px;
+      line-height: 1.35;
+      color: #cbd5e1;
+    }
+
+    .guide-item strong {
+      color: #f8fafc;
+      font-weight: 700;
+    }
+
+    .guide-sep {
+      color: var(--text-muted);
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    /* SUMMARY STATS ROW (4 COMPACT KPI CARDS) */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
       margin-bottom: 6px;
     }
-    .sub {
+
+    .stat-pill {
+      height: 38px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .stat-pill strong {
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1280px) {
+      .stats-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .brand-group {
+        flex-wrap: wrap;
+        gap: 6px;
+        max-width: 100%;
+      }
+
+      .brand-title {
+        font-size: 14px;
+      }
+
+      .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+
+      .btn-download {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+      }
+
+      .clock-box {
+        width: 100%;
+        text-align: left;
+      }
+
+      .guide-strip {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 8px 10px;
+        font-size: 11.5px;
+      }
+
+      .guide-sep {
+        display: none;
+      }
+
+      .mt5-top-row {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .mt5-status-pill {
+        max-width: 100%;
+      }
+
+      .ticker-open-strip {
+        flex: 1 1 100%;
+        width: 100%;
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: 6px;
+        overflow: visible;
+      }
+
+      .mt5-time-tag {
+        width: 100%;
+        margin-left: 0;
+        white-space: normal;
+        font-size: 11px;
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .stat-pill {
+        height: auto;
+        min-height: 34px;
+        padding: 6px 10px;
+        white-space: normal;
+        overflow: visible;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 8px 10px;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .filter-group select,
+      .filter-group input {
+        flex: 1 1 calc(50% - 6px);
+        min-width: 130px;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      #search-bot {
+        width: 100% !important;
+        flex: 1 1 100%;
+      }
+
+      .top-key-vault {
+        width: 100%;
+        height: auto;
+        min-height: 34px;
+        padding: 4px 6px;
+        box-sizing: border-box;
+      }
+
+      .top-key-label {
+        font-size: 10.5px;
+        flex-shrink: 0;
+      }
+
+      .top-key-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto !important;
+        font-size: 11px !important;
+      }
+
+      .btn-top-copy {
+        flex-shrink: 0;
+        padding: 0 10px;
+      }
+
+      .table-wrapper {
+        max-height: 70vh;
+        overflow-x: auto;
+      }
+    }
+
+    /* FILTER + KEY BOX BAR */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 9px;
+      min-height: 36px;
+      padding: 4px 10px;
+      margin-bottom: 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    select, input[type="text"] {
+      height: 28px;
+      background: #111a2b;
+      color: var(--text-main);
+      border: 1px solid #243552;
+      border-radius: 6px;
+      padding: 0 8px;
+      font-size: 11.5px;
+      outline: none;
+    }
+
+    /* DEDICATED TOP KEY BOX (Ô CHỨA KEY) */
+    .top-key-vault {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      background: #0a101d;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: 7px;
+      padding: 0 6px;
+    }
+
+    .top-key-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent-gold);
+      white-space: nowrap;
+    }
+
+    .top-key-input {
+      height: 22px !important;
+      background: #131d31 !important;
+      color: #fbbf24 !important;
+      border: 1px solid #2d4268 !important;
+      font-family: Consolas, monospace;
+      font-weight: 800;
+      font-size: 11px !important;
+      width: 266px;
+      text-align: center;
+      letter-spacing: 0.1px;
+    }
+
+    .btn-top-copy {
+      height: 22px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #111;
+      border: none;
+      border-radius: 5px;
+      padding: 0 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    /* LEADERBOARD TABLE */
+    .table-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      max-height: calc(100vh - 235px);
+      min-height: 340px;
+      overflow-y: auto;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #243552 #090e18;
+    }
+
+    .table-wrapper::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: #090e18;
+      border-radius: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #243552;
+      border-radius: 6px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #3b5582;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #0b111c;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 7px 7px;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 1px 0 var(--border-color);
+      text-align: center;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    thead th.sortable {
+      cursor: pointer;
+    }
+
+    thead th.active-sort {
+      color: var(--accent-green);
+      border-bottom: 2px solid var(--accent-green);
+    }
+
+    tbody tr {
+      background: var(--bg-row);
+      border-bottom: 1px solid #162238;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-row-hover);
+    }
+
+    tbody td {
+      padding: 6px 7px;
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 24px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: #111; }
+    .rank-2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #111; }
+    .rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+
+    .bot-cell {
+      text-align: left;
+    }
+
+    .bot-name {
+      font-weight: 800;
       font-size: 13px;
-      color: #7f91ad;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 3px;
+    }
+
+    .bot-tags {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tag-id {
+      font-size: 10px;
+      font-family: Consolas, monospace;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-weight: 700;
+    }
+
+    .tag-dna {
+      font-size: 10px;
+      font-family: Consolas, monospace;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--accent-gold-bg);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .tag-gen {
+      font-size: 9.5px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--accent-blue-bg);
+      color: #60a5fa;
+      font-weight: 700;
+    }
+
+    .symbol-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #131f33;
+      border: 1px solid #253859;
+      color: #93c5fd;
+      font-weight: 800;
+      font-size: 11px;
+      font-family: Consolas, monospace;
+    }
+
+    /* OPEN POSITION */
+    .pos-box {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .pos-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pos-side {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .pos-buy {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .pos-sell {
+      background: rgba(244, 63, 94, 0.16);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.45);
+    }
+
+    .pos-lots {
+      font-family: Consolas, monospace;
+      font-weight: 800;
+      font-size: 11px;
+      color: #e2e8f0;
+    }
+
+    .pos-pnl {
+      font-family: Consolas, monospace;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .pos-pnl-win {
+      background: rgba(16, 185, 129, 0.18);
+      color: #2dd4bf;
+      border: 1px solid rgba(45, 212, 191, 0.45);
+    }
+
+    .pos-pnl-loss {
+      background: rgba(249, 115, 22, 0.16);
+      color: #fb7185;
+      border: 1px solid rgba(251, 113, 133, 0.45);
+    }
+
+    .pos-prices {
+      font-family: Consolas, monospace;
+      font-size: 10.5px;
+      color: #94a3b8;
+    }
+
+    .pos-entry { color: #e2e8f0; font-weight: 600; }
+    .sl-val { color: #fb7185; }
+    .tp-val { color: #34d399; }
+
+    /* ROW ACTION BUTTONS */
+    .btn-copy-key {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-copy-key.copied {
+      background: var(--accent-green);
+      color: #04130d;
+    }
+
+    .btn-history {
+      background: #162236;
+      color: var(--text-main);
+      border: 1px solid #293d5e;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-history:hover {
+      background: #1d2c46;
+      border-color: #3a5480;
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 14, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 860px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+
+    /* CUSTOMER SUPPORT LOGO BUTTON (HEADER SHORTCUT + FLOATING LOGO FAB) */
+    .btn-support-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(16, 185, 129, 0.22));
+      color: #e0f2fe;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: 1px solid rgba(56, 189, 248, 0.55);
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 3px 12px rgba(14, 165, 233, 0.18);
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-support-header:hover {
+      transform: translateY(-1px);
+      border-color: #34d399;
+      box-shadow: 0 5px 16px rgba(16, 185, 129, 0.28);
+    }
+
+    .support-inline-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      flex-shrink: 0;
+    }
+
+    .guide-feedback-btn {
+      margin-left: auto;
+      background: rgba(14, 165, 233, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .guide-feedback-btn:hover {
+      background: rgba(14, 165, 233, 0.26);
+      color: #f0f9ff;
+    }
+
+    .support-logo-fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px 9px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #0b1628 0%, #0f2537 60%, #09352b 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.7);
+      color: #f8fafc;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 18px rgba(16, 185, 129, 0.28);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    }
+
+    .support-logo-fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65), 0 0 24px rgba(56, 189, 248, 0.42);
+    }
+
+    .support-logo-fab.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.96);
+    }
+
+    .support-logo-emblem {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #031510;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+    }
+
+    .support-online-dot {
+      position: absolute;
+      right: -1px;
+      bottom: -1px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #22c55e;
+      border: 2px solid #0b1628;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    .support-logo-text {
+      display: flex;
+      align-items: center;
+      text-align: left;
+      line-height: 1.2;
+    }
+
+    .support-logo-sub {
+      font-size: 12px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 0.2px;
+    }
+
+    .support-live-pill {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.45);
+      text-transform: uppercase;
+    }
+
+    /* LIVE CUSTOMER CHAT DRAWER */
+    .support-chat-panel {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 980;
+      width: 400px;
+      max-width: calc(100vw - 24px);
+      height: 550px;
+      max-height: calc(100vh - 28px);
+      background: #0b1220;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.72), 0 0 24px rgba(14, 165, 233, 0.18);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .support-chat-panel.open {
+      display: flex;
+    }
+
+    .chat-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 13px;
+      background: linear-gradient(135deg, #0f1b30, #0b2430);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .chat-header-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .chat-header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      color: #031510;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-header-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-header-status {
+      font-size: 10.5px;
+      color: #6ee7b7;
+      font-weight: 600;
+    }
+
+    .chat-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .chat-mini-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid #263856;
+      color: #cbd5e1;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chat-mini-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .chat-context-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(245, 158, 11, 0.12);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .chat-context-banner.visible {
+      display: flex;
+    }
+
+    .chat-reg-view {
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .chat-reg-intro {
+      background: rgba(16, 185, 129, 0.09);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      border-radius: 9px;
+      padding: 9px 11px;
+      font-size: 12px;
+      color: #d1fae5;
+      line-height: 1.45;
+    }
+
+    .chat-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .chat-field-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .chat-input,
+    .chat-textarea {
+      width: 100%;
+      background: #121c2e;
+      border: 1px solid #263959;
+      border-radius: 8px;
+      color: #f8fafc;
+      padding: 8px 10px;
+      font-size: 12.5px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .chat-input:focus,
+    .chat-textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18);
+    }
+
+    .chat-cat-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chat-cat-pill {
+      flex: 1;
+      min-width: 88px;
+      background: #121c2e;
+      border: 1px solid #263959;
+      color: #94a3b8;
+      border-radius: 7px;
+      padding: 5px 7px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .chat-cat-pill.active {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+
+    .chat-error-box {
+      display: none;
+      background: rgba(244, 63, 94, 0.14);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      color: #fda4af;
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .chat-error-box.visible {
+      display: block;
+    }
+
+    .chat-submit-btn {
+      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      color: #031510;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: auto;
+    }
+
+    .chat-submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .chat-live-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .chat-customer-bar {
+      padding: 5px 12px;
+      background: #0e1726;
+      border-bottom: 1px solid #1b2a44;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .chat-messages-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #243552 #090e18;
+    }
+
+    .chat-msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%;
+      gap: 3px;
+    }
+
+    .chat-msg-row.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .chat-msg-row.assistant {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .chat-bubble {
+      padding: 8px 11px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .chat-msg-row.user .chat-bubble {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: #ffffff;
+      border-bottom-right-radius: 3px;
+    }
+
+    .chat-msg-row.assistant .chat-bubble {
+      background: #131d31;
+      border: 1px solid #243654;
+      color: #e6edf7;
+      border-bottom-left-radius: 3px;
+    }
+
+    .chat-bubble code {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      font-size: 11px;
+      color: #fcd34d;
+    }
+
+    .chat-msg-meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chat-msg-tag {
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fcd34d;
+      font-weight: 700;
+      font-size: 9.5px;
+    }
+
+    .chat-typing {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: #6ee7b7;
+      flex-shrink: 0;
+    }
+
+    .chat-typing.visible {
+      display: flex;
+    }
+
+    .chat-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 5px 10px;
+      border-top: 1px solid #162238;
+      background: #0a101c;
+      flex-shrink: 0;
+    }
+
+    .chat-quick-chip {
+      background: #131e33;
+      border: 1px solid #25395b;
+      color: #93c5fd;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .chat-quick-chip:hover {
+      background: #1b2c4a;
+      color: #ffffff;
+    }
+
+    .chat-composer {
+      padding: 8px 10px;
+      border-top: 1px solid var(--border-color);
+      background: #0d1524;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .chat-composer-cats {
+      display: flex;
+      gap: 5px;
+    }
+
+    .chat-composer-cat {
+      background: #131d31;
+      border: 1px solid #233452;
+      color: #94a3b8;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chat-composer-cat.active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+
+    .chat-composer-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+    }
+
+    .chat-composer-row textarea {
+      flex: 1;
+      resize: none;
+      height: 38px;
+      max-height: 90px;
+      background: #121c2e;
+      border: 1px solid #283c5e;
+      border-radius: 8px;
+      color: #f8fafc;
+      padding: 8px 10px;
+      font-size: 12.5px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .chat-send-btn {
+      height: 38px;
+      padding: 0 13px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      color: #031510;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .support-toast {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      z-index: 940;
+      background: #0f1b2e;
+      border: 1px solid rgba(16, 185, 129, 0.55);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+      color: #e2e8f0;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+      max-width: calc(100vw - 36px);
+    }
+
+    .support-toast.visible {
+      display: flex;
+    }
+
+    .support-toast-btn {
+      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      color: #031510;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .btn-support-header {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+      }
+
+      .guide-feedback-btn {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .support-logo-fab {
+        right: 12px;
+        bottom: 12px;
+        padding: 8px 12px 8px 8px;
+        gap: 8px;
+      }
+
+      .support-live-pill {
+        display: none;
+      }
+
+      .support-chat-panel {
+        right: 8px;
+        bottom: 8px;
+        width: calc(100vw - 16px);
+        height: 82vh;
+        max-height: calc(100vh - 16px);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="loader-screen" id="loader">
-    <div class="spinner"></div>
-    <div class="title">THƯ VIỆN CHIẾN LƯỢC SILENT TRADER</div>
-    <div class="sub" id="status-msg">Đang kết nối tới Máy Chủ Định Lượng MT5 Thời Gian Thực...</div>
+  <div class="container">
+    <!-- TOP HEADER -->
+    <div class="header-bar">
+      <div class="brand-group">
+        <div class="brand-logo">ST</div>
+        <div class="brand-title">THƯ VIỆN CHIẾN LƯỢC <span>SILENT TRADER</span></div>
+        <span class="engine-badge">LIVE REAL-TIME ENGINE</span>
+      </div>
+      <div class="header-actions">
+        <a href="/api/download_copier" download class="btn-download">
+          <span>📥 Tải SilentAgentCopier Duy Nhất (.EXE)</span>
+        </a>
+        <button type="button" class="btn-support-header" id="btn-support-header" onclick="openSupportChat('header_btn')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 13v-2a8 8 0 0 1 16 0v2"/>
+            <rect x="2" y="13" width="4" height="6" rx="2"/>
+            <rect x="18" y="13" width="4" height="6" rx="2"/>
+            <path d="M20 19v1a2 2 0 0 1-2 2h-4"/>
+          </svg>
+          <span>Trả Lời Khách Hàng</span>
+          <span class="support-inline-dot" aria-hidden="true"></span>
+        </button>
+        <div class="clock-box">
+          <div>Giờ VN: <strong id="vn-clock">--:--:--</strong> <span style="opacity: 0.85;">(UTC+7)</span></div>
+          <div class="clock-sub">• Vốn Chuẩn $1,000 • Rủi ro $50/lệnh (Tính theo Lot)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HƯỚNG DẪN NHANH CHO NGƯỜI MỚI -->
+    <div class="guide-strip" aria-label="Hướng dẫn nhanh Silent Trader">
+      <span class="guide-item">🏆 <strong>Xếp hạng Top 100/1,000+</strong> chiến lược (30 ngày)</span>
+      <span class="guide-sep">•</span>
+      <span class="guide-item">⚡ Cập nhật real-time <strong>mỗi 2ms</strong> từ MT5</span>
+      <span class="guide-sep">•</span>
+      <span class="guide-item">📌 Xem Lệnh đang chạy có <strong>(Entry / SL / TP)</strong></span>
+      <span class="guide-sep">•</span>
+      <span class="guide-item">🔑 Bấm <strong>Lấy Key</strong> → Dán vào <strong>SilentAgentCopier (.EXE)</strong> để copy chiến lược vào MT5 của bạn trên PC</span>
+      <button type="button" class="guide-feedback-btn" onclick="openSupportChat('guide_strip', 'feedback', 'Phản hồi / Thắc mắc về Silent Trader')">
+        💬 Gửi phản hồi &amp; Hỏi đáp trực tuyến →
+      </button>
+    </div>
+
+    <!-- MT5 LIVE STREAM BAR -->
+    <div class="mt5-verify-bar" id="mt5-verify-bar">
+      <div class="mt5-top-row">
+        <div class="mt5-status-pill" id="mt5-status-badge">
+          <span class="pulse-dot"></span>
+          <span id="mt5-status-text">MT5 LIVE • KHỚP LỆNH TRỰC TIẾP</span>
+        </div>
+        <div class="ticker-open-strip" id="live-ticker-open-strip">
+          <span style="color: var(--text-muted); font-size: 11.5px;">Đang kết nối luồng giá MT5...</span>
+        </div>
+        <button type="button" class="btn-toggle-closed" id="btn-toggle-closed" style="display:none;" onclick="toggleClosedTickers()">
+          🔒 Hiện cặp đóng cửa ▾
+        </button>
+        <div class="mt5-time-tag" id="mt5-last-sync">--</div>
+      </div>
+      <div class="ticker-closed-strip" id="live-ticker-closed-strip" style="display:none;"></div>
+    </div>
+
+    <!-- SUMMARY STATS (4 KPI STRIP) -->
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span>Đã loại: <strong style="color: var(--accent-red);" id="stat-eliminated">0</strong> | Cấy mới: <strong style="color: var(--accent-green);" id="stat-spawned">0</strong></span>
+      </div>
+      <div class="stat-pill">
+        <span>Tổng DNA đã tạo: <strong style="color: var(--accent-gold);" id="stat-total-dna">1,000</strong></span>
+        <span style="font-size: 10.5px; color: var(--accent-green); font-weight: 600;" id="stat-active-count">(1,000 Active)</span>
+      </div>
+      <div class="stat-pill">
+        <span>Dẫn đầu: <strong style="color: var(--accent-green);" id="stat-leader">Silent Trader 0001 (+0.00%)</strong></span>
+      </div>
+      <div class="stat-pill">
+        <span>Cơ chế: <strong style="color: var(--accent-gold);">Cố định SL/TP theo DNA (100% Zero-BE)</strong></span>
+      </div>
+    </div>
+
+    <!-- FILTER BAR + Ô CHỨA KEY TRUNG TÂM -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">🏆 LỌC:</span>
+        <select id="filter-symbol">
+          <option value="ALL">🔄 Tất cả Cặp Giao Dịch</option>
+        </select>
+        <select id="filter-trades">
+          <option value="0">📊 Mọi số lệnh</option>
+          <option value="5">Từ 5 lệnh</option>
+          <option value="10">Từ 10 lệnh</option>
+          <option value="20">Từ 20 lệnh</option>
+        </select>
+        <select id="filter-dd">
+          <option value="100">🛡️ Mọi Max DD</option>
+          <option value="10">DD &lt; 10%</option>
+          <option value="20">DD &lt; 20%</option>
+        </select>
+        <input type="text" id="search-bot" placeholder="🔍 Tìm mã Bot..." style="width: 132px;" />
+      </div>
+
+      <!-- Ô CHỨA KEY KÍCH HOẠT 7 NGÀY -->
+      <div class="top-key-vault">
+        <span class="top-key-label">🔑 KEY 7 NGÀY:</span>
+        <input type="text" id="top-key-box" class="top-key-input" value="ST-PRO-0001" readonly title="Mã Key để dán vào SilentAgentCopier.exe" />
+        <button class="btn-top-copy" id="btn-top-copy" onclick="copyTopVaultKey()">📋 Copy Key</button>
+      </div>
+
+      <div style="color: var(--text-muted); font-size: 11.5px;">
+        Hiển thị: <strong id="visible-count" style="color: #fff;">100</strong> chiến lược
+      </div>
+    </div>
+
+    <!-- LEADERBOARD TABLE -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="rank">HẠNG</th>
+            <th class="sortable" data-sort="name" style="text-align: left;">CHIẾN LƯỢC & MÃ CẤY DNA</th>
+            <th class="sortable" data-sort="symbol">CẶP</th>
+            <th class="sortable" data-sort="status">LỆNH ĐANG MỞ</th>
+            <th class="sortable active-sort" data-sort="growth">TĂNG TRƯỞNG 30 NGÀY ▼</th>
+            <th class="sortable" data-sort="pf">PROFIT FACTOR</th>
+            <th class="sortable" data-sort="winrate">WIN RATE</th>
+            <th class="sortable" data-sort="maxdd">MAX DD</th>
+            <th class="sortable" data-sort="trades">SỐ LỆNH</th>
+            <th>MÃ KEY COPY (7 NGÀY)</th>
+            <th>LỊCH SỬ</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </div>
+
+    <!-- XAUUSD SILENT EYES K-LINE FORECAST -->
+    <section style="margin: 24px 0; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; background: #070b12;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#0e1522; border-bottom:1px solid #1e293b;">
+        <strong style="color:#e2e8f0;">XAUUSD Silent Eyes K-Line Forecast (Ghost Candles &amp; P10–P90 Cone)</strong>
+        <a href="./silenteyes.html" target="_blank" style="color:#38bdf8; font-size:13px; text-decoration:none;">Mở toàn màn hình ↗</a>
+      </div>
+      <iframe
+        src="./silenteyes.html"
+        style="width: 100%; height: 660px; border: none; display: block;"
+        loading="lazy"
+        title="Silent Trader Silent Eyes XAUUSD Forecast">
+      </iframe>
+    </section>
+  </div>
+
+  <!-- TRADE HISTORY MODAL -->
+  <div class="modal-backdrop" id="history-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <strong id="modal-title" style="font-size: 14px;">Lịch Sử Giao Dịch Thực Tế</strong>
+          <div id="modal-subtitle" style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;"></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="chat-mini-btn" id="modal-feedback-btn" onclick="routeHistoryFeedbackToChat()" style="border-color: rgba(56,189,248,0.5); color: #7dd3fc;">💬 Hỏi / Phản hồi Bot này</button>
+          <button class="btn-close" onclick="closeHistoryModal()">✕ Đóng</button>
+        </div>
+      </div>
+      <div class="modal-body" id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- FLOATING CUSTOMER SUPPORT LOGO BUTTON -->
+  <button type="button" class="support-logo-fab" id="support-logo-fab" onclick="openSupportChat('floating_logo')" aria-label="Ô logo hỗ trợ và trả lời khách hàng trực tuyến">
+    <div class="support-logo-emblem" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 13v-2a9 9 0 0 1 18 0v2"/>
+        <rect x="2" y="13" width="4" height="6" rx="2"/>
+        <rect x="18" y="13" width="4" height="6" rx="2"/>
+        <path d="M8 10.5h8M8 14h5"/>
+      </svg>
+      <span class="support-online-dot"></span>
+    </div>
+    <div class="support-logo-text">
+      <span class="support-logo-sub">💬 Hỏi đáp &amp; Phản hồi trực tuyến</span>
+    </div>
+    <span class="support-live-pill">Online 24/7</span>
+  </button>
+
+  <!-- CUSTOMER SUPPORT CHAT PANEL -->
+  <section class="support-chat-panel" id="support-chat-panel" aria-label="Ô chat giải đáp thắc mắc khách hàng trực tuyến">
+    <div class="chat-panel-header">
+      <div class="chat-header-brand">
+        <div class="chat-header-avatar" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 13v-2a9 9 0 0 1 18 0v2"/>
+            <rect x="2" y="13" width="4" height="6" rx="2"/>
+            <rect x="18" y="13" width="4" height="6" rx="2"/>
+            <path d="M20 19v1a2 2 0 0 1-2 2h-4"/>
+          </svg>
+        </div>
+        <div style="min-width: 0;">
+          <div class="chat-header-title">CSKH Trực Tuyến Silent Trader</div>
+          <div class="chat-header-status">● Trực tuyến 24/7 • Lưu lịch sử hỗ trợ</div>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button type="button" class="chat-mini-btn" id="btn-chat-edit-profile" onclick="showChatRegistrationForm(true)" style="display: none;">Đổi SĐT/Tên</button>
+        <button type="button" class="chat-mini-btn" onclick="closeSupportChat()">✕</button>
+      </div>
+    </div>
+
+    <div class="chat-context-banner" id="chat-context-banner">
+      <span id="chat-context-text"></span>
+      <button type="button" class="chat-mini-btn" onclick="clearChatContext()" style="padding: 1px 6px;">✕</button>
+    </div>
+
+    <!-- STEP 1: MANDATORY REGISTRATION (TÊN + SĐT/ZALO) -->
+    <form class="chat-reg-view" id="chat-reg-view" onsubmit="submitChatRegistration(event)">
+      <div class="chat-reg-intro">
+        👋 Chào bạn! Vui lòng nhập <strong>Tên</strong> và <strong>SĐT / Zalo</strong> để hệ thống lưu thông tin hỗ trợ &amp; trả lời trực tuyến ngay cho thắc mắc của bạn.
+      </div>
+
+      <div class="chat-field-group">
+        <label for="chat-customer-name">Họ và Tên / Biệt danh *</label>
+        <input type="text" id="chat-customer-name" class="chat-input" placeholder="VD: Nguyễn Văn Minh" maxlength="80" required />
+      </div>
+
+      <div class="chat-field-group">
+        <label for="chat-customer-contact">Số điện thoại / Zalo liên hệ *</label>
+        <input type="text" id="chat-customer-contact" class="chat-input" placeholder="VD: 0912345678 hoặc @zalo" maxlength="60" required />
+      </div>
+
+      <div class="chat-field-group">
+        <label>Chủ đề phản hồi / hỗ trợ</label>
+        <div class="chat-cat-row" id="reg-cat-row">
+          <button type="button" class="chat-cat-pill active" data-cat="question" onclick="setChatCategory('question')">❓ Thắc mắc</button>
+          <button type="button" class="chat-cat-pill" data-cat="feedback" onclick="setChatCategory('feedback')">📝 Phản hồi</button>
+          <button type="button" class="chat-cat-pill" data-cat="bug_report" onclick="setChatCategory('bug_report')">🛠️ Báo lỗi</button>
+        </div>
+      </div>
+
+      <div class="chat-field-group">
+        <label for="chat-initial-message">Câu hỏi hoặc phản hồi của bạn (có thể gửi ngay)</label>
+        <textarea id="chat-initial-message" class="chat-textarea" rows="3" placeholder="VD: Làm sao lấy Key 7 ngày và cài SilentAgentCopier vào MT5?" maxlength="1500"></textarea>
+      </div>
+
+      <div class="chat-error-box" id="chat-reg-error"></div>
+
+      <button type="submit" class="chat-submit-btn" id="chat-reg-submit">Bắt Đầu Chat Trực Tuyến →</button>
+    </form>
+
+    <!-- STEP 2: LIVE CHAT CONVERSATION -->
+    <div class="chat-live-view" id="chat-live-view">
+      <div class="chat-customer-bar">
+        <span>Khách: <strong id="chat-active-customer" style="color: #f8fafc;">--</strong></span>
+        <span id="chat-active-contact" style="color: #6ee7b7; font-family: Consolas, monospace;">--</span>
+      </div>
+
+      <div class="chat-messages-list" id="chat-messages-list"></div>
+
+      <div class="chat-typing" id="chat-typing-indicator">
+        <span>● ● ● Trợ lý Silent Trader đang trả lời trực tuyến...</span>
+      </div>
+
+      <div class="chat-quick-chips">
+        <button type="button" class="chat-quick-chip" onclick="sendQuickChatPrompt('Làm sao lấy Key 7 ngày và cài SilentAgentCopier vào MT5?', 'question')">🔑 Lấy Key &amp; Cài MT5</button>
+        <button type="button" class="chat-quick-chip" onclick="sendQuickChatPrompt('Tôi cần vốn bao nhiêu để chạy? Tài khoản Exness Cent dùng được không?', 'question')">💰 Vốn Cent / $1,000</button>
+        <button type="button" class="chat-quick-chip" onclick="sendQuickChatPrompt('Cơ chế Zero-BE và SL/TP cố định hoạt động thế nào?', 'question')">🛡️ Cơ chế SL/TP</button>
+        <button type="button" class="chat-quick-chip" onclick="prefillFeedbackMode()">📝 Gửi góp ý / Báo lỗi</button>
+      </div>
+
+      <div class="chat-composer">
+        <div class="chat-composer-cats">
+          <button type="button" class="chat-composer-cat active" data-cat="question" onclick="setChatCategory('question')">❓ Thắc mắc</button>
+          <button type="button" class="chat-composer-cat" data-cat="feedback" onclick="setChatCategory('feedback')">💬 Phản hồi</button>
+          <button type="button" class="chat-composer-cat" data-cat="bug_report" onclick="setChatCategory('bug_report')">🛠️ Báo lỗi</button>
+        </div>
+        <div class="chat-error-box" id="chat-send-error"></div>
+        <div class="chat-composer-row">
+          <textarea id="chat-message-input" placeholder="Nhập thắc mắc hoặc phản hồi của bạn..." maxlength="1500" onkeydown="handleChatKeyDown(event)"></textarea>
+          <button type="button" class="chat-send-btn" id="chat-send-btn" onclick="sendChatMessage()">Gửi ➤</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NON-BLOCKING KEY HELPER TOAST -->
+  <div class="support-toast" id="support-toast" role="status" aria-live="polite">
+    <span id="support-toast-msg"></span>
+    <button type="button" class="support-toast-btn" id="support-toast-action" onclick="openToastChatAction()">💬 Hỏi cách cài</button>
+    <button type="button" class="chat-mini-btn" onclick="hideSupportToast()" style="padding: 2px 6px;">✕</button>
   </div>
 
   <script>
-    const GIST_API_URL = "https://api.github.com/gists/2bf53bd09bbb0594b5f9440c059b0a88";
-    const GIST_RAW_URL = "https://gist.githubusercontent.com/lemanhnewlife-cmd/2bf53bd09bbb0594b5f9440c059b0a88/raw/silent_trader_endpoint.json";
+    let allBots = [];
+    let livePrices = {};
+    let currentSort = { key: "growth", asc: false };
+    let discoveredMainEndpoint = null;
 
-    async function fetchEndpoint() {
-      try {
-        const res = await fetch(GIST_API_URL + "?t=" + Date.now(), { cache: "no-store" });
-        if (res.ok) {
-          const gist = await res.json();
-          const rawContent = gist.files && gist.files["silent_trader_endpoint.json"] && gist.files["silent_trader_endpoint.json"].content;
-          if (rawContent) {
-            return JSON.parse(rawContent);
+    const MAIN_ENDPOINTS = [
+      "/api/strategies",
+      "/api/arena",
+      "/api/leaderboard",
+      "/api/bots",
+      "/api/state",
+      "/api/data",
+      "/api/init"
+    ];
+
+    const PRICE_ENDPOINTS = [
+      "/api/mt5_bridge",
+      "/api/live_prices",
+      "/api/prices",
+      "/api/status",
+      "/mt5_live_prices_bridge.json"
+    ];
+
+    function cleanSymbol(sym) {
+      if (!sym) return "XAUUSD";
+      let s = String(sym).toUpperCase().trim();
+      if (s === "USTE" || s === "USTECC" || s === "NAS100") return "USTEC";
+      if (s === "US30C") return "US30";
+      if (s.endsWith("C") && s.length > 6) s = s.slice(0, -1);
+      return s;
+    }
+
+    function getSymbolDecimals(sym) {
+      const s = cleanSymbol(sym);
+      if (
+        s.includes("XAU") ||
+        s.includes("BTC") ||
+        s.includes("ETH") ||
+        s.includes("USTEC") ||
+        s.includes("US30") ||
+        s.includes("US500") ||
+        s.includes("USOIL") ||
+        s.includes("NAS")
+      ) {
+        return 2;
+      }
+      if (s.includes("JPY")) return 3;
+      return 5;
+    }
+
+    function formatPrice(price, sym) {
+      const num = Number(price);
+      if (!Number.isFinite(num) || num === 0) return "--";
+      return num.toFixed(getSymbolDecimals(sym));
+    }
+
+    function maskAccount(acc) {
+      const s = String(acc || "443050867").trim();
+      if (s.length <= 5) return s;
+      return s.slice(0, 3) + "***" + s.slice(-3);
+    }
+
+    function getBotIdNum(bot, fallbackIdx = 1) {
+      const raw = bot.bot_id ?? bot.id ?? bot.strategy_id ?? bot.rank ?? fallbackIdx;
+      const parsed = parseInt(String(raw).replace(/\D/g, ""), 10);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackIdx;
+    }
+
+    function getBotCopyKey(bot, idx = 1) {
+      if (bot.copy_key) return String(bot.copy_key);
+      if (bot.license_key) return String(bot.license_key);
+      if (bot.strategy_key) return String(bot.strategy_key);
+      if (bot.code && String(bot.code).startsWith("ST-")) return String(bot.code);
+      const padded = String(getBotIdNum(bot, idx)).padStart(4, "0");
+      return `ST-PRO-${padded}`;
+    }
+
+    let lastMt5SyncAt = 0;
+    let lastMt5ServerStamp = "";
+    let lastMt5Online = true;
+
+    function updateMt5SyncDisplay() {
+      const syncEl = document.getElementById("mt5-last-sync");
+      if (!syncEl) return;
+      syncEl.title = lastMt5ServerStamp ? `Cập nhật gần nhất từ MT5: ${lastMt5ServerStamp}` : "";
+      if (!lastMt5SyncAt) {
+        syncEl.textContent = "⏳ Đang đồng bộ MT5 Real-time...";
+        syncEl.style.color = "var(--text-muted)";
+        return;
+      }
+      const sec = Math.max(0, Math.floor((Date.now() - lastMt5SyncAt) / 1000));
+      if (!lastMt5Online || sec >= 10) {
+        syncEl.textContent = `⚠️ Trễ tín hiệu (${sec}s trước)`;
+        syncEl.style.color = "var(--accent-red)";
+      } else if (sec <= 2) {
+        syncEl.textContent = `⚡ Đồng bộ MT5 Real-time • Vừa xong (${sec}s trước)`;
+        syncEl.style.color = "var(--accent-green)";
+      } else {
+        syncEl.textContent = `⚡ Đồng bộ MT5 Real-time • ${sec}s trước`;
+        syncEl.style.color = "var(--accent-gold)";
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const vnTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+      const hh = String(vnTime.getHours()).padStart(2, "0");
+      const mm = String(vnTime.getMinutes()).padStart(2, "0");
+      const ss = String(vnTime.getSeconds()).padStart(2, "0");
+      document.getElementById("vn-clock").textContent = `${hh}:${mm}:${ss}`;
+      updateMt5SyncDisplay();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function extractBotsArray(payload) {
+      if (!payload) return [];
+      if (Array.isArray(payload)) return payload;
+      const candidateKeys = [
+        "strategies", "leaderboard", "bots", "data",
+        "items", "rows", "top_100", "top100", "list", "results"
+      ];
+      for (const k of candidateKeys) {
+        if (Array.isArray(payload[k]) && payload[k].length > 0) {
+          return payload[k];
+        }
+      }
+      for (const val of Object.values(payload)) {
+        if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+          return val;
+        }
+      }
+      return [];
+    }
+
+    function extractLivePrices(payload) {
+      if (!payload || typeof payload !== "object") return {};
+      const directSources = [
+        payload.live_prices,
+        payload.prices,
+        payload.mt5_prices,
+        payload.quotes,
+        payload.ticks,
+        payload.symbols,
+        payload.mt5_bridge && payload.mt5_bridge.prices,
+        payload.bridge && payload.bridge.prices,
+        payload.mt5 && payload.mt5.prices,
+        payload.mt5_bridge,
+        payload.bridge
+      ];
+
+      for (const src of directSources) {
+        if (src && typeof src === "object" && !Array.isArray(src)) {
+          const filtered = {};
+          for (const [k, v] of Object.entries(src)) {
+            if (["online", "mt5_online", "account", "login", "updated_at", "timestamp", "time", "status"].includes(k)) continue;
+            if (typeof v === "object" && v !== null) {
+              const bidNum = Number(v.bid ?? v.price ?? v.last);
+              const askNum = Number(v.ask ?? bidNum);
+              if (Number.isFinite(bidNum) && bidNum > 0) {
+                filtered[cleanSymbol(k)] = {
+                  bid: bidNum,
+                  ask: Number.isFinite(askNum) && askNum > 0 ? askNum : bidNum,
+                  market_open: v.market_open !== false
+                };
+              }
+            } else {
+              const num = Number(v);
+              if (Number.isFinite(num) && num > 0) {
+                filtered[cleanSymbol(k)] = { bid: num, ask: num, market_open: true };
+              }
+            }
           }
+          if (Object.keys(filtered).length > 0) return filtered;
+        }
+      }
+      return {};
+    }
+
+    function normalizeOpenPos(bot) {
+      if (!bot) return null;
+      const nested = bot.open_position || bot.open_trade || bot.active_trade || bot.position || bot.current_trade;
+      if (nested && typeof nested === "object") {
+        const side = nested.side || nested.type || nested.direction || nested.action;
+        const entry = Number(nested.entry ?? nested.entry_price ?? nested.open_price ?? nested.price ?? 0);
+        const sl = Number(nested.sl ?? nested.sl_price ?? nested.stop_loss ?? 0);
+        const tp = Number(nested.tp ?? nested.tp_price ?? nested.take_profit ?? 0);
+        if (side && ["BUY", "SELL"].includes(String(side).toUpperCase()) && entry > 0) {
+          const lots = Number(nested.lots ?? bot.open_lots ?? 0);
+          const rawFloat = nested.floating_usd ?? bot.floating_usd;
+          const floating_usd = (rawFloat !== null && rawFloat !== undefined && Number.isFinite(Number(rawFloat))) ? Number(rawFloat) : NaN;
+          return { side: String(side).toUpperCase(), entry, sl, tp, lots, floating_usd };
+        }
+      }
+
+      const rawSide =
+        bot.open_order_side || bot.open_side || bot.pos_side || bot.trade_side ||
+        bot.open_type || bot.pos_type || bot.position_type ||
+        bot.direction || bot.side || bot.status;
+      const entry = Number(bot.open_entry ?? bot.entry_price ?? bot.pos_entry ?? bot.open_price ?? bot.entry ?? 0);
+      const sl = Number(bot.open_sl ?? bot.sl_price ?? bot.pos_sl ?? bot.stop_loss ?? bot.sl ?? 0);
+      const tp = Number(bot.open_tp ?? bot.tp_price ?? bot.pos_tp ?? bot.take_profit ?? bot.tp ?? 0);
+
+      if (rawSide && ["BUY", "SELL"].includes(String(rawSide).toUpperCase()) && entry > 0) {
+        const lots = Number(bot.open_trade?.lots ?? bot.open_lots ?? 0);
+        const rawFloat = bot.open_trade?.floating_usd ?? bot.floating_usd;
+        const floating_usd = (rawFloat !== null && rawFloat !== undefined && Number.isFinite(Number(rawFloat))) ? Number(rawFloat) : NaN;
+        return { side: String(rawSide).toUpperCase(), entry, sl, tp, lots, floating_usd };
+      }
+      return null;
+    }
+
+    function computeFloatingR(bot) {
+      const pos = normalizeOpenPos(bot);
+      if (!pos || !pos.entry) return null;
+      const sym = cleanSymbol(bot.symbol || bot.pair);
+      const rawLive = livePrices[sym];
+      const priceField = (rawLive && typeof rawLive === "object")
+        ? (pos.side === "BUY" ? (rawLive.bid ?? rawLive.price) : (rawLive.ask ?? rawLive.bid ?? rawLive.price))
+        : rawLive;
+      const currentPrice = safeNum(priceField, safeNum(bot.live_price || bot.current_price, 0));
+      if (!Number.isFinite(currentPrice) || currentPrice <= 0) return null;
+
+      const oneR = (pos.sl > 0 && Math.abs(pos.entry - pos.sl) > 0)
+        ? Math.abs(pos.entry - pos.sl)
+        : (pos.tp > 0 ? Math.abs(pos.tp - pos.entry) / 2.0 : 0);
+      if (oneR <= 0) return null;
+      const diff = pos.side === "BUY" ? (currentPrice - pos.entry) : (pos.entry - currentPrice);
+      return diff / oneR;
+    }
+
+    function renderOpenPositionCell(bot) {
+      const pos = normalizeOpenPos(bot);
+      if (!pos) {
+        return `<span style="color: var(--text-muted); font-size: 11px;">IDLE</span>`;
+      }
+      const sym = cleanSymbol(bot.symbol || bot.pair);
+      const isBuy = pos.side === "BUY";
+
+      let floatUsd = Number.isFinite(pos.floating_usd) ? pos.floating_usd : null;
+      if (floatUsd === null) {
+        const floatR = computeFloatingR(bot);
+        if (floatR !== null) {
+          floatUsd = floatR * 50.0;
+        }
+      }
+
+      const lotsHtml = Number(pos.lots) > 0
+        ? `<span class="pos-lots">${Number(pos.lots).toFixed(2)} lot</span>`
+        : "";
+
+      let pnlHtml = "";
+      if (floatUsd !== null && Number.isFinite(floatUsd)) {
+        const cls = floatUsd >= 0 ? "pos-pnl-win" : "pos-pnl-loss";
+        const usdSign = floatUsd >= 0 ? "+" : "-";
+        pnlHtml = `<span class="pos-pnl ${cls}">${usdSign}$${Math.abs(floatUsd).toFixed(2)}</span>`;
+      }
+
+      return `
+        <div class="pos-box">
+          <div class="pos-header">
+            <span class="pos-side ${isBuy ? "pos-buy" : "pos-sell"}">${pos.side}</span>
+            ${lotsHtml}
+            ${pnlHtml}
+          </div>
+          <div class="pos-prices">
+            <span class="pos-entry">@ ${formatPrice(pos.entry, sym)}</span> | <span class="sl-val">SL: ${formatPrice(pos.sl, sym)}</span> | <span class="tp-val">TP: ${formatPrice(pos.tp, sym)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    let prevLivePrices = {};
+    let showClosedTickers = false;
+    let lastTickerMeta = {};
+
+    function toggleClosedTickers() {
+      showClosedTickers = !showClosedTickers;
+      renderTickerBar(lastTickerMeta);
+    }
+
+    function renderTickerBar(meta = {}) {
+      lastTickerMeta = meta || {};
+      if (meta && meta.syncedAt) {
+        lastMt5SyncAt = meta.syncedAt;
+      }
+      if (meta && meta.updated_at) {
+        lastMt5ServerStamp = String(meta.updated_at);
+      }
+      lastMt5Online = !(meta && meta.online === false);
+      const badge = document.getElementById("mt5-status-badge");
+      const statusText = document.getElementById("mt5-status-text");
+      const openStrip = document.getElementById("live-ticker-open-strip");
+      const closedStrip = document.getElementById("live-ticker-closed-strip");
+      const toggleBtn = document.getElementById("btn-toggle-closed");
+      const syncEl = document.getElementById("mt5-last-sync");
+
+      const entries = Object.entries(livePrices).filter(([sym]) => cleanSymbol(sym) !== "NAS100");
+      const openEntries = entries
+        .filter(([, p]) => (p && typeof p === "object" ? p.market_open !== false : true))
+        .sort(([a], [b]) => cleanSymbol(a).localeCompare(cleanSymbol(b)));
+      const closedEntries = entries
+        .filter(([, p]) => p && typeof p === "object" && p.market_open === false)
+        .sort(([a], [b]) => cleanSymbol(a).localeCompare(cleanSymbol(b)));
+
+      const openCount = openEntries.length;
+      const isOnline = entries.length > 0 || meta.online !== false;
+      const accMasked = maskAccount(meta.account || "443050867");
+
+      if (isOnline) {
+        badge.classList.remove("offline");
+        const ratioText = meta.active_symbols_count || `${openCount}/${entries.length || 15}`;
+        statusText.textContent = `MT5 LIVE (#${accMasked}) • ${ratioText} CẶP`;
+      } else {
+        badge.classList.add("offline");
+        statusText.textContent = `MT5 ĐANG ĐỒNG BỘ • TẠM DỪNG`;
+      }
+
+      if (!lastMt5ServerStamp) {
+        lastMt5ServerStamp = new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }) + " (UTC+7)";
+      }
+      updateMt5SyncDisplay();
+
+      if (entries.length > 0) {
+        openStrip.innerHTML = openEntries.length > 0
+          ? openEntries
+              .map(([rawSym, priceObj]) => {
+                const sym = cleanSymbol(rawSym);
+                const bidVal = (priceObj && typeof priceObj === "object") ? safeNum(priceObj.bid ?? priceObj.price, 0) : safeNum(priceObj, 0);
+                const askVal = (priceObj && typeof priceObj === "object") ? safeNum(priceObj.ask, bidVal) : bidVal;
+                const prevBid = safeNum(prevLivePrices[sym], bidVal);
+                let arrowHtml = `<span style="color: var(--text-muted); font-size: 9px;">•</span>`;
+                if (bidVal > prevBid) arrowHtml = `<span style="color: #34d399; font-size: 10px;">▲</span>`;
+                else if (bidVal < prevBid) arrowHtml = `<span style="color: #fb7185; font-size: 10px;">▼</span>`;
+                prevLivePrices[sym] = bidVal;
+
+                const priceText = askVal > 0 && askVal !== bidVal
+                  ? `${formatPrice(bidVal, sym)} / ${formatPrice(askVal, sym)}`
+                  : formatPrice(bidVal, sym);
+                return `
+                  <div class="ticker-chip open-pair">
+                    <span style="color: #10b981; font-size: 9px;" title="Đang mở cửa">●</span>
+                    <span class="ticker-sym">${sym}</span>
+                    <span class="ticker-price">${priceText}</span>
+                    ${arrowHtml}
+                  </div>
+                `;
+              })
+              .join("")
+          : `<span style="color: var(--text-muted); font-size: 11px;">Thị trường đang đóng cửa cuối tuần</span>`;
+
+        if (closedEntries.length > 0) {
+          toggleBtn.style.display = "inline-flex";
+          toggleBtn.textContent = showClosedTickers
+            ? `🔒 Ẩn ${closedEntries.length} cặp đóng cửa ▴`
+            : `🔒 Hiện ${closedEntries.length} cặp đóng cửa ▾`;
+
+          if (showClosedTickers) {
+            closedStrip.style.display = "flex";
+            closedStrip.innerHTML = closedEntries
+              .map(([rawSym, priceObj]) => {
+                const sym = cleanSymbol(rawSym);
+                const bidVal = (priceObj && typeof priceObj === "object") ? safeNum(priceObj.bid ?? priceObj.price, 0) : safeNum(priceObj, 0);
+                return `
+                  <div class="ticker-chip closed-pair" title="Đóng cửa cuối tuần">
+                    <span>🔒</span>
+                    <span class="ticker-sym">${sym}</span>
+                    <span class="ticker-price">${formatPrice(bidVal, sym)}</span>
+                  </div>
+                `;
+              })
+              .join("");
+          } else {
+            closedStrip.style.display = "none";
+            closedStrip.innerHTML = "";
+          }
+        } else {
+          toggleBtn.style.display = "none";
+          closedStrip.style.display = "none";
+          closedStrip.innerHTML = "";
+        }
+      }
+    }
+
+    async function requestAndCopyKey(btn, botId, defaultKey) {
+      let finalKey = defaultKey;
+      try {
+        const res = await fetch("/api/generate_key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bot_id: botId, strategy_id: botId, key: defaultKey })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          finalKey = data.key || data.copy_key || data.license_key || defaultKey;
         }
       } catch (_) {}
 
-      const rawRes = await fetch(GIST_RAW_URL + "?t=" + Date.now(), { cache: "no-store" });
-      if (!rawRes.ok) throw new Error("Gist unavailable");
-      return await rawRes.json();
+      const topInput = document.getElementById("top-key-box");
+      if (topInput) topInput.value = finalKey;
+
+      try {
+        await navigator.clipboard.writeText(finalKey);
+      } catch (_) {}
+
+      if (btn) {
+        const oldText = btn.textContent;
+        btn.textContent = "✓ Đã lấy Key";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = oldText;
+          btn.classList.remove("copied");
+        }, 1500);
+      }
+
+      showSupportToast(
+        `Đã copy Key Bot #${botId}`,
+        `Key Bot #${botId} (${finalKey.slice(0, 18)}...)`,
+        "Làm sao dán Key này vào SilentAgentCopier và MT5?"
+      );
     }
 
-    async function connectToLiveArena() {
-      const statusMsg = document.getElementById("status-msg");
+    function copyTopVaultKey() {
+      const topInput = document.getElementById("top-key-box");
+      const btn = document.getElementById("btn-top-copy");
+      if (!topInput) return;
+      navigator.clipboard.writeText(topInput.value).then(() => {
+        const old = btn.textContent;
+        btn.textContent = "✓ Đã Sao Chép!";
+        setTimeout(() => { btn.textContent = old; }, 1500);
+        showSupportToast(
+          "Đã sao chép Key 7 ngày",
+          `Key (${topInput.value.slice(0, 18)}...)`,
+          "Hướng dẫn cài đặt SilentAgentCopier.exe và dán Key vào MT5"
+        );
+      });
+    }
+
+    function safeNum(val, fallback = 0) {
+      if (val === null || val === undefined || Array.isArray(val)) return fallback;
+      if (typeof val === "number") return Number.isFinite(val) ? val : fallback;
+      const cleaned = String(val).replace(/[%$,\s]/g, "");
+      if (!cleaned) return fallback;
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function renderLeaderboard() {
+      const symFilter = document.getElementById("filter-symbol").value;
+      const minTrades = safeNum(document.getElementById("filter-trades").value, 0);
+      const maxDDLimit = safeNum(document.getElementById("filter-dd").value, 100);
+      const query = document.getElementById("search-bot").value.trim().toUpperCase();
+
+      let filtered = allBots.filter((b, idx) => {
+        const sym = cleanSymbol(b.symbol || b.display_symbol || b.pair);
+        const totalTrades = safeNum(b.total_trades ?? b.trades_count ?? b.trades, 0);
+        const maxDD = safeNum(b.max_dd ?? b.max_drawdown ?? b.dd, 0);
+        const copyKey = getBotCopyKey(b, idx + 1).toUpperCase();
+        const paddedId = String(getBotIdNum(b, idx + 1)).padStart(4, "0");
+        const name = String(b.name || `Silent Trader ${paddedId}`).toUpperCase();
+        const dna = String(b.dna || b.dna_hash || "").toUpperCase();
+
+        if (symFilter !== "ALL" && sym !== symFilter) return false;
+        if (totalTrades < minTrades) return false;
+        if (maxDD > maxDDLimit) return false;
+        if (query && !name.includes(query) && !copyKey.includes(query) && !dna.includes(query) && !paddedId.includes(query)) return false;
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        if (currentSort.key === "growth" && !currentSort.asc) {
+          const ra = Number(a.rank);
+          const rb = Number(b.rank);
+          if (Number.isFinite(ra) && ra > 0 && Number.isFinite(rb) && rb > 0 && ra !== rb) {
+            return ra - rb;
+          }
+        }
+
+        const getVal = (bot, key) => {
+          const bal = safeNum(bot.balance ?? bot.equity, 1000);
+          if (key === "rank") return safeNum(bot.rank, getBotIdNum(bot, 9999));
+          if (key === "name") return String(bot.name || "");
+          if (key === "symbol") return cleanSymbol(bot.symbol || bot.pair);
+          if (key === "status") return bot.open_order_side ? 1 : 0;
+          if (key === "growth") return safeNum(bot.rolling_30_growth_pct ?? bot.growth_30 ?? bot.growth_pct ?? bot.roi, (bal - 1000) / 10);
+          if (key === "pf") return safeNum(bot.profit_factor ?? bot.pf, 0);
+          if (key === "winrate") return safeNum(bot.win_rate ?? bot.winrate, 0);
+          if (key === "maxdd") return safeNum(bot.max_dd ?? bot.max_drawdown, 0);
+          if (key === "trades") return safeNum(bot.total_trades ?? bot.trades_count ?? bot.trades, 0);
+          return 0;
+        };
+
+        const valA = getVal(a, currentSort.key);
+        const valB = getVal(b, currentSort.key);
+        if (valA !== valB) {
+          if (typeof valA === "string" || typeof valB === "string") {
+            return currentSort.asc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+          }
+          return currentSort.asc ? valA - valB : valB - valA;
+        }
+
+        const floatA = safeNum(a.floating_usd ?? a.open_trade?.floating_usd, 0);
+        const floatB = safeNum(b.floating_usd ?? b.open_trade?.floating_usd, 0);
+        if (floatA !== floatB) return floatB - floatA;
+
+        const tradesDiff = safeNum(b.total_trades ?? b.trades, 0) - safeNum(a.total_trades ?? a.trades, 0);
+        if (tradesDiff !== 0) return tradesDiff;
+
+        return getBotIdNum(a, 0) - getBotIdNum(b, 0);
+      });
+
+      const top100 = filtered.slice(0, 100);
+      document.getElementById("visible-count").textContent = top100.length;
+
+      if (top100.length > 0) {
+        const leader = top100[0];
+        const lName = leader.name || "Silent Trader 0001";
+        const lBal = safeNum(leader.balance ?? leader.equity, 1000);
+        const lFloat = safeNum(leader.floating_usd ?? leader.open_trade?.floating_usd, 0);
+        const lGrowth = safeNum(leader.rolling_30_growth_pct ?? leader.growth_30 ?? leader.growth_pct, ((lBal - 1000) / 1000) * 100);
+        const l30Usd = safeNum(leader.rolling_30d_usd, lBal - 1000);
+        let leaderText = `${lName} (${lGrowth >= 0 ? "+" : ""}${lGrowth.toFixed(2)}%)`;
+        if (lBal === 1000 && lFloat > 0) {
+          leaderText = `${lName}: +$${lFloat.toFixed(2)} (+${((lFloat / 1000) * 100).toFixed(2)}% tạm tính)`;
+        } else if (lBal < 1000 && (lBal + lFloat) > 1000) {
+          const netEq = (lBal + lFloat) - 1000;
+          leaderText = `${lName}: +$${netEq.toFixed(2)} (+${((netEq / 1000) * 100).toFixed(2)}% tạm tính)`;
+        } else if (l30Usd > 0) {
+          leaderText = `${lName}: +$${l30Usd.toFixed(2)} (+${lGrowth.toFixed(2)}%)`;
+        } else if (lBal > 1000) {
+          leaderText = `${lName}: +$${(lBal - 1000).toFixed(2)} (+${lGrowth.toFixed(2)}%)`;
+        }
+        document.getElementById("stat-leader").textContent = leaderText;
+
+        const topKeyBox = document.getElementById("top-key-box");
+        if (!window._topKeyInitialized && topKeyBox && (!topKeyBox.value || topKeyBox.value.startsWith("ST-PRO-"))) {
+          window._topKeyInitialized = true;
+          const leaderSid = leader.strategy_id || `ST-PRO-${String(getBotIdNum(leader, 1)).padStart(4, "0")}`;
+          fetch("/api/generate_key", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bot_id: leaderSid, days: 7 })
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              if (d && (d.key || d.license_key)) {
+                topKeyBox.value = d.key || d.license_key;
+              }
+            })
+            .catch(() => {});
+        }
+      }
+
+      const tbody = document.getElementById("leaderboard-body");
+      tbody.innerHTML = top100
+        .map((bot, idx) => {
+          try {
+            const rank = idx + 1;
+            const rankClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : "";
+            const rankLabel = rank <= 3 ? `🏆 ${rank}` : `#${rank}`;
+
+            const botIdNum = getBotIdNum(bot, rank);
+            const paddedId = String(botIdNum).padStart(4, "0");
+            const botName = bot.name || `Silent Trader ${paddedId}`;
+            const tagCode = bot.strategy_id || bot.code || `ST-PRO-${paddedId}`;
+            const copyKey = getBotCopyKey(bot, rank);
+            const sym = cleanSymbol(bot.symbol || bot.display_symbol || bot.pair);
+
+            const balance = safeNum(bot.balance ?? bot.equity, 1000);
+            const netProfit = balance - 1000;
+            const growthPct = safeNum(bot.rolling_30_growth_pct ?? bot.growth_30 ?? bot.growth_pct, (netProfit / 1000) * 100);
+            const growthColor = growthPct >= 0 ? "var(--accent-green)" : "var(--accent-red)";
+            const growthSign = growthPct >= 0 ? "+" : "";
+
+            const pf = safeNum(bot.profit_factor ?? bot.pf, 0).toFixed(2);
+            const winRate = safeNum(bot.win_rate ?? bot.winrate, 0).toFixed(1);
+            const wins = safeNum(bot.win_trades ?? bot.wins ?? bot.win_count, 0);
+            const losses = safeNum(bot.loss_trades ?? bot.losses ?? bot.loss_count, 0);
+            const maxDD = safeNum(bot.max_dd ?? bot.max_drawdown, 0).toFixed(1);
+            const totalTrades = safeNum(bot.total_trades ?? bot.trades_count ?? bot.trades, 0);
+            const gen = String(bot.generation ?? bot.gen ?? 1).replace(/^GEN-/i, "");
+
+            return `
+            <tr>
+              <td><span class="rank-badge ${rankClass}">${rankLabel}</span></td>
+              <td class="bot-cell">
+                <div class="bot-name">${botName}</div>
+                <div class="bot-tags">
+                  <span class="tag-id">${tagCode}</span>
+                  <span class="tag-dna">DNA: ${bot.dna || bot.dna_hash || "CDEAF836CFAD"}</span>
+                  <span class="tag-gen">GEN-${gen}</span>
+                </div>
+              </td>
+              <td><span class="symbol-pill">${sym}</span></td>
+              <td>${renderOpenPositionCell(bot)}</td>
+              <td>
+                <div style="font-weight: 800; font-size: 14px; line-height: 1.2; color: ${growthColor};">
+                  ${growthSign}${growthPct.toFixed(2)}%
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); font-family: Consolas, monospace;">
+                  $${balance.toFixed(2)} (${netProfit >= 0 ? "+" : "-"}$${Math.abs(netProfit).toFixed(2)})
+                </div>
+              </td>
+              <td style="font-weight: 800; color: var(--accent-gold); font-size: 12.5px;">${pf}</td>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${winRate}%</div>
+                <div style="font-size: 10px; color: var(--text-muted); font-family: Consolas, monospace;">
+                  ${wins}W · ${losses}L
+                </div>
+              </td>
+              <td style="font-weight: 700;">${maxDD}%</td>
+              <td style="color: #60a5fa; font-weight: 700;">${totalTrades} lệnh</td>
+              <td>
+                <button class="btn-copy-key" onclick="requestAndCopyKey(this, ${botIdNum}, '${copyKey}')">🔑 Lấy Key</button>
+              </td>
+              <td>
+                <button class="btn-history" onclick="openHistoryModal(${botIdNum}, '${botName}', '${sym}')">📜 Lịch sử</button>
+              </td>
+            </tr>
+          `;
+          } catch (err) {
+            console.error("Row render error:", err, bot);
+            return "";
+          }
+        })
+        .join("");
+    }
+
+    function populateSymbolFilter() {
+      const select = document.getElementById("filter-symbol");
+      const currentVal = select.value;
+      const CANONICAL_15 = ["AUDUSD","BTCUSD","ETHUSD","EURJPY","EURUSD","GBPJPY","GBPUSD","NZDUSD","US30","USDCAD","USDCHF","USDJPY","USOIL","USTEC","XAUUSD"];
+      const symbols = Array.from(new Set([...CANONICAL_15, ...allBots.map((b) => cleanSymbol(b.symbol || b.pair))])).sort();
+      select.innerHTML =
+        `<option value="ALL">🔄 Tất cả Cặp Giao Dịch (${symbols.length})</option>` +
+        symbols.map((s) => `<option value="${s}">${s}</option>`).join("");
+      if (symbols.includes(currentVal)) select.value = currentVal;
+    }
+
+    async function tryFetchJson(url) {
       try {
-        const data = await fetchEndpoint();
-        if (data && data.public_url && data.public_url.startsWith("http")) {
-          window.location.replace(data.public_url);
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return null;
+        const text = await res.text();
+        if (!text || text.trim().startsWith("<")) return null;
+        return JSON.parse(text);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function fetchArenaData() {
+      let payload = null;
+
+      if (discoveredMainEndpoint) {
+        payload = await tryFetchJson(discoveredMainEndpoint);
+      }
+
+      if (!payload) {
+        for (const ep of MAIN_ENDPOINTS) {
+          const data = await tryFetchJson(ep);
+          if (data) {
+            const bots = extractBotsArray(data);
+            if (bots.length > 0) {
+              discoveredMainEndpoint = ep;
+              payload = data;
+              break;
+            }
+          }
+        }
+      }
+
+      if (payload) {
+        const bots = extractBotsArray(payload);
+        if (bots.length > 0) allBots = bots;
+
+        const extractedPrices = extractLivePrices(payload);
+        if (Object.keys(extractedPrices).length > 0) {
+          livePrices = { ...livePrices, ...extractedPrices };
+        }
+
+        // Harvest live prices embedded inside bots if present
+        for (const b of allBots) {
+          const s = cleanSymbol(b.symbol || b.pair);
+          const p = Number(b.live_price ?? b.current_price ?? b.bid ?? 0);
+          if (s && p > 0 && !livePrices[s]) {
+            livePrices[s] = p;
+          }
+        }
+
+        const statsSrc = payload.stats || payload.meta || payload.arena_stats || payload;
+        const elim = Number(statsSrc.eliminated_count ?? statsSrc.eliminated ?? 0);
+        const spawned = Number(statsSrc.respawned_count ?? statsSrc.spawned_count ?? statsSrc.spawned ?? 0);
+        const totalDna = Number(statsSrc.total_unique_dna ?? statsSrc.total_dna ?? (1000 + spawned));
+        const aliveCnt = Number(statsSrc.alive_count ?? 1000);
+
+        document.getElementById("stat-eliminated").textContent = elim;
+        document.getElementById("stat-spawned").textContent = spawned;
+        document.getElementById("stat-total-dna").textContent = totalDna.toLocaleString();
+        const activeEl = document.getElementById("stat-active-count");
+        if (activeEl) activeEl.textContent = `(${aliveCnt.toLocaleString()} Active)`;
+      }
+
+      if (Object.keys(livePrices).length === 0) {
+        for (const pep of PRICE_ENDPOINTS) {
+          const pData = await tryFetchJson(pep);
+          if (pData) {
+            const found = extractLivePrices(pData);
+            if (Object.keys(found).length > 0) {
+              livePrices = { ...livePrices, ...found };
+              break;
+            }
+          }
+        }
+      }
+
+      const gotFreshData = Boolean(payload || Object.keys(livePrices).length > 0);
+      const metaObj = (payload && (payload.mt5_bridge || payload.bridge || payload.mt5 || payload.meta || payload)) || {};
+      renderTickerBar({
+        online: metaObj.online !== false && gotFreshData,
+        account: metaObj.account || metaObj.mt5_account || "443050867",
+        updated_at: metaObj.updated_at_vn || metaObj.updated_at || metaObj.timestamp,
+        syncedAt: gotFreshData ? Date.now() : 0,
+        active_symbols_count: payload && payload.active_symbols_count
+      });
+
+      if (allBots.length > 0) {
+        populateSymbolFilter();
+        renderLeaderboard();
+      }
+    }
+
+    let _modalTrades = [];
+    let _modalSym = "XAUUSD";
+    let historySort = { key: "closed_at", asc: false };
+
+    function sortHistoryBy(key) {
+      if (historySort.key === key) {
+        historySort.asc = !historySort.asc;
+      } else {
+        historySort.key = key;
+        historySort.asc = false;
+      }
+      renderHistoryTable();
+    }
+
+    function renderHistoryTable() {
+      const content = document.getElementById("modal-content");
+      const trades = [..._modalTrades];
+      const sym = _modalSym;
+
+      trades.sort((a, b) => {
+        const k = historySort.key;
+        let va = a[k], vb = b[k];
+        if (k === "pnl_usd" || k === "entry_price" || k === "exit_price" || k === "lots") {
+          va = safeNum(a[k] ?? 0, 0);
+          vb = safeNum(b[k] ?? 0, 0);
+          return historySort.asc ? va - vb : vb - va;
+        }
+        va = String(va || "");
+        vb = String(vb || "");
+        return historySort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+
+      let wCnt = 0, lCnt = 0, totalPnl = 0;
+      for (const t of trades) {
+        const p = safeNum(t.pnl_usd ?? t.pnl ?? t.profit, 0);
+        totalPnl += p;
+        if (p > 0) wCnt++;
+        else lCnt++;
+      }
+
+      const arrow = (k) => historySort.key === k ? (historySort.asc ? " ▲" : " ▼") : "";
+
+      content.innerHTML = `
+        <div style="margin-bottom: 12px; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
+          <span>Tổng đối soát: <strong>${trades.length} lệnh</strong> (${wCnt}W · ${lCnt}L)</span>
+          <span style="color: ${totalPnl >= 0 ? "var(--accent-green)" : "var(--accent-red)"}; font-family: monospace;">Tổng lợi nhuận: ${totalPnl >= 0 ? "+" : "-"}$${Math.abs(totalPnl).toFixed(2)}</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('closed_at')">THỜI GIAN ĐÓNG${arrow("closed_at")}</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('symbol')">CẶP${arrow("symbol")}</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('side')">LOẠI${arrow("side")}</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('lots')">SỐ LOT${arrow("lots")}</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('entry_price')">ENTRY${arrow("entry_price")}</th>
+              <th>SL / TP</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('exit_price')">GIÁ ĐÓNG${arrow("exit_price")}</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('exit_reason')">KẾT QUẢ${arrow("exit_reason")}</th>
+              <th style="cursor:pointer;" onclick="sortHistoryBy('pnl_usd')">LỢI NHUẬN${arrow("pnl_usd")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${trades
+              .map((t) => {
+                const pnl = safeNum(t.pnl_usd ?? t.pnl ?? t.profit, 0);
+                const pnlColor = pnl > 0 ? "var(--accent-green)" : pnl < 0 ? "var(--accent-red)" : "var(--text-muted)";
+                const s = cleanSymbol(t.symbol || sym);
+                const lotsVal = safeNum(t.lots, 0);
+                const lotsText = lotsVal > 0 ? `${lotsVal.toFixed(2)} lot` : "--";
+                const entryVal = safeNum(t.entry_price ?? t.entry ?? t.open_price, 0);
+                const slVal = safeNum(t.sl_price ?? t.sl, 0);
+                const tpVal = safeNum(t.tp_price ?? t.tp, 0);
+                const exitVal = safeNum(t.exit_price ?? t.close_price, 0);
+                const resLabel = pnl > 0 ? "WIN (+TP)" : "LOSS (-SL)";
+                const resColor = pnl > 0 ? "var(--accent-green)" : "var(--accent-red)";
+                const usdSign = pnl > 0 ? "+" : (pnl < 0 ? "-" : "");
+                return `
+                  <tr>
+                    <td style="font-family: monospace; font-size: 11px;">${t.closed_at || t.close_time || t.time || "--"}</td>
+                    <td><span class="symbol-pill">${s}</span></td>
+                    <td style="font-weight: 800; color: ${String(t.side || t.type).toUpperCase() === "BUY" ? "var(--accent-green)" : "var(--accent-red)"};">${t.side || t.type}</td>
+                    <td style="font-family: monospace; font-weight: 700;">${lotsText}</td>
+                    <td style="font-family: monospace;">${formatPrice(entryVal, s)}</td>
+                    <td style="font-family: monospace; font-size: 10.5px;">
+                      <span class="sl-val">${formatPrice(slVal, s)}</span> / <span class="tp-val">${formatPrice(tpVal, s)}</span>
+                    </td>
+                    <td style="font-family: monospace;">${formatPrice(exitVal, s)}</td>
+                    <td style="font-weight: 700; color: ${resColor};">${resLabel}</td>
+                    <td style="font-weight: 800; font-family: monospace; color: ${pnlColor};">${usdSign}$${Math.abs(pnl).toFixed(2)}</td>
+                  </tr>
+                `;
+              })
+              .join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    let _historyModalCtx = { botId: "", botName: "", sym: "" };
+
+    async function openHistoryModal(botId, botName, sym) {
+      _historyModalCtx = { botId, botName, sym };
+      const modal = document.getElementById("history-modal");
+      const title = document.getElementById("modal-title");
+      const subtitle = document.getElementById("modal-subtitle");
+      const content = document.getElementById("modal-content");
+
+      title.textContent = `📜 Lịch Sử Giao Dịch: ${botName} (${sym})`;
+      subtitle.textContent = `Chỉ hiển thị các lệnh đã đóng thực tế từ MT5 Tick Feed`;
+      content.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted);">Đang tải dữ liệu lịch sử...</div>`;
+      modal.classList.add("open");
+
+      const data =
+        (await tryFetchJson(`/api/trade_history?bot_id=${encodeURIComponent(botId)}`)) ||
+        (await tryFetchJson(`/api/history?bot_id=${encodeURIComponent(botId)}`));
+
+      const trades = Array.isArray(data) ? data : (data && (data.trades || data.history || data.items)) || [];
+
+      if (!trades.length) {
+        content.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-muted);">
+          <p>Chiến lược <strong>${escapeHtml(botName)}</strong> hiện chưa có lệnh đóng nào sau đợt Hard Reset ($1,000.00). Ngay khi lệnh đang mở chạm Chốt lời (TP) hoặc Cắt lỗ (SL), chi tiết lệnh sẽ xuất hiện tại đây.</p>
+          <button type="button" class="btn-support-header" style="margin-top: 12px;" onclick="routeHistoryFeedbackToChat()">💬 Thắc mắc / Phản hồi về chiến lược này</button>
+        </div>`;
+        return;
+      }
+
+      _modalTrades = trades;
+      _modalSym = sym;
+      renderHistoryTable();
+    }
+
+    function closeHistoryModal() {
+      document.getElementById("history-modal").classList.remove("open");
+    }
+
+    function routeHistoryFeedbackToChat() {
+      const ctx = _historyModalCtx || {};
+      const label = ctx.botName ? `${ctx.botName} (${ctx.sym || ""})` : "Lịch sử chiến lược";
+      closeHistoryModal();
+      openSupportChat(
+        "history_modal",
+        "feedback",
+        `Chiến lược ${label}`,
+        `Tôi có thắc mắc / phản hồi về chiến lược ${label}: `
+      );
+    }
+
+    document.querySelectorAll("thead th.sortable").forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.getAttribute("data-sort");
+        if (currentSort.key === key) {
+          currentSort.asc = !currentSort.asc;
+        } else {
+          currentSort.key = key;
+          currentSort.asc = key === "maxdd";
+        }
+        document.querySelectorAll("thead th.sortable").forEach((el) => el.classList.remove("active-sort"));
+        th.classList.add("active-sort");
+        renderLeaderboard();
+      });
+    });
+
+    ["filter-symbol", "filter-trades", "filter-dd", "search-bot"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", renderLeaderboard);
+      document.getElementById(id).addEventListener("change", renderLeaderboard);
+    });
+
+    // =========================================================================
+    // CUSTOMER SUPPORT CHAT WIDGET (MANDATORY NAME + SĐT/ZALO -> OPENROUTER AI)
+    // =========================================================================
+    const CHAT_STORAGE_SID_KEY = "st_chat_session_id_v1";
+    const CHAT_STORAGE_PROFILE_KEY = "st_chat_profile_v1";
+
+    const chatState = {
+      sessionId: "",
+      registered: false,
+      customerName: "",
+      customerContact: "",
+      category: "question",
+      contextTag: "",
+      sourceContext: "floating_logo",
+      messages: [],
+      sending: false,
+      editingProfile: false,
+      toastContext: null,
+      toastTimer: null,
+    };
+
+    function escapeHtml(raw) {
+      return String(raw ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatChatRichText(raw) {
+      let safe = escapeHtml(raw);
+      safe = safe.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+      safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      safe = safe.replace(/\n/g, "<br>");
+      return safe;
+    }
+
+    function ensureChatSessionId() {
+      let sid = "";
+      try {
+        sid = localStorage.getItem(CHAT_STORAGE_SID_KEY) || "";
+      } catch (_) {}
+      if (!/^[a-zA-Z0-9_-]{8,64}$/.test(sid)) {
+        const rnd = (window.crypto && window.crypto.randomUUID)
+          ? window.crypto.randomUUID().replace(/-/g, "")
+          : (Date.now().toString(36) + Math.random().toString(36).slice(2, 12));
+        sid = "st_" + rnd.slice(0, 28);
+        try {
+          localStorage.setItem(CHAT_STORAGE_SID_KEY, sid);
+        } catch (_) {}
+      }
+      chatState.sessionId = sid;
+      return sid;
+    }
+
+    function setChatCategory(cat) {
+      chatState.category = ["question", "feedback", "bug_report"].includes(cat) ? cat : "question";
+      document.querySelectorAll(".chat-cat-pill, .chat-composer-cat").forEach((el) => {
+        el.classList.toggle("active", el.getAttribute("data-cat") === chatState.category);
+      });
+    }
+
+    function updateChatContextBanner() {
+      const banner = document.getElementById("chat-context-banner");
+      const textEl = document.getElementById("chat-context-text");
+      if (!banner || !textEl) return;
+      if (chatState.contextTag) {
+        textEl.textContent = `📌 Đang dẫn phản hồi: ${chatState.contextTag}`;
+        banner.classList.add("visible");
+      } else {
+        textEl.textContent = "";
+        banner.classList.remove("visible");
+      }
+    }
+
+    function clearChatContext() {
+      chatState.contextTag = "";
+      updateChatContextBanner();
+    }
+
+    function showChatError(boxId, msg) {
+      const el = document.getElementById(boxId);
+      if (!el) return;
+      if (!msg) {
+        el.textContent = "";
+        el.classList.remove("visible");
+      } else {
+        el.textContent = msg;
+        el.classList.add("visible");
+      }
+    }
+
+    function renderChatViewState() {
+      const regView = document.getElementById("chat-reg-view");
+      const liveView = document.getElementById("chat-live-view");
+      const editBtn = document.getElementById("btn-chat-edit-profile");
+      const showReg = !chatState.registered || chatState.editingProfile;
+
+      if (regView) regView.style.display = showReg ? "flex" : "none";
+      if (liveView) liveView.style.display = showReg ? "none" : "flex";
+      if (editBtn) editBtn.style.display = (chatState.registered && !chatState.editingProfile) ? "inline-block" : "none";
+
+      if (chatState.registered) {
+        const nameEl = document.getElementById("chat-active-customer");
+        const contactEl = document.getElementById("chat-active-contact");
+        if (nameEl) nameEl.textContent = chatState.customerName;
+        if (contactEl) contactEl.textContent = chatState.customerContact;
+      }
+      updateChatContextBanner();
+      renderChatMessages();
+    }
+
+    function renderChatMessages() {
+      const list = document.getElementById("chat-messages-list");
+      if (!list) return;
+      const catLabels = {
+        question: "Thắc mắc",
+        feedback: "Phản hồi",
+        bug_report: "Báo lỗi",
+      };
+      list.innerHTML = chatState.messages
+        .map((m) => {
+          const role = m.role === "user" ? "user" : "assistant";
+          const who = role === "user" ? escapeHtml(chatState.customerName || "Bạn") : "🤖 Trợ Lý Silent Trader";
+          const catTag = (role === "user" && m.category && m.category !== "question")
+            ? `<span class="chat-msg-tag">${escapeHtml(catLabels[m.category] || m.category)}</span>`
+            : "";
+          const timeText = escapeHtml((m.created_at || "").replace(" (UTC+7)", "").slice(11, 19) || "");
+          return `
+            <div class="chat-msg-row ${role}">
+              <div class="chat-bubble">${formatChatRichText(m.content || "")}</div>
+              <div class="chat-msg-meta">
+                <span>${who}</span>
+                ${catTag}
+                ${timeText ? `<span>• ${timeText}</span>` : ""}
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function openSupportChat(source = "floating_logo", category = "question", contextTag = "", prefillText = "") {
+      ensureChatSessionId();
+      hideSupportToast();
+
+      if (source) chatState.sourceContext = source;
+      if (category) setChatCategory(category);
+      if (contextTag) chatState.contextTag = contextTag;
+
+      const panel = document.getElementById("support-chat-panel");
+      const fab = document.getElementById("support-logo-fab");
+      if (panel) panel.classList.add("open");
+      if (fab) fab.classList.add("hidden");
+
+      showChatError("chat-reg-error", "");
+      showChatError("chat-send-error", "");
+
+      if (prefillText) {
+        if (!chatState.registered) {
+          const initEl = document.getElementById("chat-initial-message");
+          if (initEl && !initEl.value.trim()) initEl.value = prefillText;
+        } else {
+          const msgEl = document.getElementById("chat-message-input");
+          if (msgEl && !msgEl.value.trim()) msgEl.value = prefillText;
+        }
+      }
+
+      renderChatViewState();
+
+      setTimeout(() => {
+        if (!chatState.registered || chatState.editingProfile) {
+          const nEl = document.getElementById("chat-customer-name");
+          if (nEl) nEl.focus();
+        } else {
+          const mEl = document.getElementById("chat-message-input");
+          if (mEl) mEl.focus();
+        }
+      }, 60);
+    }
+
+    function closeSupportChat() {
+      const panel = document.getElementById("support-chat-panel");
+      const fab = document.getElementById("support-logo-fab");
+      if (panel) panel.classList.remove("open");
+      if (fab) fab.classList.remove("hidden");
+    }
+
+    function showChatRegistrationForm(editing = false) {
+      chatState.editingProfile = Boolean(editing);
+      if (chatState.registered) {
+        const nEl = document.getElementById("chat-customer-name");
+        const cEl = document.getElementById("chat-customer-contact");
+        if (nEl && !nEl.value) nEl.value = chatState.customerName;
+        if (cEl && !cEl.value) cEl.value = chatState.customerContact;
+      }
+      renderChatViewState();
+    }
+
+    async function submitChatRegistration(event) {
+      event.preventDefault();
+      showChatError("chat-reg-error", "");
+
+      const nameEl = document.getElementById("chat-customer-name");
+      const contactEl = document.getElementById("chat-customer-contact");
+      const initMsgEl = document.getElementById("chat-initial-message");
+      const submitBtn = document.getElementById("chat-reg-submit");
+
+      const name = (nameEl ? nameEl.value : "").trim();
+      const contact = (contactEl ? contactEl.value : "").trim();
+      const initialText = (initMsgEl ? initMsgEl.value : "").trim();
+
+      if (name.length < 2) {
+        showChatError("chat-reg-error", "Vui lòng nhập Tên của bạn (tối thiểu 2 ký tự).");
+        return;
+      }
+      const digits = contact.replace(/\D/g, "");
+      if (digits.length < 8 && !(contact.startsWith("@") && contact.length >= 4)) {
+        showChatError("chat-reg-error", "Vui lòng nhập SĐT hoặc Zalo hợp lệ (tối thiểu 8 chữ số hoặc @username).");
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Đang kết nối CSKH...";
+      }
+
+      try {
+        const res = await fetch("/api/chat/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: ensureChatSessionId(),
+            customer_name: name,
+            customer_contact: contact,
+            source_context: chatState.contextTag || chatState.sourceContext || "web",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || data.status !== "ok") {
+          showChatError("chat-reg-error", data.message || "Không thể đăng ký phiên chat. Vui lòng thử lại.");
           return;
         }
-      } catch (e) {
-        statusMsg.textContent = "Đang đồng bộ lại luồng dữ liệu MT5, tự động thử lại sau 3 giây...";
+
+        chatState.registered = true;
+        chatState.editingProfile = false;
+        chatState.customerName = data.session.customer_name;
+        chatState.customerContact = data.session.customer_contact;
+        chatState.messages = Array.isArray(data.messages) ? data.messages : [];
+
+        try {
+          localStorage.setItem(CHAT_STORAGE_PROFILE_KEY, JSON.stringify({
+            customerName: chatState.customerName,
+            customerContact: chatState.customerContact,
+          }));
+        } catch (_) {}
+
+        if (initMsgEl) initMsgEl.value = "";
+        renderChatViewState();
+
+        if (initialText) {
+          await sendChatMessageText(initialText);
+        }
+      } catch (_) {
+        showChatError("chat-reg-error", "Kết nối tới máy chủ tạm gián đoạn. Vui lòng thử lại.");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Bắt Đầu Chat Trực Tuyến →";
+        }
       }
-      setTimeout(connectToLiveArena, 3000);
     }
 
-    connectToLiveArena();
+    function handleChatKeyDown(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    }
+
+    async function sendQuickChatPrompt(text, cat = "question") {
+      setChatCategory(cat);
+      await sendChatMessageText(text);
+    }
+
+    function prefillFeedbackMode() {
+      setChatCategory("feedback");
+      const input = document.getElementById("chat-message-input");
+      if (input) {
+        if (!input.value.trim()) input.value = "Góp ý / Phản hồi: ";
+        input.focus();
+      }
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById("chat-message-input");
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      await sendChatMessageText(text);
+    }
+
+    async function sendChatMessageText(text) {
+      if (chatState.sending) return;
+      const cleanText = String(text || "").trim();
+      if (!cleanText) return;
+
+      showChatError("chat-send-error", "");
+      if (!chatState.registered) {
+        const initEl = document.getElementById("chat-initial-message");
+        if (initEl) initEl.value = cleanText;
+        renderChatViewState();
+        return;
+      }
+
+      chatState.sending = true;
+      const sendBtn = document.getElementById("chat-send-btn");
+      const typingEl = document.getElementById("chat-typing-indicator");
+      if (sendBtn) sendBtn.disabled = true;
+      if (typingEl) typingEl.classList.add("visible");
+
+      const tempId = "tmp_" + Date.now();
+      chatState.messages.push({
+        id: tempId,
+        role: "user",
+        category: chatState.category,
+        context_tag: chatState.contextTag,
+        content: cleanText,
+        created_at: "",
+      });
+      renderChatMessages();
+
+      try {
+        const res = await fetch("/api/chat/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: ensureChatSessionId(),
+            message: cleanText,
+            category: chatState.category,
+            context_tag: chatState.contextTag,
+          }),
+        });
+        const data = await res.json();
+        chatState.messages = chatState.messages.filter((m) => m.id !== tempId);
+
+        if (!res.ok || data.status !== "ok") {
+          if (data && data.require_registration) {
+            chatState.registered = false;
+            const initEl = document.getElementById("chat-initial-message");
+            if (initEl) initEl.value = cleanText;
+            renderChatViewState();
+            showChatError("chat-reg-error", data.message || "Vui lòng nhập Tên và SĐT/Zalo.");
+            return;
+          }
+          showChatError("chat-send-error", data.message || "Không gửi được tin nhắn. Vui lòng thử lại.");
+          const input = document.getElementById("chat-message-input");
+          if (input && !input.value) input.value = cleanText;
+          renderChatMessages();
+          return;
+        }
+
+        if (data.user_message) chatState.messages.push(data.user_message);
+        if (data.assistant_message) chatState.messages.push(data.assistant_message);
+        renderChatMessages();
+      } catch (_) {
+        chatState.messages = chatState.messages.filter((m) => m.id !== tempId);
+        showChatError("chat-send-error", "Mạng tạm gián đoạn, vui lòng bấm gửi lại.");
+        const input = document.getElementById("chat-message-input");
+        if (input && !input.value) input.value = cleanText;
+        renderChatMessages();
+      } finally {
+        chatState.sending = false;
+        if (sendBtn) sendBtn.disabled = false;
+        if (typingEl) typingEl.classList.remove("visible");
+      }
+    }
+
+    function showSupportToast(title, contextTag, questionPrefill) {
+      const toast = document.getElementById("support-toast");
+      const msgEl = document.getElementById("support-toast-msg");
+      if (!toast || !msgEl) return;
+      msgEl.textContent = `✓ ${title} • Cần hướng dẫn cài vào MT5?`;
+      chatState.toastContext = { contextTag, questionPrefill };
+      toast.classList.add("visible");
+      if (chatState.toastTimer) clearTimeout(chatState.toastTimer);
+      chatState.toastTimer = setTimeout(hideSupportToast, 7000);
+    }
+
+    function hideSupportToast() {
+      const toast = document.getElementById("support-toast");
+      if (toast) toast.classList.remove("visible");
+      if (chatState.toastTimer) {
+        clearTimeout(chatState.toastTimer);
+        chatState.toastTimer = null;
+      }
+    }
+
+    function openToastChatAction() {
+      const info = chatState.toastContext || {};
+      hideSupportToast();
+      openSupportChat(
+        "copy_key_toast",
+        "question",
+        info.contextTag || "Cài đặt Key & SilentAgentCopier",
+        info.questionPrefill || "Làm sao dán Key này vào SilentAgentCopier và MT5?"
+      );
+    }
+
+    async function initSupportChat() {
+      const sid = ensureChatSessionId();
+      try {
+        const cached = JSON.parse(localStorage.getItem(CHAT_STORAGE_PROFILE_KEY) || "null");
+        if (cached && cached.customerName) {
+          chatState.customerName = cached.customerName;
+          chatState.customerContact = cached.customerContact || "";
+        }
+      } catch (_) {}
+
+      const data = await tryFetchJson(`/api/chat/history?session_id=${encodeURIComponent(sid)}`);
+      if (data && data.registered && data.session) {
+        chatState.registered = true;
+        chatState.customerName = data.session.customer_name || chatState.customerName;
+        chatState.customerContact = data.session.customer_contact || chatState.customerContact;
+        chatState.messages = Array.isArray(data.messages) ? data.messages : [];
+      } else {
+        chatState.registered = false;
+      }
+      renderChatViewState();
+    }
+
+    initSupportChat();
+    fetchArenaData();
+    setInterval(fetchArenaData, 2000);
   </script>
 </body>
 </html>
