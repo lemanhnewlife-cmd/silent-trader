@@ -1,71 +1,73 @@
-// Plugin renderer Shadow
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.SHADOW = function(ctx, w, h, st) {
-  'use strict';
-  var tel = (st && st.snap && st.snap.visual_telemetry) || {};
-  var ot = st && st.snap && st.snap.open_trade;
-  var t = st && st.t || 0;
-  ctx.fillStyle = '#0d050c';
-  ctx.fillRect(0, 0, w, h);
-  var topH = h * 0.72;
-  var botH = h * 0.28;
-  var botY = topH;
-  var bins = tel.hist_bins || [];
-  var gauss = tel.gauss_bins || [];
-  var maxHist = 1;
-  for (var i = 0; i < bins.length; i++) {
-    if (bins[i] > maxHist) maxHist = bins[i];
-  }
-  var grad = ctx.createLinearGradient(0, topH, 0, 0);
-  grad.addColorStop(0, '#ec4899');
-  grad.addColorStop(1, '#facc15');
-  ctx.fillStyle = grad;
-  var barW = w / Math.max(bins.length, 1);
-  for (var i = 0; i < bins.length; i++) {
-    var bh = (bins[i] / maxHist) * topH * 0.85;
-    ctx.fillRect(i * barW, topH - bh, barW * 0.8, bh);
-  }
-  if (gauss.length > 1) {
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 4]);
+export function render(canvas, telemetry) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
+  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
+  if (w === 0 || h === 0) return;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const data = telemetry || {};
+  const shadowValue = Number.isFinite(data.shadow_value) ? data.shadow_value : 0;
+  const shadowPower = Number.isFinite(data.shadow_power) ? data.shadow_power : 0;
+  const shadowTrend = Number.isFinite(data.shadow_trend) ? data.shadow_trend : 0;
+
+  const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+
+  // Background Gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, safeNum(h));
+  bgGrad.addColorStop(0, '#0f172a');
+  bgGrad.addColorStop(1, '#020617');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, safeNum(w), safeNum(h));
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 10; i++) {
+    const x = safeNum((w / 10) * i);
+    const y = safeNum((h / 10) * i);
     ctx.beginPath();
-    var maxG = 1;
-    for (var i = 0; i < gauss.length; i++) {
-      if (gauss[i] > maxG) maxG = gauss[i];
-    }
-    for (var i = 0; i < gauss.length; i++) {
-      var x = i * barW;
-      var y = topH - (gauss[i] / maxG) * topH * 0.85;
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    }
+    ctx.moveTo(x, 0); ctx.lineTo(x, safeNum(h));
     ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(safeNum(w), y);
+    ctx.stroke();
   }
-  ctx.fillStyle = '#e5e7eb';
+
+  // Shadow Core Visualization
+  const centerX = safeNum(w / 2);
+  const centerY = safeNum(h / 2);
+  const baseRadius = safeNum(Math.min(w, h) * 0.3);
+  const pulseRadius = safeNum(baseRadius + (shadowPower * 20));
+
+  const radialGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseRadius > 0 ? pulseRadius : 1);
+  const color = shadowTrend >= 0 ? 'rgba(56, 189, 248,' : 'rgba(244, 63, 94,';
+  radialGrad.addColorStop(0, color + ' 0.4)');
+  radialGrad.addColorStop(0.5, color + ' 0.1)');
+  radialGrad.addColorStop(1, 'transparent');
+
+  ctx.fillStyle = radialGrad;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, pulseRadius > 0 ? pulseRadius : 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Shadow Line
+  ctx.strokeStyle = shadowTrend >= 0 ? '#38bdf8' : '#f43f5e';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(safeNum(w * 0.2), centerY);
+  ctx.lineTo(safeNum(w * 0.8), safeNum(centerY - (shadowTrend * 50)));
+  ctx.stroke();
+
+  // Text Info
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = 'bold 16px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`SHADOW: ${shadowValue.toFixed(2)}`, centerX, safeNum(centerY - baseRadius - 20));
   ctx.font = '12px monospace';
-  ctx.fillText('SKEWNESS ' + (tel.skewness != null ? tel.skewness.toFixed(2) : '-'), w - 160, 24);
-  ctx.fillText('KURTOSIS ' + (tel.kurtosis != null ? tel.kurtosis.toFixed(2) : '-'), w - 160, 44);
-  var lower = tel.lower_wick_energy || 0;
-  var upper = tel.upper_wick_energy || 0;
-  var barH = botH * 0.45;
-  ctx.fillStyle = '#4ade80';
-  ctx.fillRect(20, botY + 20, w * Math.min(lower / 100, 1), barH);
-  ctx.fillStyle = '#f43f5e';
-  ctx.fillRect(20, botY + 20 + barH + 12, w * Math.min(upper / 100, 1), barH);
-  ctx.fillStyle = '#e5e7eb';
-  ctx.font = '12px sans-serif';
-  ctx.fillText('Lower Wick Energy ' + lower + '%', 20, botY + 15);
-  ctx.fillText('Upper Wick Energy ' + upper + '%', 20, botY + 15 + barH + 12);
-  if (ot) {
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(0, 0, w, 30);
-    ctx.fillStyle = '#facc15';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.fillText('OPEN TRADE: ' + ot, 10, 22);
-  }
-};
+  ctx.fillStyle = 'rgba(248, 250, 252, 0.7)';
+  ctx.fillText(`POWER: ${shadowPower.toFixed(2)} | TREND: ${shadowTrend.toFixed(2)}`, centerX, safeNum(centerY + baseRadius + 30));
+}

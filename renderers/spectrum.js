@@ -1,117 +1,86 @@
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.SPECTRUM = function(ctx, w, h, st) {
-  const tel = (st.snap && st.snap.visual_telemetry) || {};
-  const ot = st.snap && st.snap.open_trade;
-  const t = st.t || 0;
-  ctx.fillStyle = '#070511';
+export default function render(canvas, telemetry) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
+  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
+
+  if (w === 0 || h === 0) return;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const data = telemetry || {};
+  const points = Array.isArray(data.spectrum) ? data.spectrum : [];
+  const signalStrength = Number.isFinite(data.signal_strength) ? data.signal_strength : 0;
+  const frequency = Number.isFinite(data.frequency) ? data.frequency : 0;
+
+  // Background Gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+  bgGrad.addColorStop(0, '#0f172a');
+  bgGrad.addColorStop(1, '#020617');
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
-  const topH = h * 0.44;
-  const botY = topH;
-  const botH = h - topH;
-  const bars = tel.spectrum_bars || [];
-  const n = bars.length || 32;
-  const bw = w / n * 0.8;
-  const gap = w / n * 0.2;
-  for (let i = 0; i < n; i++) {
-    const v = Math.min(1, Math.max(0, bars[i] || 0));
-    const bh = v * topH * 0.9;
-    const x = i * (bw + gap) + gap * 0.5;
-    const y = topH - bh;
-    const grad = ctx.createLinearGradient(x, topH, x, y);
-    grad.addColorStop(0, '#8b5cf6');
-    grad.addColorStop(1, '#22d3ee');
-    ctx.fillStyle = grad;
-    ctx.shadowColor = '#22d3ee';
-    ctx.shadowBlur = 12;
-    ctx.fillRect(x, y, bw, bh);
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#22d3ee';
-    ctx.font = '10px monospace';
+
+  if (points.length === 0) {
+    ctx.fillStyle = '#475569';
+    ctx.font = '12px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`P=${v.toFixed(2)}`, x + bw/2, topH + 12);
+    ctx.fillText('WAITING FOR SPECTRUM DATA...', w / 2, h / 2);
+    return;
   }
-  const cx = w - 60;
-  const cy = 60;
-  const r = 40;
-  ctx.strokeStyle = '#22d3ee';
+
+  // Draw Spectrum Waves
+  ctx.beginPath();
+  ctx.strokeStyle = '#38bdf8';
   ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.lineJoin = 'round';
+
+  const step = w / (points.length - 1 || 1);
+  points.forEach((val, i) => {
+    const x = Number.isFinite(i * step) ? i * step : 0;
+    const normalizedVal = Number.isFinite(val) ? val : 0;
+    const y = Number.isFinite(h - (normalizedVal * h)) ? h - (normalizedVal * h) : h;
+    
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
   ctx.stroke();
-  for (let d = 0; d < 360; d += 45) {
-    const a = d * Math.PI / 180 - Math.PI/2;
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.cos(a) * (r - 8), cy + Math.sin(a) * (r - 8));
-    ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-    ctx.stroke();
-  }
-  const phase = (tel.composite_phase_deg || 0) * Math.PI / 180 - Math.PI/2;
-  ctx.strokeStyle = '#fde047';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + Math.cos(phase) * (r - 10), cy + Math.sin(phase) * (r - 10));
-  ctx.stroke();
-  ctx.fillStyle = '#fde047';
-  ctx.beginPath();
-  ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+
+  // Fill Area
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  const fillGrad = ctx.createLinearGradient(0, 0, 0, h);
+  fillGrad.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
+  fillGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+  ctx.fillStyle = fillGrad;
   ctx.fill();
-  ctx.fillStyle = '#22d3ee';
-  ctx.font = '11px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('HILBERT', cx, cy + r + 18);
-  ctx.fillText(`${(tel.composite_phase_deg||0).toFixed(0)}°`, cx, cy + r + 32);
-  const midY = botY + botH / 2;
-  const scaleY = botH * 0.4;
-  const pd = tel.price_detrended || [];
-  const dw = tel.dominant_waves || [];
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-  ctx.beginPath();
-  for (let i = 0; i < pd.length; i++) {
-    const x = (i / Math.max(1, pd.length - 1)) * w;
-    const y = midY - pd[i] * scaleY;
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-  const colors = ['#22d3ee', '#8b5cf6', '#fde047'];
-  for (let wi = 0; wi < Math.min(3, dw.length); wi++) {
-    const wave = dw[wi];
-    if (!wave) continue;
-    const amp = wave.amplitude || 0;
-    const freq = wave.frequency || 0.01;
-    const ph = wave.phase || 0;
-    ctx.strokeStyle = colors[wi];
-    ctx.lineWidth = 2;
-    ctx.shadowColor = colors[wi];
-    ctx.shadowBlur = 8;
+
+  // Draw Signal Indicator
+  const centerX = w * 0.85;
+  const centerY = h * 0.2;
+  const radius = Number.isFinite(h * 0.1) ? h * 0.1 : 0;
+
+  if (radius > 0) {
+    const radGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+    const glowColor = signalStrength > 0.7 ? 'rgba(34, 197, 94, 0.5)' : 'rgba(249, 115, 22, 0.5)';
+    radGrad.addColorStop(0, glowColor);
+    radGrad.addColorStop(1, 'transparent');
+
+    ctx.fillStyle = radGrad;
     ctx.beginPath();
-    for (let i = 0; i < w; i += 2) {
-      const x = i;
-      const y = midY - Math.sin(freq * i + ph + t * 0.001) * amp * scaleY;
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-  }
-  if (ot) {
-    const ox = (ot.index / Math.max(1, (pd.length||1) - 1)) * w;
-    const oy = midY - (ot.price_detrended || 0) * scaleY;
-    ctx.fillStyle = ot.side === 'buy' ? '#22c55e' : '#ef4444';
-    ctx.beginPath();
-    ctx.arc(ox, oy, 6, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '10px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(ot.side.toUpperCase(), ox, oy - 10);
   }
-  ctx.strokeStyle = '#22d3ee';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath();
-  ctx.moveTo(0, midY);
-  ctx.lineTo(w, midY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-};
+
+  // Text Info
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = 'bold 14px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  const displayFreq = frequency.toFixed(2);
+  const displayStrength = (signalStrength * 100).toFixed(1);
+  ctx.fillText(`${displayFreq} Hz`, w - 20, h - 40);
+  ctx.font = '11px monospace';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(`STRENGTH: ${displayStrength}%`, w - 20, h - 20);
+}

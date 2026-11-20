@@ -1,36 +1,65 @@
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.RATIO = function(ctx, w, h, st) {
-  const tel = (st.snap && st.snap.visual_telemetry) || {};
-  const snap = st.snap || {};
-  const buy_vol = tel.buy_volume || 1;
-  const sell_vol = tel.sell_volume || 1;
-  const total = buy_vol + sell_vol;
-  const ratio = (buy_vol / total) * 100;
+export function renderRatio(canvas, telemetry) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width || 0;
+  const h = canvas.height || 0;
+  ctx.clearRect(0, 0, w, h);
+  if (w <= 0 || h <= 0) return;
 
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0, 0, w, h);
+  const safe = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
 
-  const midX = w / 2;
-  const barH = 40;
-  const barY = h / 2 - 20;
+  const ratio = safe(telemetry?.ratio, 0);
+  const label = telemetry?.label || 'Ratio';
+  const color = telemetry?.color || '#38bdf8';
 
-  ctx.fillStyle = '#ef4444';
-  ctx.fillRect(50, barY, w - 100, barH);
-  ctx.fillStyle = '#22c55e';
-  ctx.fillRect(50, barY, (w - 100) * (ratio / 100), barH);
+  const centerX = safe(w / 2);
+  const centerY = safe(h / 2);
+  const radius = safe(Math.min(w, h) * 0.35);
 
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(50, barY, w - 100, barH);
+  // Background Circle
+  ctx.beginPath();
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = safe(radius * 0.15);
+  ctx.arc(centerX, centerY, radius, 0, safe(Math.PI * 2));
+  ctx.stroke();
 
-  ctx.fillStyle = '#fff';
-  ctx.font = '16px monospace';
+  // Progress Arc
+  const startAngle = safe(-Math.PI / 2);
+  const endAngle = safe(startAngle + (Math.PI * 2 * (Math.min(Math.max(ratio, 0), 100) / 100)));
+  
+  ctx.beginPath();
+  const grad = ctx.createLinearGradient(safe(centerX - radius), centerY, safe(centerX + radius), centerY);
+  grad.addColorStop(0, color);
+  grad.addColorStop(1, '#ffffff');
+  ctx.strokeStyle = grad;
+  ctx.lineCap = 'round';
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.stroke();
+
+  // Text Rendering
   ctx.textAlign = 'center';
-  ctx.fillText(`BUY ${ratio.toFixed(1)}%`, midX - 50, barY - 10);
-  ctx.fillText(`SELL ${(100 - ratio).toFixed(1)}%`, midX + 50, barY - 10);
+  ctx.textBaseline = 'middle';
+  
+  const fontSizeValue = safe(radius * 0.5);
+  ctx.font = `bold ${fontSizeValue}px Inter, sans-serif`;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(`${ratio.toFixed(1)}%`, centerX, safe(centerY - radius * 0.05));
 
-  const imbalance = snap.imbalance_score || 0;
-  ctx.font = '32px monospace';
-  ctx.fillStyle = imbalance > 0 ? '#22c55e' : '#ef4444';
-  ctx.fillText(`IMBALANCE: ${imbalance.toFixed(2)}`, midX, barY + 80);
-};
+  const fontSizeLabel = safe(radius * 0.18);
+  ctx.font = `${fontSizeLabel}px Inter, sans-serif`;
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(label.toUpperCase(), centerX, safe(centerY + radius * 0.4));
+
+  // Bottom Bar Indicator
+  const barW = safe(w * 0.6);
+  const barH = safe(4);
+  const barX = safe((w - barW) / 2);
+  const barY = safe(h - 10);
+  
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(barX, barY, barW, barH);
+  
+  ctx.fillStyle = color;
+  const fillW = safe(barW * (Math.min(Math.max(ratio, 0), 100) / 100));
+  ctx.fillRect(barX, barY, fillW, barH);
+}

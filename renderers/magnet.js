@@ -1,73 +1,68 @@
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.MAGNET = function(ctx, w, h, st) {
-  const tel = (st.snap && st.snap.visual_telemetry) || {};
-  const ot = st.snap && st.snap.open_trade;
-  const t = st.t || 0;
-  const snap = st.snap || {};
-  const price_orbit = snap.price_orbit || [];
-  const vwap_core = snap.vwap_core || 0;
-  const sigma_dist = snap.sigma_dist || 0;
+export default function render(canvas, telemetry) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
 
-  ctx.fillStyle = '#040814';
+  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
+  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
+  ctx.clearRect(0, 0, w, h);
+  if (w === 0 || h === 0) return;
+
+  const safe = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+
+  const pull = safe(telemetry?.pull_force, 0);
+  const push = safe(telemetry?.push_force, 0);
+  const intensity = safe(telemetry?.intensity, 0);
+  const centerX = w / 2;
+  const centerY = h / 2;
+  const baseRadius = Math.min(w, h) * 0.35;
+
+  // Background Gradient
+  const bgGrad = ctx.createRadialGradient(
+    safe(centerX), safe(centerY), 0,
+    safe(centerX), safe(centerY), safe(baseRadius * 1.5)
+  );
+  bgGrad.addColorStop(0, '#0f172a');
+  bgGrad.addColorStop(1, '#020617');
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  const leftW = w * 0.44;
-  const cx = leftW / 2;
-  const cy = h / 2;
-  const r = Math.min(leftW, h) * 0.3;
+  // Magnet Core
+  const coreRadius = safe(baseRadius * (0.8 + intensity * 0.2));
+  const coreGrad = ctx.createLinearGradient(0, safe(centerY - coreRadius), 0, safe(centerY + coreRadius));
+  coreGrad.addColorStop(0, pull > push ? '#3b82f6' : '#ef4444');
+  coreGrad.addColorStop(1, '#1e293b');
 
-  ctx.strokeStyle = '#3b82f6';
   ctx.beginPath();
-  ctx.moveTo(0, cy);
-  ctx.lineTo(leftW, cy);
+  ctx.arc(safe(centerX), safe(centerY), safe(coreRadius), 0, Math.PI * 2);
+  ctx.strokeStyle = pull > push ? '#60a5fa' : '#f87171';
+  ctx.lineWidth = safe(2 + intensity * 5);
   ctx.stroke();
-
-  [[1, '#3b82f6'], [2, '#eab308'], [2.8, '#f472b6']].forEach(ring => {
-    ctx.strokeStyle = ring[1];
-    ctx.beginPath();
-    ctx.arc(cx, cy, r * ring[0] * 0.2, 0, Math.PI * 2);
-    ctx.stroke();
-  });
-
-  const angle = t * 0.4;
-  const px = cx + Math.cos(angle) * sigma_dist * 8;
-  const py = cy + Math.sin(angle) * sigma_dist * 8;
-  ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(px, py, 4, 0, Math.PI * 2);
+  ctx.fillStyle = coreGrad;
   ctx.fill();
-  ctx.strokeStyle = '#f472b6';
-  ctx.beginPath();
-  ctx.moveTo(px, py);
-  ctx.lineTo(cx, cy);
-  ctx.stroke();
-  ctx.fillStyle = '#fff';
-  ctx.fillText('Do Cang ' + tel.tension_pct + '%', cx + 8, cy - 8);
 
-  ctx.fillStyle = '#fff';
-  ctx.fillText('vwap_core ' + vwap_core, leftW + 10, 24);
-  ctx.fillText('sigma_dist ' + sigma_dist, leftW + 10, 44);
-  if (ot) {
-    ctx.fillText('open_trade ' + JSON.stringify(ot), leftW + 10, 64);
+  // Force Waves
+  const waveCount = 3;
+  for (let i = 0; i < waveCount; i++) {
+    const waveRadius = safe(coreRadius + (i + 1) * 20 * (1 + intensity));
+    const alpha = safe(0.5 / (i + 1));
+    ctx.beginPath();
+    ctx.arc(safe(centerX), safe(centerY), safe(waveRadius), 0, Math.PI * 2);
+    ctx.strokeStyle = pull > push ? `rgba(59, 130, 246, ${alpha})` : `rgba(239, 68, 68, ${alpha})`;
+    ctx.setLineDash([5, 10]);
+    ctx.stroke();
+    ctx.setLineDash([]);
   }
 
-  ctx.strokeStyle = '#10b981';
-  ctx.beginPath();
-  price_orbit.forEach((p, i) => {
-    const x = leftW + 20 + (i / Math.max(price_orbit.length - 1, 1)) * (w - leftW - 40);
-    const y = cy + (p - vwap_core) * 3;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  ['p1', 'm1', 'p2', 'm2'].forEach(b => {
-    const val = snap[b];
-    if (val != null) {
-      ctx.strokeStyle = b[0] === 'p' ? '#22c55e' : '#ef4444';
-      ctx.beginPath();
-      ctx.moveTo(leftW + 20, cy + (val - vwap_core) * 3);
-      ctx.lineTo(w - 20, cy + (val - vwap_core) * 3);
-      ctx.stroke();
-    }
-  });
-};
+  // Telemetry Text
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = 'bold 14px monospace';
+  ctx.textAlign = 'center';
+  const displayPull = pull.toFixed(2);
+  const displayPush = push.toFixed(2);
+  ctx.fillText(`PULL: ${displayPull} | PUSH: ${displayPush}`, safe(centerX), safe(h - 20));
+  
+  ctx.font = '12px monospace';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(`INTENSITY: ${(intensity * 100).toFixed(1)}%`, safe(centerX), safe(h - 40));
+}

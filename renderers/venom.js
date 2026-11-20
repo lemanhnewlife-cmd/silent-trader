@@ -1,41 +1,61 @@
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.VENOM = function(ctx, w, h, st) {
-  const tel = (st.snap && st.snap.visual_telemetry) || {};
-  const ot = st.snap && st.snap.open_trade;
-  const t = st.t || 0;
-  const snap = st.snap || {};
-  const venom_flow = snap.venom_flow || [];
-  const toxicity = tel.toxicity || 0;
+export default function render(ctx, telemetry) {
+  const w = Number.isFinite(ctx.canvas.width) && ctx.canvas.width > 0 ? ctx.canvas.width : 0;
+  const h = Number.isFinite(ctx.canvas.height) && ctx.canvas.height > 0 ? ctx.canvas.height : 0;
+  if (w === 0 || h === 0) return;
 
-  ctx.fillStyle = '#020617';
+  const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+
+  ctx.clearRect(0, 0, w, h);
+
+  const data = telemetry || {};
+  const price = safeNum(data.price, 0);
+  const spread = safeNum(data.spread, 0);
+  const volume = safeNum(data.volume, 0);
+  const pressure = safeNum(data.pressure, 0.5);
+  const trend = safeNum(data.trend, 0);
+
+  const centerX = w / 2;
+  const centerY = h / 2;
+  const radius = safeNum(Math.min(w, h) * 0.35, 10);
+
+  // Background Glow
+  const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 1.5);
+  grad.addColorStop(0, 'rgba(30, 30, 50, 1)');
+  grad.addColorStop(1, 'rgba(10, 10, 20, 1)');
+  ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
-  const barW = w / Math.max(venom_flow.length, 1);
-  venom_flow.forEach((v, i) => {
-    const hue = 120 + v * 60;
-    ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.3)`;
-    const vh = Math.abs(v) * h * 0.4;
-    ctx.fillRect(i * barW, h / 2 - (v > 0 ? vh : 0), barW - 1, vh);
-  });
-
-  ctx.strokeStyle = '#22c55e';
-  ctx.lineWidth = 2;
+  // Pressure Ring
   ctx.beginPath();
-  ctx.moveTo(0, h / 2);
-  ctx.lineTo(w, h / 2);
+  ctx.lineWidth = safeNum(radius * 0.1, 2);
+  ctx.strokeStyle = pressure > 0.5 ? '#00ff88' : '#ff4444';
+  const startAngle = -Math.PI / 2;
+  const endAngle = startAngle + safeNum(pressure * Math.PI * 2, 0);
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
   ctx.stroke();
 
-  const pulse = Math.sin(t * 0.1) * 10;
-  ctx.fillStyle = toxicity > 70 ? '#ef4444' : '#22c55e';
-  ctx.font = 'bold 24px monospace';
-  ctx.fillText(`TOXICITY: ${toxicity.toFixed(1)}%`, 20, 40 + pulse);
+  // Center Text
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${safeNum(radius * 0.3, 12)}px monospace`;
+  ctx.fillText(price.toFixed(2), centerX, centerY - radius * 0.2);
 
-  if (ot) {
-    ctx.fillStyle = 'rgba(34, 197, 94, 0.1)';
-    ctx.fillRect(w - 200, 10, 190, 60);
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px monospace';
-    ctx.fillText(`Side: ${ot.side}`, w - 190, 30);
-    ctx.fillText(`P&L: $${(ot.floating_usd || 0).toFixed(2)}`, w - 190, 50);
-  }
-};
+  ctx.font = `${safeNum(radius * 0.15, 10)}px monospace`;
+  ctx.fillStyle = '#8888ff';
+  ctx.fillText(`VOL: ${volume.toFixed(0)}`, centerX, centerY + radius * 0.2);
+  
+  ctx.fillStyle = trend >= 0 ? '#00ff00' : '#ff3300';
+  ctx.fillText(`TREND: ${(trend * 100).toFixed(1)}%`, centerX, centerY + radius * 0.4);
+
+  // Decorative Lines
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, centerY);
+  ctx.lineTo(w, centerY);
+  ctx.moveTo(centerX, 0);
+  ctx.lineTo(centerX, h);
+  ctx.stroke();
+}

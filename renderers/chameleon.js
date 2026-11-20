@@ -1,93 +1,88 @@
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.CHAMELEON = function(ctx, w, h, st) {
-  'use strict';
-  const stt = st || {};
-  const snap = stt.snap || {};
-  const tel = snap.visual_telemetry || {};
-  const ot = snap.open_trade;
-  const t = stt.t || 0;
-  const regime = tel.regime || 'SIDEWAY';
-  const pT = Number(tel.p_trend || 0);
-  const pS = Number(tel.p_sideway || 0);
-  const pC = Number(tel.p_chop || 0);
-  const prices = tel.prices || [];
-  const er = Number(tel.efficiency_ratio || 0);
-  const rho = Number(tel.autocorr || 0);
-  const bg = regime === 'TREND' ? '#04130f' : regime === 'SIDEWAY' ? '#100718' : '#17080a';
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-  const lw = w * 0.44;
-  const cx = lw * 0.5;
-  const cy = h * 0.5;
-  const r = Math.min(lw, h) * 0.35;
-  const ax = cx;
-  const ay = cy - r;
-  const bx = cx - r * 0.866;
-  const by = cy + r * 0.5;
-  const cx2 = cx + r * 0.866;
-  const cy2 = cy + r * 0.5;
-  const angle = t * 0.5;
-  const vx = cx + r * Math.cos(angle - Math.PI / 2);
-  const vy = cy + r * Math.sin(angle - Math.PI / 2);
-  const px = pT * ax + pS * bx + pC * cx2;
-  const py = pT * ay + pS * by + pC * cy2;
-  ctx.beginPath();
-  ctx.moveTo(ax, ay);
-  ctx.lineTo(bx, by);
-  ctx.lineTo(cx2, cy2);
-  ctx.closePath();
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  const verts = [
-    {x: ax, y: ay, c: '#10b981', label: 'TREND', p: pT},
-    {x: bx, y: by, c: '#c084fc', label: 'SIDEWAY', p: pS},
-    {x: cx2, y: cy2, c: '#ef4444', label: 'HIBERNATE', p: pC}
-  ];
-  verts.forEach(v => {
-    ctx.fillStyle = v.c;
+window.renderChameleon = function(canvas, telemetry) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const W = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
+    const H = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
+    if (W === 0 || H === 0) return;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+
+    const data = telemetry || {};
+    const price = safeNum(data.price, 0);
+    const change = safeNum(data.change_24h, 0);
+    const volume = safeNum(data.volume_24h, 0);
+    const sentiment = safeNum(data.sentiment, 50);
+    const volatility = safeNum(data.volatility, 0);
+
+    // Background
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, safeNum(H));
+    bgGrad.addColorStop(0, '#0f172a');
+    bgGrad.addColorStop(1, '#020617');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Central Orb
+    const centerX = safeNum(W / 2);
+    const centerY = safeNum(H / 2);
+    const radius = safeNum(Math.min(W, H) * 0.25);
+
+    const orbGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+    const color = change >= 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+    orbGrad.addColorStop(0, color);
+    orbGrad.addColorStop(1, 'transparent');
+
+    ctx.fillStyle = orbGrad;
     ctx.beginPath();
-    ctx.arc(v.x, v.y, 5, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '11px monospace';
-    ctx.fillText(v.label + ' ' + (v.p * 100 | 0) + '%', v.x + 8, v.y + 4);
-  });
-  const grad = ctx.createRadialGradient(px, py, 0, px, py, 22);
-  grad.addColorStop(0, 'rgba(255,255,255,0.7)');
-  grad.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(px, py, 22, 0, Math.PI * 2);
-  ctx.fill();
-  const rx = lw;
-  const rw = w - lw;
-  ctx.fillStyle = 'rgba(0,0,0,0.45)';
-  ctx.fillRect(rx, 0, rw, h);
-  if (prices.length > 1) {
-    const mn = Math.min(...prices);
-    const mx = Math.max(...prices);
-    const step = rw / (prices.length - 1);
-    const baseY = h * 0.62;
-    const scale = h * 0.22 / (mx - mn || 1);
-    ctx.beginPath();
-    prices.forEach((p, i) => {
-      const x = rx + i * step;
-      const y = baseY - (p - mn) * scale;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.strokeStyle = regime === 'TREND' ? '#10b981' : regime === 'SIDEWAY' ? '#c084fc' : '#ef4444';
+
+    // Sentiment Ring
+    const ringRadius = radius + 20;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
     ctx.stroke();
-  }
-  const badge = regime === 'TREND' ? 'TREND' : regime === 'SIDEWAY' ? 'SIDEWAY' : 'NGU DONG NE BAO';
-  ctx.fillStyle = regime === 'TREND' ? '#10b981' : regime === 'SIDEWAY' ? '#c084fc' : '#ef4444';
-  ctx.font = 'bold 20px monospace';
-  ctx.fillText(badge, rx + 16, 42);
-  ctx.fillStyle = '#e5e7eb';
-  ctx.font = '13px monospace';
-  ctx.fillText('ER=' + er.toFixed(2) + '  AC=' + rho.toFixed(2), rx + 16, 66);
-  if (ot) {
-    ctx.fillText('OT=' + String(ot), rx + 16, 90);
-  }
+
+    const angle = safeNum((sentiment / 100) * Math.PI * 2);
+    ctx.strokeStyle = sentiment > 50 ? '#22c55e' : '#ef4444';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, ringRadius, -Math.PI / 2, angle - Math.PI / 2);
+    ctx.stroke();
+
+    // Data Labels
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.font = 'bold 24px monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(price.toFixed(2), centerX, centerY - 10);
+
+    ctx.font = '14px monospace';
+    ctx.fillStyle = change >= 0 ? '#4ade80' : '#f87171';
+    ctx.fillText((change >= 0 ? '+' : '') + change.toFixed(2) + '%', centerX, centerY + 20);
+
+    // Volatility Waves
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    const waveCount = 50;
+    for (let i = 0; i <= waveCount; i++) {
+        const x = safeNum((W / waveCount) * i);
+        const yOffset = Math.sin(i * 0.5 + Date.now() * 0.002) * volatility * 10;
+        const y = safeNum(H * 0.85 + yOffset);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Bottom Info
+    ctx.font = '10px monospace';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillText('VOL: ' + volume.toLocaleString(), centerX, H - 20);
 };

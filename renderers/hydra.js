@@ -1,39 +1,73 @@
-window.SilentRenderers = window.SilentRenderers || {};
-window.SilentRenderers.HYDRA = function(ctx, w, h, st) {
-  const tel = (st.snap && st.snap.visual_telemetry) || {};
-  const t = st.t || 0;
-  const heads = tel.active_heads || 3;
+export default function renderHydra(ctx, telemetry) {
+    const w = Number.isFinite(ctx.canvas.width) && ctx.canvas.width > 0 ? ctx.canvas.width : 0;
+    const h = Number.isFinite(ctx.canvas.height) && ctx.canvas.height > 0 ? ctx.canvas.height : 0;
 
-  ctx.fillStyle = '#050505';
-  ctx.fillRect(0, 0, w, h);
+    if (w === 0 || h === 0) return;
 
-  ctx.translate(w / 2, h / 2);
-  for (let i = 0; i < heads; i++) {
-    const angle = (i / heads) * Math.PI * 2 + t * 0.05;
-    const dist = 60 + Math.sin(t * 0.1 + i) * 20;
-    const x = Math.cos(angle) * dist;
-    const y = Math.sin(angle) * dist;
+    ctx.clearRect(0, 0, w, h);
 
-    ctx.strokeStyle = `hsl(${(t + i * 40) % 360}, 70%, 50%)`;
-    ctx.lineWidth = 3;
+    const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+
+    const data = telemetry || {};
+    const score = safeNum(data.score, 0);
+    const flow = safeNum(data.flow, 0);
+    const pressure = safeNum(data.pressure, 0);
+    const density = safeNum(data.density, 0);
+
+    const centerX = safeNum(w / 2);
+    const centerY = safeNum(h / 2);
+    const baseRadius = safeNum(Math.min(w, h) * 0.35);
+
+    // Background Gradient
+    const bgGrad = ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, safeNum(baseRadius * 1.5)
+    );
+    bgGrad.addColorStop(0, '#0f172a');
+    bgGrad.addColorStop(1, '#020617');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw Multi-headed Hydra Rings
+    const heads = 7;
+    for (let i = 0; i < heads; i++) {
+        const angle = safeNum((i / heads) * Math.PI * 2);
+        const offset = safeNum(Math.sin(Date.now() / 1000 + i) * 10);
+        const r = safeNum(baseRadius + offset);
+        
+        const x = safeNum(centerX + Math.cos(angle) * (flow * 20));
+        const y = safeNum(centerY + Math.sin(angle) * (flow * 20));
+
+        ctx.beginPath();
+        ctx.strokeStyle = i % 2 === 0 ? `rgba(168, 85, 247, ${0.3 + pressure * 0.5})` : `rgba(56, 189, 248, ${0.3 + pressure * 0.5})`;
+        ctx.lineWidth = safeNum(2 + density * 5);
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // Center Core
+    const coreGrad = ctx.createLinearGradient(
+        safeNum(centerX - 50), safeNum(centerY - 50),
+        safeNum(centerX + 50), safeNum(centerY + 50)
+    );
+    coreGrad.addColorStop(0, '#a855f7');
+    coreGrad.addColorStop(1, '#38bdf8');
+
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.quadraticCurveTo(x * 0.5, y * 1.5, x, y);
-    ctx.stroke();
-
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = coreGrad;
+    ctx.shadowBlur = safeNum(15 + score * 10);
+    ctx.shadowColor = '#a855f7';
+    ctx.arc(centerX, centerY, safeNum(20 + score * 5), 0, Math.PI * 2);
     ctx.fill();
-  }
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.shadowBlur = 0;
 
-  ctx.fillStyle = '#6366f1';
-  ctx.font = '14px monospace';
-  ctx.fillText(`HYDRA NODES: ${heads}`, 20, 30);
-  ctx.fillText(`LATENCY: ${tel.latency_ms || 0}ms`, 20, 50);
-  if (st.snap && st.snap.open_trade) {
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillText('ACTIVE POSITION DETECTED', 20, 70);
-  }
-};
+    // HUD Text
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`HYDRA CORE: ${score.toFixed(2)}`, centerX, safeNum(centerY + baseRadius + 40));
+    
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`F:${flow.toFixed(2)} P:${pressure.toFixed(2)} D:${density.toFixed(2)}`, centerX, safeNum(centerY + baseRadius + 60));
+}
