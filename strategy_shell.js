@@ -390,6 +390,10 @@
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.width / dpr;
     const h = canvas.height / dpr;
+    if (!Number.isFinite(w) || !Number.isFinite(h) || w < 10 || h < 10) {
+      requestAnimationFrame(renderLoop);
+      return;
+    }
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const fn = window.SilentRenderers && window.SilentRenderers[SYSTEM_ID];
