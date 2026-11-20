@@ -164,7 +164,7 @@ window.SilentRenderers.SEISMOGRAPH = function(ctx, w, h, st) {
   } else {
     ctx.fillStyle = '#64748b';
     ctx.font = '12px monospace';
-    ctx.fillText('Dang thu thap song Bid/Ask...', plotX, plotY + plotH / 2);
+    ctx.fillText('Đang thu thập sóng Bid/Ask...', plotX, plotY + plotH / 2);
   }
   ctx.restore();
 

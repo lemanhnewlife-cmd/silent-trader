@@ -148,7 +148,7 @@ window.SilentRenderers.VENOM = function(ctx, w, h, st) {
     ctx.fillStyle = '#94a3b8';
     ctx.font = '12px monospace';
     ctx.textAlign = 'left';
-    ctx.fillText('Dang theo doi xung ECG...', cX, midY - 10);
+    ctx.fillText('Đang theo dõi xung ECG...', cX, midY - 10);
   }
   ctx.restore();
 

@@ -257,7 +257,7 @@ window.SilentRenderers.CHRONOS = function(ctx, w, h, st) {
   } else {
     ctx.fillStyle = '#64748b';
     ctx.font = '12px monospace';
-    ctx.fillText('Dang nap du lieu gia phien...', cX, cY + cH / 2);
+    ctx.fillText('Đang nạp dữ liệu giá phiên...', cX, cY + cH / 2);
   }
 
   drawOpenTradeBadge(rightX + 12, h - pad - 34, rightW - 24);

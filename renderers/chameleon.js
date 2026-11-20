@@ -232,7 +232,7 @@ window.SilentRenderers.CHAMELEON = function(ctx, w, h, st) {
   } else {
     ctx.fillStyle = '#64748b';
     ctx.font = '12px monospace';
-    ctx.fillText('Dang cap nhat chuoi gia regime...', cX, cY + cH / 2);
+    ctx.fillText('Đang cập nhật chuỗi giá regime...', cX, cY + cH / 2);
   }
 
   drawOpenTradeBadge(rightX + 12, h - pad - 34, rightW - 24);

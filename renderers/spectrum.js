@@ -100,7 +100,7 @@ window.SilentRenderers.SPECTRUM = function(ctx, w, h, st) {
   } else {
     ctx.fillStyle = '#64748b';
     ctx.font = '12px monospace';
-    ctx.fillText('Dang tinh pho Fourier DFT...', pad + 14, pad + (topH - pad) / 2);
+    ctx.fillText('Đang tính phổ Fourier DFT...', pad + 14, pad + (topH - pad) / 2);
   }
   ctx.restore();
 

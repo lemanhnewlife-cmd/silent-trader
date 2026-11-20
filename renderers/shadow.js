@@ -148,7 +148,7 @@ window.SilentRenderers.SHADOW = function(ctx, w, h, st) {
   } else {
     ctx.fillStyle = '#71717a';
     ctx.font = '12px monospace';
-    ctx.fillText('Dang thu thap mau phan phoi...', cX, cY + cH / 2);
+    ctx.fillText('Đang thu thập mẫu phân phối...', cX, cY + cH / 2);
   }
   ctx.restore();
 

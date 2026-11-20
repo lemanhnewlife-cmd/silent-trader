@@ -261,7 +261,7 @@ window.SilentRenderers.MAGNET = function(ctx, w, h, st) {
   } else {
     ctx.fillStyle = '#64748b';
     ctx.font = '12px monospace';
-    ctx.fillText('Dang nap quy dao gia VWAP...', cX, cY + cH / 2);
+    ctx.fillText('Đang nạp quỹ đạo giá VWAP...', cX, cY + cH / 2);
   }
 
   drawOpenTradeBadge(rightX + 12, h - pad - 34, rightW - 24);
