@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silent Trader • Leviathan Sonar — Tàu Ngầm Dò Tảng Băng Chìm Cá Mập</title>
+  <style>
+    :root {
+      --bg: #030a12;
+      --panel: #081423;
+      --panel-2: #0c1d33;
+      --border: #16304d;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --buy: #22c55e;
+      --sell: #ef4444;
+      --accent: #22d3ee;
+      --ai: #06b6d4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+    /* === THANH DOCK BIẾN HÌNH 5 CỖ MÁY === */
+    .morph-dock {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #04070d;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .dock-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding-right: 4px;
+    }
+    .dock-pill {
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 4px 10px;
+      display: flex;
+      flex-direction: column;
+      min-width: 175px;
+      flex: 1 1 0;
+      transition: all 0.16s ease;
+    }
+    .dock-pill:hover {
+      border-color: var(--pill-col);
+      transform: translateY(-1px);
+    }
+    .dock-pill.active {
+      background: color-mix(in srgb, var(--pill-col) 18%, #090e1a);
+      border-color: var(--pill-col);
+      box-shadow: 0 0 14px color-mix(in srgb, var(--pill-col) 35%, transparent);
+    }
+    .dock-top {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+    .dock-live-dot {
+      margin-left: auto;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .dock-sub {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10.5px;
+      color: var(--muted);
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+
+    /* === TOPBAR === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 800;
+    }
+    .badge-ai {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 700;
+      background: color-mix(in srgb, var(--ai) 20%, transparent);
+      color: #f8fafc;
+      border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+    }
+    .dot.live { background: var(--buy); box-shadow: 0 0 8px var(--buy); }
+    .dot.err { background: var(--sell); }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      background: #09101d;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      width: 210px;
+    }
+    select, button {
+      background: #162033;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+    button:hover, select:hover { border-color: var(--accent); }
+    button.active {
+      background: color-mix(in srgb, var(--accent) 22%, transparent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-copy-strat {
+      background: linear-gradient(135deg, var(--ai), var(--accent));
+      border-color: rgba(255, 255, 255, 0.45);
+      color: #fff;
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      box-shadow: 0 0 16px color-mix(in srgb, var(--ai) 50%, transparent);
+    }
+    .btn-copy-strat:hover { filter: brightness(1.12); }
+    .btn-hist {
+      background: #132238;
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+      font-weight: 600;
+    }
+
+    /* === HUD === */
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 7px;
+      padding: 6px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .hud-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 9px;
+    }
+    .hud-label { font-size: 10px; color: var(--muted); margin-bottom: 1px; }
+    .hud-val {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bull { color: var(--buy); }
+    .bear { color: var(--sell); }
+    .cyan { color: var(--accent); }
+    .purple { color: var(--ai); }
+
+    /* === Ô GIỚI THIỆU ĐIỂM ĐẶC SẮC CHIẾN LƯỢC (USP SPOTLIGHT BOX) === */
+    .usp-box {
+      background: linear-gradient(90deg, color-mix(in srgb, var(--ai) 14%, var(--panel)), var(--panel-2));
+      border-bottom: 1px solid color-mix(in srgb, var(--ai) 45%, var(--border));
+      padding: 7px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .usp-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .usp-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 0.2px;
+    }
+    .usp-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .usp-magic-badge {
+      font-family: ui-monospace, monospace;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.14);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #86efac;
+      font-weight: 700;
+    }
+    .usp-toggle-btn {
+      font-size: 10.5px;
+      padding: 2px 7px;
+      background: rgba(15, 23, 42, 0.75);
+    }
+    .usp-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .usp-box.collapsed .usp-body { display: none; }
+    .usp-desc {
+      font-size: 11.5px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      flex: 2 1 420px;
+    }
+    .usp-right {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1.3 1 320px;
+      align-items: flex-end;
+    }
+    .usp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+    .usp-tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+    }
+    .usp-proof {
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(2, 6, 14, 0.55);
+      border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+      border-radius: 5px;
+      padding: 3px 8px;
+      width: 100%;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* === CANVAS === */
+    .canvas-wrap {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+      min-height: 280px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .tooltip-bar {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      background: rgba(10, 16, 28, 0.86);
+      border: 1px solid var(--border);
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-family: ui-monospace, monospace;
+      font-size: 11.5px;
+      color: var(--text);
+      pointer-events: none;
+      max-width: calc(100% - 100px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .legend {
+      position: absolute;
+      left: 12px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(7, 11, 18, 0.88);
+      border: 1px solid var(--border);
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      pointer-events: none;
+      flex-wrap: wrap;
+    }
+
+    /* === MODALS === */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 14, 0.78);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 14px;
+      user-select: text;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 480px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #0e1522;
+      border: 1px solid #283852;
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: var(--text);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 15px; font-weight: 700; color: #f8fafc; }
+    .modal-close {
+      background: #162033;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 13px;
+    }
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-pill {
+      background: #09101d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 8px;
+      text-align: center;
+    }
+    .stat-pill .k { font-size: 10px; color: var(--muted); }
+    .stat-pill .v { font-size: 12.5px; font-weight: 700; font-family: ui-monospace, monospace; margin-top: 2px; }
+    .pay-card {
+      background: #09101d;
+      border: 1px solid #24324a;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+    .qr-wrap {
+      display: inline-block;
+      background: #fff;
+      padding: 8px;
+      border-radius: 10px;
+      margin: 8px 0;
+    }
+    .qr-wrap img { display: block; width: 196px; height: 196px; }
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #121c2e;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 10px;
+      margin-top: 7px;
+      font-size: 12px;
+      text-align: left;
+      gap: 8px;
+    }
+    .info-row code {
+      font-family: ui-monospace, monospace;
+      color: #38bdf8;
+      font-weight: 700;
+      word-break: break-all;
+    }
+    .mini-copy {
+      padding: 3px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pay-status {
+      margin-top: 10px;
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+    .pay-status.paid {
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
+    .btn-primary-full {
+      width: 100%;
+      padding: 10px 14px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+      border: none;
+      color: #041019;
+    }
+    .btn-primary-full:hover { filter: brightness(1.08); }
+    .steps-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #121c2e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: left;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+    .steps-box ol { padding-left: 18px; margin-top: 4px; }
+    .link-reset {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      text-decoration: underline;
+      margin-top: 8px;
+      padding: 2px 4px;
+    }
+    .history-box {
+      width: 100%;
+      max-width: 940px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #0e1522;
+      border: 1px solid #283852;
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: var(--text);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+    .hist-kpi {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .strat-banner {
+      background: color-mix(in srgb, var(--ai) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ai) 40%, transparent);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #e9d5ff;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .modal-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .tab-btn {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .hist-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #09101d;
+    }
+    .hist-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .hist-table th, .hist-table td {
+      padding: 7px 9px;
+      border-bottom: 1px solid #162033;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .hist-table th {
+      background: #121c2e;
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .tag-buy { color: #22c55e; font-weight: 700; }
+    .tag-sell { color: #ef4444; font-weight: 700; }
+    .tag-tp {
+      background: rgba(34, 197, 94, 0.16);
+      color: #4ade80;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .tag-sl {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .tag-open {
+      background: rgba(56, 189, 248, 0.18);
+      color: #7dd3fc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    @media (max-width: 900px) {
+      .hud { grid-template-columns: repeat(2, 1fr); }
+      .usp-right { align-items: flex-start; }
+      .usp-tags { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <!-- THANH DOCK BIẾN HÌNH 5 CỖ MÁY ĐỘC LẬP -->
+  <nav class="morph-dock" id="morphDock" aria-label="Chuyển đổi 5 cỗ máy chiến lược">
+    <div class="dock-label">⚡ 5 CỖ MÁY ĐỘC LẬP:</div>
+      <a href="./silenteyes.html" data-sys="SILENT_EYES" data-page="silenteyes.html" class="dock-pill " style="--pill-col:#a855f7;" title="Silent Eyes — Phễu Tiên Tri K-Line (Magic #43450483)"><span class="dock-top"><span class="dock-ico">🔮</span><span class="dock-name">SILENT EYES</span><span class="dock-live-dot" id="dockPos_SILENT_EYES"></span></span><span class="dock-sub" id="dockMeta_SILENT_EYES">$10,000 • Đang tải...</span></a>
+      <a href="./graveyard.html" data-sys="GRAVEYARD" data-page="graveyard.html" class="dock-pill " style="--pill-col:#ef4444;" title="Liquidity Graveyard — Tử Địa Săn Stoploss Đám Đông (Magic #43450484)"><span class="dock-top"><span class="dock-ico">🩸</span><span class="dock-name">GRAVEYARD</span><span class="dock-live-dot" id="dockPos_GRAVEYARD"></span></span><span class="dock-sub" id="dockMeta_GRAVEYARD">$10,000 • Đang tải...</span></a>
+      <a href="./nexus15.html" data-sys="NEXUS15" data-page="nexus15.html" class="dock-pill " style="--pill-col:#10b981;" title="Nexus-15 — Ma Trận Độ Trễ Liên Thị Trường 15 Tài Sản (Magic #43450485)"><span class="dock-top"><span class="dock-ico">🌐</span><span class="dock-name">NEXUS-15</span><span class="dock-live-dot" id="dockPos_NEXUS15"></span></span><span class="dock-sub" id="dockMeta_NEXUS15">$10,000 • Đang tải...</span></a>
+      <a href="./leviathan.html" data-sys="LEVIATHAN" data-page="leviathan.html" class="dock-pill active" style="--pill-col:#06b6d4;" title="Leviathan Sonar — Tàu Ngầm Dò Tảng Băng Chìm Cá Mập (Magic #43450486)"><span class="dock-top"><span class="dock-ico">🐋</span><span class="dock-name">LEVIATHAN</span><span class="dock-live-dot" id="dockPos_LEVIATHAN"></span></span><span class="dock-sub" id="dockMeta_LEVIATHAN">$10,000 • Đang tải...</span></a>
+      <a href="./anticrowd.html" data-sys="ANTICROWD" data-page="anticrowd.html" class="dock-pill " style="--pill-col:#f59e0b;" title="Anti-Crowd Mirror — Gương Phản Chiếu Đánh Ngược Đám Đông (Magic #43450487)"><span class="dock-top"><span class="dock-ico">🪞</span><span class="dock-name">ANTI-CROWD</span><span class="dock-live-dot" id="dockPos_ANTICROWD"></span></span><span class="dock-sub" id="dockMeta_ANTICROWD">$10,000 • Đang tải...</span></a>
+  </nav>
+
+  <div class="topbar">
+    <div class="brand">
+      <span>🐋 LEVIATHAN</span>
+      <span id="engineBadge" class="badge-ai">BOOKMAP ICEBERG & TICK SONAR</span>
+      <div class="status">
+        <span id="statusDot" class="dot"></span>
+        <span id="statusText">Sẵn sàng</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <select id="tfSelect" title="Khung thời gian">
+        <option value="M1" selected>M1</option><option value="M5">M5</option><option value="M15">M15</option><option value="H1">H1</option>
+      </select>
+      <select id="horizonSelect" title="Độ sâu dữ liệu" style="display:none;">
+        <option value="12" selected>Dự báo 12 nến</option>
+        <option value="20">Dự báo 20 nến</option>
+        <option value="30">Dự báo 30 nến</option>
+      </select>
+      <input id="apiUrlInput" type="text" placeholder="URL Server / Tunnel" style="display:none;" />
+      <button id="btnSettings" title="Cấu hình Server URL">⚙</button>
+      <button id="btnLive" class="active">Live MT5</button>
+      <button id="btnBoxes" class="active" title="Bật/tắt hộp Long/Short Position">📦 Hộp Lệnh</button>
+      <button id="btnHistory" class="btn-hist">📊 Lịch sử ($10k)</button>
+      <button id="btnCopyStrat" class="btn-copy-strat">⚡ TẢI LEVIATHAN_SONAR.EX5</button>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="hud-card">
+      <div class="hud-label">XAUUSD BID / ASK</div>
+      <div id="hudPrice" class="hud-val cyan">-- / --</div>
+    </div>
+    <div class="hud-card">
+      <div class="hud-label">LEVIATHAN TÍN HIỆU &amp; ĐỘ TIN CẬY</div>
+      <div id="hudBias" class="hud-val">--</div>
+    </div>
+    <div class="hud-card">
+      <div class="hud-label" id="hudMetric3Label">CHỈ SỐ ĐẶC TRƯNG CỖ MÁY</div>
+      <div id="hudTarget" class="hud-val purple">--</div>
+    </div>
+    <div class="hud-card">
+      <div class="hud-label" id="hudMetric4Label">VÙNG SL / TP HIỆN TẠI</div>
+      <div id="hudCone" class="hud-val">--</div>
+    </div>
+    <div class="hud-card" id="hudVirtualCard" style="cursor:pointer;" title="Bấm để xem lịch sử giao dịch $10,000 của LEVIATHAN">
+      <div class="hud-label">TK $10K (LEVIATHAN) • RISK 1%</div>
+      <div id="hudVirtual" class="hud-val bull">$10,000.00 (0%)</div>
+    </div>
+  </div>
+
+  <!-- Ô GIỚI THIỆU ĐIỂM ĐẶC SẮC CHIẾN LƯỢC (USP SPOTLIGHT) -->
+  <section class="usp-box" id="uspSpotlight">
+    <div class="usp-head">
+      <div class="usp-title">🐋 ĐIỂM ĐẶC SẮC: RADAR TẢNG BĂNG CHÌM BOOKMAP — ĐỌC SỔ LỆNH ẨN CỦA CÁ MẬP</div>
+      <div class="usp-actions">
+        <span class="usp-magic-badge">Magic #43450486 • Chạy song song 5 Bot trên cùng 1 MT5</span>
+        <button id="btnToggleUsp" class="usp-toggle-btn">Thu gọn ▴</button>
+      </div>
+    </div>
+    <div class="usp-body">
+      <div class="usp-desc">Thay vì nhìn nến M5/M15 trễ nhịp, Leviathan đo gia tốc xung Tick (Tick Burst Velocity) và mật độ thanh khoản mỗi bước giá $0.50. Khi hàng trăm lệnh bán tháo đập vào 1 mức giá nhưng giá không thủng (Cá mập đặt lệnh Tảng Băng Chìm hấp thụ), Bot lập tức vào lệnh theo lưng Cá mập.</div>
+      <div class="usp-right">
+        <div class="usp-tags"><span class="usp-tag">Vi Cấu Trúc Sổ Lệnh Bookmap</span><span class="usp-tag">Phát Hiện Tảng Băng Chìm (Iceberg)</span><span class="usp-tag">Bong Bóng Dòng Tiền Thời Gian Thực</span><span class="usp-tag">Magic #43450486 (Chạy Song Song)</span></div>
+        <div class="usp-proof" id="liveTriggerProof">⚡ Bằng chứng tín hiệu sống: Đang đồng bộ từ MT5 Server...</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="canvas-wrap">
+    <canvas id="strategyCanvas"></canvas>
+    <div id="ohlcBar" class="tooltip-bar">Di chuột lên biểu đồ để xem phân tích trực tiếp của LEVIATHAN</div>
+    <div class="legend">
+      <span style="color:#22d3ee;">● Bong Bóng Lực Mua</span><span style="color:#fb7185;">● Bong Bóng Lực Bán</span><span style="color:#facc15;">◎ Tảng Băng Chìm (Iceberg Absorption)</span>
+    </div>
+  </div>
+
+  <!-- MODAL COPY CHIẾN LƯỢC (.EX5) - THANH TOÁN MOMO 10.000Đ / 24H RIÊNG BIỆT -->
+  <div id="copyModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="modal-title">🐋 Tải Bot Leviathan_Sonar.ex5 (24h)</div>
+        <button id="btnCloseModal" class="modal-close">✕</button>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat-pill">
+          <div class="k">PHÍ BẢN QUYỀN</div>
+          <div class="v bull">10.000đ</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">MAGIC NUMBER</div>
+          <div class="v cyan">#43450486</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">CHẠY SONG SONG</div>
+          <div class="v purple">Độc lập 5 Bot</div>
+        </div>
+      </div>
+
+      <div id="payStepIntro" class="pay-card">
+        <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
+          Tải file <strong>Leviathan_Sonar.ex5</strong> đã biên dịch sẵn (<strong>Magic #43450486</strong> — chạy song song với 4 cỗ máy còn lại trên cùng 1 tài khoản MT5 mà không đụng lệnh!). Tự chọn 3 chế độ quản lý vốn trong Inputs: <code>% Tài khoản</code>, <code>USD cố định</code>, hoặc <code>Lot cố định</code>.
+        </div>
+        <button id="btnCreateOrder" class="btn-primary-full">💳 Thanh toán 10.000đ qua MoMo để tải Leviathan_Sonar.ex5</button>
+        <div id="introErr" style="color:#f87171; font-size:12px; margin-top:8px;"></div>
+      </div>
+
+      <div id="payStepQr" class="pay-card" style="display:none;">
+        <div style="font-size:12px; color:#f9a8d4; font-weight:700;">QUÉT MÃ QR MOMO (MỞ KHÓA LEVIATHAN_SONAR SAU 3 GIÂY)</div>
+        <div class="qr-wrap"><img id="momoQrImg" src="" alt="MoMo QR" /></div>
+
+        <div class="info-row">
+          <span>Ví MoMo: <strong style="color:#f472b6;">0977098166</strong></span>
+          <button class="mini-copy" data-copy="0977098166">Copy SĐT</button>
+        </div>
+        <div class="info-row">
+          <span>Số tiền: <strong class="bull">10.000 VNĐ</strong></span>
+          <button class="mini-copy" data-copy="10000">Copy</button>
+        </div>
+        <div class="info-row">
+          <span>Lời nhắn (BẮT BUỘC): <code id="orderCodeText">DV------</code></span>
+          <button id="btnCopyCode" class="mini-copy">Copy Mã</button>
+        </div>
+
+        <div id="payStatusBanner" class="pay-status">⏳ Đang chờ MoMo 0977098166 xác nhận chuyển khoản...</div>
+        <button id="btnNewOrder" class="link-reset">Tạo mã đơn mới</button>
+      </div>
+
+      <div id="payStepPaid" class="pay-card" style="display:none;">
+        <div class="pay-status paid" style="margin-top:0;">
+          ✅ Đã kích hoạt <strong>Leviathan_Sonar.ex5</strong> (24h) cho mã <strong id="paidCodeText"></strong>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:var(--muted);">
+          Thời gian còn lại: <strong id="paidCountdown" class="cyan">24h 00m</strong>
+        </div>
+
+        <button id="btnDownloadEx5" class="btn-primary-full">📥 Tải Leviathan_Sonar.ex5 (Magic #43450486)</button>
+
+        <div class="info-row" style="margin-top:10px;">
+          <span style="overflow:hidden;">URL WebRequest: <code id="eaApiUrlText"></code></span>
+          <button id="btnCopyApiUrl" class="mini-copy">Copy URL</button>
+        </div>
+
+        <div class="steps-box">
+          <strong>Hướng dẫn cài Leviathan_Sonar.ex5 vào MT5 PC (20 giây):</strong>
+          <ol>
+            <li>Mở MT5 → <code>Tools → Options → Expert Advisors</code> → tick <strong>Allow WebRequest</strong> và dán URL ở trên.</li>
+            <li>Copy <code>Leviathan_Sonar.ex5</code> vào <code>MQL5/Experts/</code>, kéo thả lên 1 tab biểu đồ <code>XAUUSD</code> (có thể mở nhiều tab gắn song song cả 5 bot khác nhau!).</li>
+          </ol>
+        </div>
+        <button id="btnNewOrderPaid" class="link-reset">Gia hạn / Tạo đơn 24h mới</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LỊCH SỬ GIAO DỊCH $10,000 RIÊNG CỦA CỖ MÁY -->
+  <div id="historyModal" class="modal-backdrop">
+    <div class="history-box">
+      <div class="modal-head">
+        <div class="modal-title">🐋 Tài Khoản $10,000 (Leviathan Sonar — Tàu Ngầm Dò Tảng Băng Chìm Cá Mập) • Risk 1%</div>
+        <button id="btnCloseHistory" class="modal-close">✕</button>
+      </div>
+
+      <div class="hist-kpi">
+        <div class="stat-pill">
+          <div class="k">EQUITY ($10K GỐC)</div>
+          <div id="vEquity" class="v cyan">$10,000.00</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">LÃI / LỖ RÒNG</div>
+          <div id="vNetPnl" class="v bull">+$0.00 (0%)</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">WINRATE (W / L)</div>
+          <div id="vWinrate" class="v purple">0.0% (0/0)</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">PROFIT FACTOR</div>
+          <div id="vPf" class="v">0.00</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">MAX DRAWDOWN</div>
+          <div id="vMaxDd" class="v bear">0.0%</div>
+        </div>
+        <div class="stat-pill">
+          <div class="k">MAGIC ĐỘC LẬP</div>
+          <div id="vNextOpt" class="v cyan">#43450486</div>
+        </div>
+      </div>
+
+      <div id="vStratBanner" class="strat-banner">
+        <span id="vStratText">Leviathan Sonar — Tàu Ngầm Dò Tảng Băng Chìm Cá Mập • BOOKMAP ICEBERG & TICK SONAR</span>
+        <span style="color:#94a3b8; font-size:11px;">Tách biệt 100% — Không trùng lệnh với 4 cỗ máy khác</span>
+      </div>
+
+      <div class="modal-tabs">
+        <button id="tabTradesBtn" class="tab-btn active">Lịch sử lệnh &amp; Bằng chứng vào lệnh</button>
+        <button id="tabOptBtn" class="tab-btn">Nhật ký tự tối ưu 24h</button>
+      </div>
+
+      <div id="tabTradesView" class="hist-table-wrap">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Giờ mở → đóng</th>
+              <th>Lệnh</th>
+              <th>Lot</th>
+              <th>Vào → Đóng</th>
+              <th>SL / TP</th>
+              <th>Kết quả</th>
+              <th>PnL ($)</th>
+              <th>Số dư ($)</th>
+              <th>Lý do thuật toán (Trigger)</th>
+            </tr>
+          </thead>
+          <tbody id="vTradesBody">
+            <tr><td colspan="10" style="text-align:center; color:#64748b; padding:16px;">Đang tải dữ liệu tài khoản $10,000...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="tabOptView" class="hist-table-wrap" style="display:none;">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Thực tế 24h</th>
+              <th>Phiên bản</th>
+              <th>Quyết định &amp; Tóm tắt tối ưu</th>
+            </tr>
+          </thead>
+          <tbody id="vOptBody">
+            <tr><td colspan="4" style="text-align:center; color:#64748b; padding:16px;">Chưa tới mốc tự tối ưu 24h đầu tiên.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PAGE_META = {"system_id": "LEVIATHAN", "page": "leviathan.html", "name": "Leviathan Sonar — Tàu Ngầm Dò Tảng Băng Chìm Cá Mập", "short_name": "LEVIATHAN", "icon": "🐋", "badge": "BOOKMAP ICEBERG & TICK SONAR", "ea_name": "Leviathan_Sonar", "magic": 43450486, "default_tf": "M1", "theme": "#06b6d4", "accent": "#22d3ee", "canvas_bg": "#030a12", "usp_title": "🐋 ĐIỂM ĐẶC SẮC: RADAR TẢNG BĂNG CHÌM BOOKMAP — ĐỌC SỔ LỆNH ẨN CỦA CÁ MẬP", "usp_desc": "Thay vì nhìn nến M5/M15 trễ nhịp, Leviathan đo gia tốc xung Tick (Tick Burst Velocity) và mật độ thanh khoản mỗi bước giá $0.50. Khi hàng trăm lệnh bán tháo đập vào 1 mức giá nhưng giá không thủng (Cá mập đặt lệnh Tảng Băng Chìm hấp thụ), Bot lập tức vào lệnh theo lưng Cá mập."};
+    const PAGE_SYSTEM_ID = PAGE_META.system_id;
+    const GIST_ID = '2bf53bd09bbb0594b5f9440c059b0a88';
+    const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;
+    const GIST_RAW_URL = `https://gist.githubusercontent.com/lemanhnewlife-cmd/${GIST_ID}/raw/silent_trader_endpoint.json`;
+
+    const canvas = document.getElementById('strategyCanvas');
+    const ctx = canvas.getContext('2d');
+    const engineBadge = document.getElementById('engineBadge');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const tfSelect = document.getElementById('tfSelect');
+    const horizonSelect = document.getElementById('horizonSelect');
+    const apiUrlInput = document.getElementById('apiUrlInput');
+    const btnSettings = document.getElementById('btnSettings');
+    const btnLive = document.getElementById('btnLive');
+    const ohlcBar = document.getElementById('ohlcBar');
+    const liveTriggerProof = document.getElementById('liveTriggerProof');
+    const uspSpotlight = document.getElementById('uspSpotlight');
+    const btnToggleUsp = document.getElementById('btnToggleUsp');
+
+    const hudPrice = document.getElementById('hudPrice');
+    const hudBias = document.getElementById('hudBias');
+    const hudTarget = document.getElementById('hudTarget');
+    const hudCone = document.getElementById('hudCone');
+    const hudMetric3Label = document.getElementById('hudMetric3Label');
+    const hudMetric4Label = document.getElementById('hudMetric4Label');
+
+    const isHostedOnBackend =
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname.endsWith('.trycloudflare.com');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramApi = urlParams.get('api');
+    let customApiOverride = false;
+
+    apiUrlInput.value = paramApi
+      ? paramApi
+      : (isHostedOnBackend ? window.location.origin : '');
+
+    btnSettings.onclick = () => {
+      apiUrlInput.style.display = apiUrlInput.style.display === 'none' ? 'inline-block' : 'none';
+    };
+    apiUrlInput.addEventListener('input', () => {
+      customApiOverride = apiUrlInput.value.trim().length > 0;
+    });
+    apiUrlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') startLive();
+    });
+
+    btnToggleUsp.onclick = () => {
+      const collapsed = uspSpotlight.classList.toggle('collapsed');
+      btnToggleUsp.textContent = collapsed ? 'Mở giới thiệu ▾' : 'Thu gọn ▴';
+      setTimeout(resize, 30);
+    };
+
+    // Preserve ?api=... when switching between the 5 independent pages on the Morphing Dock
+    document.querySelectorAll('.dock-pill').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const basePage = link.getAttribute('data-page');
+        if (!basePage) return;
+        const apiVal = apiUrlInput.value.trim();
+        if (paramApi || (apiVal && !isHostedOnBackend)) {
+          e.preventDefault();
+          window.location.href = `./${basePage}?api=${encodeURIComponent(paramApi || apiVal)}`;
+        }
+      });
+    });
+
+    function cleanSymbol(sym) {
+      if (!sym) return 'XAUUSD';
+      return sym.length > 3 && (sym.endsWith('c') || sym.endsWith('m'))
+        ? sym.slice(0, -1)
+        : sym;
+    }
+
+    let timer = null;
+    let isFetching = false;
+    let candles = [];
+    let forecast = [];
+    let bid = 0, ask = 0;
+    let visibleHistCount = 72;
+    let mouseX = -1, mouseY = -1;
+    let needsDraw = true;
+    let showBoxes = true;
+    let virtualSnapshot = null;
+
+    function requestDraw() { needsDraw = true; }
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      requestDraw();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function setStatus(state, text) {
+      statusDot.className = 'dot ' + (state || '');
+      statusText.textContent = text;
+    }
+
+    function stopTimer() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function updateHud(data) {
+      bid = data.bid;
+      ask = data.ask;
+      candles = data.candles || [];
+      forecast = data.forecast || [];
+      hudPrice.textContent = `${bid.toFixed(2)} / ${ask.toFixed(2)}`;
+
+      if (PAGE_SYSTEM_ID === 'SILENT_EYES' && data.signal) {
+        const sig = data.signal;
+        const isBull = sig.bias === 'BULLISH';
+        hudBias.className = 'hud-val ' + (isBull ? 'bull' : 'bear');
+        hudBias.textContent = `${sig.bias} (${sig.confidence}%)`;
+        const sign = sig.delta >= 0 ? '+' : '';
+        hudTarget.textContent = `${sig.target.toFixed(2)} (${sign}${sig.delta.toFixed(2)})`;
+        hudCone.textContent = `${sig.p10.toFixed(2)} – ${sig.p90.toFixed(2)}`;
+      }
+      requestDraw();
+    }
+
+    let failStreak = 0;
+    async function resolveDefaultTunnel(forceRefresh = false) {
+      if (isHostedOnBackend || paramApi || (customApiOverride && !forceRefresh)) return;
+      try {
+        const rawRes = await fetch(GIST_RAW_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        if (rawRes.ok) {
+          const parsed = await rawRes.json();
+          if (parsed?.public_url) {
+            apiUrlInput.value = parsed.public_url;
+            return;
+          }
+        }
+      } catch (_) {}
+      try {
+        const gistRes = await fetch(GIST_API_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        if (gistRes.ok) {
+          const gistData = await gistRes.json();
+          const raw = gistData?.files?.['silent_trader_endpoint.json']?.content;
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.public_url) {
+              apiUrlInput.value = parsed.public_url;
+              return;
+            }
+          }
+        }
+      } catch (_) {}
+      try {
+        const res = await fetch('./tunnel_info.json?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          const info = await res.json();
+          if (info && info.public_url) {
+            apiUrlInput.value = info.public_url;
+            return;
+          }
+        }
+      } catch (_) {}
+    }
+
+    async function fetchMarketData(force = false) {
+      if (isFetching && !force) return;
+      let base = apiUrlInput.value.trim().replace(/\/+$/, '');
+      if (!base) {
+        await resolveDefaultTunnel(true);
+        base = apiUrlInput.value.trim().replace(/\/+$/, '');
+      }
+      if (!base) {
+        setStatus('err', 'Đang tìm kết nối máy chủ...');
+        return;
+      }
+      const tf = tfSelect.value;
+      const predLen = horizonSelect.value;
+      const url = `${base}/api/kronos?tf=${tf}&pred_len=${predLen}&force=${force ? 1 : 0}`;
+
+      isFetching = true;
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.status === 'live') {
+          failStreak = 0;
+          const sym = cleanSymbol(data.symbol);
+          engineBadge.textContent = `${sym} • ${PAGE_META.badge}`;
+          setStatus('live', `LIVE • ${data.timeframe}`);
+          updateHud(data);
+        } else {
+          setStatus('err', data.message || 'MT5 chưa sẵn sàng');
+        }
+      } catch (e) {
+        failStreak++;
+        setStatus('err', 'Đang đồng bộ kết nối máy chủ...');
+        if (failStreak >= 3 && !isHostedOnBackend && !customApiOverride) {
+          failStreak = 0;
+          await resolveDefaultTunnel(true);
+        }
+      } finally {
+        isFetching = false;
+      }
+    }
+
+    async function startLive() {
+      stopTimer();
+      btnLive.classList.add('active');
+      setStatus('', `Đang kết nối ${PAGE_META.short_name}...`);
+      await resolveDefaultTunnel();
+      fetchMarketData(true);
+      fetchVirtual10k();
+      timer = setInterval(() => fetchMarketData(false), 1500);
+    }
+
+    // === SHARED TRADINGVIEW POSITION BOX HELPERS ===
+    function findBarXForTime(histSlice, tsSec, barSlot, clampRight) {
+      if (!histSlice.length) return 0;
+      const firstT = histSlice[0].time;
+      const lastT = histSlice[histSlice.length - 1].time;
+      if (tsSec <= firstT) return 0.5 * barSlot;
+      if (tsSec >= lastT) return clampRight;
+      for (let i = histSlice.length - 1; i >= 0; i--) {
+        if (histSlice[i].time <= tsSec) return (i + 0.5) * barSlot;
+      }
+      return 0.5 * barSlot;
+    }
+
+    function drawSingleTvBox(x1, x2, yEntry, ySl, yTp, isOpen) {
+      const boxW = Math.max(18, x2 - x1);
+      const tpTop = Math.min(yEntry, yTp);
+      const tpH = Math.max(2, Math.abs(yTp - yEntry));
+      ctx.fillStyle = isOpen ? 'rgba(34, 197, 94, 0.16)' : 'rgba(34, 197, 94, 0.08)';
+      ctx.fillRect(x1, tpTop, boxW, tpH);
+      ctx.strokeStyle = isOpen ? 'rgba(34, 197, 94, 0.85)' : 'rgba(34, 197, 94, 0.35)';
+      ctx.lineWidth = isOpen ? 1.2 : 1;
+      ctx.strokeRect(x1, tpTop, boxW, tpH);
+
+      const slTop = Math.min(yEntry, ySl);
+      const slH = Math.max(2, Math.abs(ySl - yEntry));
+      ctx.fillStyle = isOpen ? 'rgba(239, 68, 68, 0.16)' : 'rgba(239, 68, 68, 0.08)';
+      ctx.fillRect(x1, slTop, boxW, slH);
+      ctx.strokeStyle = isOpen ? 'rgba(239, 68, 68, 0.85)' : 'rgba(239, 68, 68, 0.35)';
+      ctx.lineWidth = isOpen ? 1.2 : 1;
+      ctx.strokeRect(x1, slTop, boxW, slH);
+
+      ctx.strokeStyle = isOpen ? '#f8fafc' : 'rgba(226, 232, 240, 0.45)';
+      ctx.lineWidth = isOpen ? 1.5 : 1;
+      ctx.beginPath();
+      ctx.moveTo(x1, yEntry);
+      ctx.lineTo(x1 + boxW, yEntry);
+      ctx.stroke();
+    }
+
+    function drawPill(x, y, text, bg, fg, maxRight) {
+      ctx.font = 'bold 10.5px ui-monospace, monospace';
+      const w = ctx.measureText(text).width + 10;
+      const h = 16;
+      const limitR = maxRight || (canvas.parentElement.getBoundingClientRect().width - 78);
+      const rx = Math.max(4, Math.min(x, limitR - w));
+      ctx.fillStyle = bg;
+      ctx.fillRect(rx, y - h / 2, w, h);
+      ctx.fillStyle = fg;
+      ctx.fillText(text, rx + 5, y + 3.5);
+    }
+
+    function drawTradingViewBoxes(histSlice, barSlot, splitX, chartW, priceToY, leftOffset = 0) {
+      if (!showBoxes || !virtualSnapshot || !histSlice.length) return;
+      const firstT = histSlice[0].time;
+      const recent = (virtualSnapshot.recent_trades || []).slice(0, 4);
+      for (const tr of recent) {
+        if (!tr.close_time || tr.close_time < firstT) continue;
+        const x1 = leftOffset + findBarXForTime(histSlice, tr.open_time, barSlot, splitX - leftOffset - barSlot);
+        const x2 = leftOffset + findBarXForTime(histSlice, tr.close_time, barSlot, splitX - leftOffset);
+        drawSingleTvBox(x1, Math.max(x1 + 14, x2), priceToY(tr.open_price), priceToY(tr.sl), priceToY(tr.tp), false);
+      }
+      const ot = virtualSnapshot.open_trade;
+      if (ot) {
+        const x1 = leftOffset + findBarXForTime(histSlice, ot.open_time, barSlot, Math.max(0, splitX - leftOffset - barSlot * 3));
+        const x2 = Math.min(chartW - 4, Math.max(x1 + 48, splitX + barSlot * 4));
+        drawSingleTvBox(x1, x2, priceToY(ot.open_price), priceToY(ot.sl), priceToY(ot.tp), true);
+      }
+    }
+
+    function drawTradingViewOpenLabels(ot, histSlice, barSlot, splitX, chartW, priceToY, leftOffset = 0) {
+      if (!showBoxes || !ot || !histSlice.length) return;
+      const x1 = leftOffset + findBarXForTime(histSlice, ot.open_time, barSlot, Math.max(0, splitX - leftOffset - barSlot * 3));
+      const yEntry = priceToY(ot.open_price);
+      const yTp = priceToY(ot.tp);
+      const ySl = priceToY(ot.sl);
+      const pnl = Number(ot.floating_usd || 0);
+      const pnlSign = pnl >= 0 ? '+' : '';
+      const sideLabel = ot.side === 'BUY' ? 'LONG' : 'SHORT';
+      const rewardUsd = Number(ot.reward_usd || ot.risk_usd || 100);
+      const riskUsd = Number(ot.risk_usd || 100);
+
+      drawPill(x1 + 4, yTp, `TP ${Number(ot.tp).toFixed(2)} (+$${rewardUsd.toFixed(0)} • +${Number(ot.rr).toFixed(1)}R)`, 'rgba(22, 163, 74, 0.92)', '#fff', chartW - 4);
+      drawPill(x1 + 4, ySl, `SL ${Number(ot.sl).toFixed(2)} (-$${riskUsd.toFixed(0)} • -1.0R)`, 'rgba(220, 38, 38, 0.92)', '#fff', chartW - 4);
+      drawPill(x1 + 4, yEntry, `${sideLabel} ${Number(ot.lot).toFixed(2)} @ ${Number(ot.open_price).toFixed(2)} | ${pnlSign}$${pnl.toFixed(2)}`, pnl >= 0 ? 'rgba(14, 165, 233, 0.95)' : 'rgba(234, 88, 12, 0.95)', '#fff', chartW - 4);
+    }
+
+    function drawCandles(histSlice, barSlot, priceToY, leftOffset = 0, candleAlpha = 1.0) {
+      const candleW = Math.max(3, Math.min(13, barSlot * 0.65));
+      ctx.save();
+      ctx.globalAlpha = candleAlpha;
+      for (let i = 0; i < histSlice.length; i++) {
+        const c = histSlice[i];
+        const cx = leftOffset + (i + 0.5) * barSlot;
+        const isUp = c.close >= c.open;
+        const color = isUp ? '#22c55e' : '#ef4444';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(cx, priceToY(c.high));
+        ctx.lineTo(cx, priceToY(c.low));
+        ctx.stroke();
+        const yTop = priceToY(Math.max(c.open, c.close));
+        const yBot = priceToY(Math.min(c.open, c.close));
+        ctx.fillStyle = color;
+        ctx.fillRect(cx - candleW / 2, yTop, candleW, Math.max(1.5, yBot - yTop));
+      }
+      ctx.restore();
+    }
+
+    function drawPriceGrid(minP, maxP, chartLeft, chartW, PAD_TOP, chartH, AXIS_W, priceToY, midPrice) {
+      const rawStep = (maxP - minP) / 7;
+      const step = rawStep <= 1 ? 0.5 : rawStep <= 2.5 ? 1 : rawStep <= 6 ? 2 : 5;
+      const firstTick = Math.ceil(minP / step) * step;
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.font = '11px ui-monospace, monospace';
+      ctx.fillStyle = '#94a3b8';
+      for (let p = firstTick; p <= maxP; p += step) {
+        const y = priceToY(p);
+        ctx.beginPath();
+        ctx.moveTo(chartLeft, y);
+        ctx.lineTo(chartLeft + chartW, y);
+        ctx.stroke();
+        ctx.fillText(p.toFixed(2), chartLeft + chartW + 8, y + 4);
+      }
+      if (midPrice > 0) {
+        const curY = priceToY(midPrice);
+        ctx.fillStyle = PAGE_META.accent;
+        ctx.fillRect(chartLeft + chartW + 2, curY - 9, AXIS_W - 4, 18);
+        ctx.fillStyle = '#070b12';
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText(midPrice.toFixed(2), chartLeft + chartW + 8, curY + 4);
+      }
+    }
+
+    // =========================================================================
+    // 5 ENGINE RENDERERS HOÀN TOÀN ĐỘC LẬP
+    // =========================================================================
+    function renderSilentEyes(W, H) {
+      const AXIS_W = 74, PAD_TOP = 38, PAD_BOT = 34;
+      const chartW = W - AXIS_W, chartH = H - PAD_TOP - PAD_BOT;
+      const histSlice = candles.slice(-visibleHistCount);
+      const totalBars = histSlice.length + forecast.length;
+      if (!totalBars) return;
+
+      let minP = Infinity, maxP = -Infinity;
+      for (const c of histSlice) { minP = Math.min(minP, c.low); maxP = Math.max(maxP, c.high); }
+      for (const f of forecast) { minP = Math.min(minP, f.p10); maxP = Math.max(maxP, f.p90); }
+      if (showBoxes && virtualSnapshot?.open_trade) {
+        const ot = virtualSnapshot.open_trade;
+        minP = Math.min(minP, ot.sl, ot.tp, ot.open_price);
+        maxP = Math.max(maxP, ot.sl, ot.tp, ot.open_price);
+      }
+      const padP = Math.max(1.5, (maxP - minP) * 0.08);
+      minP -= padP; maxP += padP;
+      const priceToY = (p) => PAD_TOP + ((maxP - p) / (maxP - minP)) * chartH;
+      const yToPrice = (y) => maxP - ((y - PAD_TOP) / chartH) * (maxP - minP);
+      const midPrice = (bid && ask) ? (bid + ask) / 2 : histSlice[histSlice.length - 1].close;
+
+      drawPriceGrid(minP, maxP, 0, chartW, PAD_TOP, chartH, AXIS_W, priceToY, midPrice);
+
+      const barSlot = chartW / Math.max(totalBars, 1);
+      const candleW = Math.max(3, Math.min(14, barSlot * 0.66));
+      const splitX = histSlice.length * barSlot;
+
+      if (forecast.length > 0) {
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.05)';
+        ctx.fillRect(splitX, PAD_TOP, chartW - splitX, chartH);
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.55)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath(); ctx.moveTo(splitX, PAD_TOP); ctx.lineTo(splitX, PAD_TOP + chartH); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#d8b4fe';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('SILENT EYES MONTE CARLO CONE →', splitX + 8, PAD_TOP + 14);
+      }
+
+      if (forecast.length > 0 && histSlice.length > 0) {
+        const anchorX = (histSlice.length - 0.5) * barSlot;
+        const anchorY = priceToY(histSlice[histSlice.length - 1].close);
+        ctx.beginPath();
+        ctx.moveTo(anchorX, anchorY);
+        for (let i = 0; i < forecast.length; i++) ctx.lineTo((histSlice.length + i + 0.5) * barSlot, priceToY(forecast[i].p90));
+        for (let i = forecast.length - 1; i >= 0; i--) ctx.lineTo((histSlice.length + i + 0.5) * barSlot, priceToY(forecast[i].p10));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.11)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(anchorX, anchorY);
+        for (let i = 0; i < forecast.length; i++) ctx.lineTo((histSlice.length + i + 0.5) * barSlot, priceToY(forecast[i].p75));
+        for (let i = forecast.length - 1; i >= 0; i--) ctx.lineTo((histSlice.length + i + 0.5) * barSlot, priceToY(forecast[i].p25));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.19)';
+        ctx.fill();
+      }
+
+      drawTradingViewBoxes(histSlice, barSlot, splitX, chartW, priceToY, 0);
+      drawCandles(histSlice, barSlot, priceToY, 0, 1.0);
+
+      for (let i = 0; i < forecast.length; i++) {
+        const f = forecast[i];
+        const cx = (histSlice.length + i + 0.5) * barSlot;
+        const isUp = f.close >= f.open;
+        ctx.strokeStyle = isUp ? '#38bdf8' : '#f472b6';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(cx, priceToY(f.high)); ctx.lineTo(cx, priceToY(f.low)); ctx.stroke();
+        const yTop = priceToY(Math.max(f.open, f.close));
+        const yBot = priceToY(Math.min(f.open, f.close));
+        ctx.fillStyle = isUp ? 'rgba(56, 189, 248, 0.35)' : 'rgba(244, 114, 182, 0.35)';
+        ctx.fillRect(cx - candleW / 2, yTop, candleW, Math.max(2, yBot - yTop));
+        ctx.strokeRect(cx - candleW / 2, yTop, candleW, Math.max(2, yBot - yTop));
+      }
+
+      if (virtualSnapshot?.open_trade) {
+        drawTradingViewOpenLabels(virtualSnapshot.open_trade, histSlice, barSlot, splitX, chartW, priceToY, 0);
+      }
+
+      if (mouseX >= 0 && mouseX <= chartW && mouseY >= PAD_TOP && mouseY <= PAD_TOP + chartH) {
+        ctx.strokeStyle = 'rgba(226, 232, 240, 0.3)';
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(mouseX, PAD_TOP); ctx.lineTo(mouseX, PAD_TOP + chartH);
+        ctx.moveTo(0, mouseY); ctx.lineTo(chartW, mouseY); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#1e293b'; ctx.fillRect(chartW + 2, mouseY - 9, AXIS_W - 4, 18);
+        ctx.fillStyle = '#e2e8f0'; ctx.fillText(yToPrice(mouseY).toFixed(2), chartW + 8, mouseY + 4);
+        const idx = Math.floor(mouseX / barSlot);
+        if (idx >= 0 && idx < histSlice.length) {
+          const c = histSlice[idx];
+          const dt = new Date(c.time * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+          ohlcBar.textContent = `[MT5 ${dt}] O:${c.open.toFixed(2)} H:${c.high.toFixed(2)} L:${c.low.toFixed(2)} C:${c.close.toFixed(2)}`;
+        } else if (idx >= histSlice.length && idx < totalBars) {
+          const f = forecast[idx - histSlice.length];
+          const dt = new Date(f.time * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+          ohlcBar.textContent = `[SILENT EYES ${dt}] C:${f.close.toFixed(2)} | P10–P90: ${f.p10.toFixed(2)}–${f.p90.toFixed(2)}`;
+        }
+      }
+    }
+
+    function renderGraveyard(W, H) {
+      const AXIS_W = 74, PAD_TOP = 38, PAD_BOT = 34;
+      const chartW = W - AXIS_W, chartH = H - PAD_TOP - PAD_BOT;
+      const histSlice = candles.slice(-visibleHistCount);
+      if (!histSlice.length) return;
+
+      const tel = virtualSnapshot?.visual_telemetry || {};
+      const buyPools = tel.buy_stop_pools || [];
+      const sellPools = tel.sell_stop_pools || [];
+      const sweeps = tel.sweep_events || [];
+
+      let minP = Infinity, maxP = -Infinity;
+      for (const c of histSlice) { minP = Math.min(minP, c.low); maxP = Math.max(maxP, c.high); }
+      for (const p of [...buyPools, ...sellPools]) { minP = Math.min(minP, p.price); maxP = Math.max(maxP, p.price); }
+      if (showBoxes && virtualSnapshot?.open_trade) {
+        const ot = virtualSnapshot.open_trade;
+        minP = Math.min(minP, ot.sl, ot.tp, ot.open_price);
+        maxP = Math.max(maxP, ot.sl, ot.tp, ot.open_price);
+      }
+      const padP = Math.max(1.5, (maxP - minP) * 0.09);
+      minP -= padP; maxP += padP;
+      const priceToY = (p) => PAD_TOP + ((maxP - p) / (maxP - minP)) * chartH;
+      const midPrice = (bid && ask) ? (bid + ask) / 2 : histSlice[histSlice.length - 1].close;
+
+      drawPriceGrid(minP, maxP, 0, chartW, PAD_TOP, chartH, AXIS_W, priceToY, midPrice);
+
+      // Draw Liquidity Stop-Pool Laser Heatmap Bars across full width
+      const drawPoolBand = (pool, isBuyStop) => {
+        const y = priceToY(pool.price);
+        const heat = Number(pool.heat || 75);
+        const alpha = Math.min(0.36, 0.10 + (heat / 100) * 0.25);
+        const col = isBuyStop ? `rgba(239, 68, 68, ${alpha})` : `rgba(245, 158, 11, ${alpha})`;
+        const strokeCol = isBuyStop ? 'rgba(248, 113, 113, 0.85)' : 'rgba(251, 191, 36, 0.85)';
+        ctx.fillStyle = col;
+        ctx.fillRect(0, y - 7, chartW, 14);
+        ctx.strokeStyle = strokeCol;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartW, y); ctx.stroke();
+        ctx.setLineDash([]);
+        const lbl = isBuyStop
+          ? `🩸 Ổ BUY-STOP (SL Phe Sell SMC) $${Number(pool.price).toFixed(2)} • Mật độ ${heat.toFixed(0)}%`
+          : `🔥 Ổ SELL-STOP (SL Phe Buy SMC) $${Number(pool.price).toFixed(2)} • Mật độ ${heat.toFixed(0)}%`;
+        ctx.fillStyle = isBuyStop ? '#fca5a5' : '#fde68a';
+        ctx.font = 'bold 10.5px ui-monospace, monospace';
+        ctx.fillText(lbl, 12, y - 2);
+      };
+
+      buyPools.forEach(p => drawPoolBand(p, true));
+      sellPools.forEach(p => drawPoolBand(p, false));
+
+      const barSlot = (chartW * 0.86) / Math.max(histSlice.length, 1);
+      const splitX = histSlice.length * barSlot;
+      drawTradingViewBoxes(histSlice, barSlot, splitX, chartW, priceToY, 0);
+      drawCandles(histSlice, barSlot, priceToY, 0, 0.92);
+
+      // Draw Stop-Hunt Sweep Lightning Events
+      for (const sw of sweeps) {
+        const x = findBarXForTime(histSlice, sw.time, barSlot, splitX - barSlot);
+        const y = priceToY(sw.price);
+        ctx.save();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.font = 'bold 10.5px sans-serif';
+        const isSellSweep = sw.type === 'SELL_STOP_SWEPT';
+        ctx.fillText('⚡ QUÉT SL', x - 24, isSellSweep ? y + 16 : y - 10);
+        ctx.restore();
+      }
+
+      // Kill-Zone Gauge Card in Top-Right of Canvas
+      const kz = Number(tel.kill_zone_meter || 78);
+      const trapped = Number(tel.retail_trapped_estimate_pct || 84);
+      const gx = chartW - 225, gy = PAD_TOP + 8;
+      ctx.fillStyle = 'rgba(22, 11, 16, 0.90)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.65)';
+      ctx.lineWidth = 1.2;
+      ctx.fillRect(gx, gy, 212, 66);
+      ctx.strokeRect(gx, gy, 212, 66);
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('🩸 KILL-ZONE RADAR (SĂN XÁC SL)', gx + 10, gy + 18);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '11px ui-monospace, monospace';
+      ctx.fillText(`Lực Quét SL: ${kz}% | Bẫy Đám Đông: ${trapped}%`, gx + 10, gy + 36);
+      ctx.fillStyle = '#29151d';
+      ctx.fillRect(gx + 10, gy + 45, 192, 10);
+      const grad = ctx.createLinearGradient(gx + 10, 0, gx + 202, 0);
+      grad.addColorStop(0, '#f59e0b'); grad.addColorStop(1, '#ef4444');
+      ctx.fillStyle = grad;
+      ctx.fillRect(gx + 10, gy + 45, Math.min(192, (kz / 100) * 192), 10);
+
+      if (virtualSnapshot?.open_trade) {
+        drawTradingViewOpenLabels(virtualSnapshot.open_trade, histSlice, barSlot, splitX, chartW, priceToY, 0);
+      }
+      drawHoverBar(0, chartW, PAD_TOP, chartH, AXIS_W, barSlot, histSlice, yToPrice => yToPrice, minP, maxP, 'GRAVEYARD');
+    }
+
+    function drawHoverBar(chartLeft, chartW, PAD_TOP, chartH, AXIS_W, barSlot, histSlice, _unused, minP, maxP, labelPrefix) {
+      if (mouseX < chartLeft || mouseX > chartLeft + chartW || mouseY < PAD_TOP || mouseY > PAD_TOP + chartH) return;
+      ctx.strokeStyle = 'rgba(226, 232, 240, 0.28)';
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(mouseX, PAD_TOP); ctx.lineTo(mouseX, PAD_TOP + chartH);
+      ctx.moveTo(chartLeft, mouseY); ctx.lineTo(chartLeft + chartW, mouseY);
+      ctx.stroke(); ctx.setLineDash([]);
+      const hoverP = maxP - ((mouseY - PAD_TOP) / chartH) * (maxP - minP);
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(chartLeft + chartW + 2, mouseY - 9, AXIS_W - 4, 18);
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '11px ui-monospace, monospace';
+      ctx.fillText(hoverP.toFixed(2), chartLeft + chartW + 8, mouseY + 4);
+      const idx = Math.floor((mouseX - chartLeft) / Math.max(1, barSlot));
+      if (idx >= 0 && idx < histSlice.length) {
+        const c = histSlice[idx];
+        const dt = new Date(c.time * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        ohlcBar.textContent = `[${labelPrefix} ${dt}] O:${c.open.toFixed(2)} H:${c.high.toFixed(2)} L:${c.low.toFixed(2)} C:${c.close.toFixed(2)} | Hover:$${hoverP.toFixed(2)}`;
+      }
+    }
+
+    function renderNexus15(W, H) {
+      const leftW = Math.max(290, Math.min(430, Math.floor(W * 0.37)));
+      const rightX = leftW + 8;
+      const AXIS_W = 74, PAD_TOP = 38, PAD_BOT = 34;
+      const chartW = W - rightX - AXIS_W;
+      const chartH = H - PAD_TOP - PAD_BOT;
+
+      const tel = virtualSnapshot?.visual_telemetry || {};
+      const sats = tel.satellites || [];
+      const fairSeries = tel.fair_series || [];
+      const actualSeries = tel.actual_series || [];
+      const gap = Number(tel.lead_lag_gap_usd || 0);
+      const fairGold = Number(tel.fair_gold_price || ((bid + ask) / 2 || 0));
+      const actGold = Number(tel.actual_gold_price || ((bid + ask) / 2 || 0));
+
+      // === LEFT PANEL: 15-ASSET MACRO CONSTELLATION RADAR ===
+      ctx.fillStyle = 'rgba(8, 22, 17, 0.85)';
+      ctx.fillRect(8, PAD_TOP, leftW - 14, chartH);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+      ctx.strokeRect(8, PAD_TOP, leftW - 14, chartH);
+
+      const cx = leftW / 2;
+      const cy = PAD_TOP + chartH / 2 + 6;
+      const radius = Math.min(leftW - 70, chartH - 70) * 0.42;
+
+      ctx.fillStyle = '#6ee7b7';
+      ctx.font = 'bold 11.5px sans-serif';
+      ctx.fillText('🌐 RADAR CHÒM SAO 15 TÀI SẢN (Dẫn Trước Vàng ~4s)', 18, PAD_TOP + 18);
+
+      // Radar rings
+      for (const frac of [0.45, 0.75, 1.0]) {
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.16)';
+        ctx.beginPath(); ctx.arc(cx, cy, radius * frac, 0, Math.PI * 2); ctx.stroke();
+      }
+
+      // Orbiting 14 Satellite Assets
+      const nSats = Math.max(1, sats.length);
+      for (let i = 0; i < sats.length; i++) {
+        const s = sats[i];
+        const ang = (i / nSats) * Math.PI * 2 - Math.PI / 2;
+        const sx = cx + Math.cos(ang) * radius;
+        const sy = cy + Math.sin(ang) * radius;
+        const isBullGold = s.direction === 'BULL_GOLD';
+        const col = isBullGold ? '#22c55e' : '#ef4444';
+
+        // Energy beam to Gold Core
+        ctx.strokeStyle = isBullGold ? 'rgba(34, 197, 94, 0.45)' : 'rgba(239, 68, 68, 0.45)';
+        ctx.lineWidth = Math.min(3.5, 1.0 + Math.abs(s.gold_impact_usd || 0) * 1.4);
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(cx, cy); ctx.stroke();
+
+        // Satellite Node
+        ctx.fillStyle = '#071410';
+        ctx.beginPath(); ctx.arc(sx, sy, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.stroke();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 9px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.symbol, sx, sy - 1);
+        ctx.fillStyle = col;
+        ctx.font = '9px ui-monospace, monospace';
+        const dSign = s.delta_pct >= 0 ? '+' : '';
+        ctx.fillText(`${dSign}${Number(s.delta_pct).toFixed(2)}%`, sx, sy + 9);
+      }
+      ctx.textAlign = 'left';
+
+      // Center Gold Core
+      ctx.fillStyle = '#0b241b';
+      ctx.beginPath(); ctx.arc(cx, cy, 34, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#facc15'; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('XAUUSD', cx, cy - 6);
+      ctx.fillStyle = gap >= 0 ? '#4ade80' : '#f87171';
+      ctx.font = 'bold 11px ui-monospace, monospace';
+      ctx.fillText(`${gap >= 0 ? '+' : ''}$${gap.toFixed(2)}`, cx, cy + 10);
+      ctx.textAlign = 'left';
+
+      // === RIGHT PANEL: LEAD-LAG OSCILLOSCOPE (FAIR GOLD vs ACTUAL MT5 GOLD) ===
+      const histSlice = candles.slice(-Math.min(55, visibleHistCount));
+      const useFair = fairSeries.length > 5 ? fairSeries : histSlice.map(c => ({ time: c.time, price: c.close + 0.8 }));
+      const useAct = actualSeries.length > 5 ? actualSeries : histSlice.map(c => ({ time: c.time, price: c.close }));
+      if (!useAct.length) return;
+
+      let minP = Infinity, maxP = -Infinity;
+      for (const p of useFair) { minP = Math.min(minP, p.price); maxP = Math.max(maxP, p.price); }
+      for (const p of useAct) { minP = Math.min(minP, p.price); maxP = Math.max(maxP, p.price); }
+      if (showBoxes && virtualSnapshot?.open_trade) {
+        const ot = virtualSnapshot.open_trade;
+        minP = Math.min(minP, ot.sl, ot.tp, ot.open_price);
+        maxP = Math.max(maxP, ot.sl, ot.tp, ot.open_price);
+      }
+      const padP = Math.max(1.2, (maxP - minP) * 0.14);
+      minP -= padP; maxP += padP;
+      const priceToY = (p) => PAD_TOP + ((maxP - p) / (maxP - minP)) * chartH;
+
+      drawPriceGrid(minP, maxP, rightX, chartW, PAD_TOP, chartH, AXIS_W, priceToY, actGold);
+
+      const nPts = useAct.length;
+      const slot = (chartW * 0.88) / Math.max(nPts, 1);
+
+      // Shade Arbitrage Gap between Fair Value & Actual MT5
+      ctx.beginPath();
+      for (let i = 0; i < nPts; i++) {
+        const x = rightX + (i + 0.5) * slot;
+        const y = priceToY(useFair[Math.min(i, useFair.length - 1)].price);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      for (let i = nPts - 1; i >= 0; i--) {
+        const x = rightX + (i + 0.5) * slot;
+        const y = priceToY(useAct[i].price);
+        ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = gap >= 0 ? 'rgba(16, 185, 129, 0.16)' : 'rgba(239, 68, 68, 0.16)';
+      ctx.fill();
+
+      // Actual MT5 Line
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      for (let i = 0; i < nPts; i++) {
+        const x = rightX + (i + 0.5) * slot;
+        const y = priceToY(useAct[i].price);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Fair Value Macro Line (Leads ahead)
+      ctx.strokeStyle = '#facc15'; ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      for (let i = 0; i < useFair.length; i++) {
+        const x = rightX + (i + 0.5) * slot;
+        const y = priceToY(useFair[i].price);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Gap Label at the right edge of oscilloscope
+      const lastX = rightX + (nPts - 0.5) * slot;
+      const yFair = priceToY(fairGold);
+      const yAct = priceToY(actGold);
+      ctx.strokeStyle = '#fde047'; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(lastX, yFair); ctx.lineTo(lastX, yAct); ctx.stroke();
+      ctx.setLineDash([]);
+      drawPill(lastX + 6, yFair, `HỢP LÝ: $${fairGold.toFixed(2)} (${gap >= 0 ? '+' : ''}${gap.toFixed(2)})`, 'rgba(234, 179, 8, 0.92)', '#041019', rightX + chartW - 4);
+
+      if (histSlice.length) {
+        const splitX = rightX + histSlice.length * slot;
+        drawTradingViewBoxes(histSlice, slot, splitX, rightX + chartW, priceToY, rightX);
+        if (virtualSnapshot?.open_trade) {
+          drawTradingViewOpenLabels(virtualSnapshot.open_trade, histSlice, slot, splitX, rightX + chartW, priceToY, rightX);
+        }
+        drawHoverBar(rightX, chartW, PAD_TOP, chartH, AXIS_W, slot, histSlice, null, minP, maxP, 'NEXUS-15');
+      }
+    }
+
+    function renderLeviathan(W, H) {
+      const DEPTH_W = 148;
+      const AXIS_W = 74, PAD_TOP = 38, PAD_BOT = 34;
+      const chartW = W - AXIS_W - DEPTH_W;
+      const chartH = H - PAD_TOP - PAD_BOT;
+      const tel = virtualSnapshot?.visual_telemetry || {};
+      const bubbles = tel.bubbles || [];
+      const depthWalls = tel.depth_walls || [];
+      const icebergPrice = Number(tel.iceberg_wall_price || 0);
+      const histSlice = candles.slice(-Math.max(42, bubbles.length));
+      if (!histSlice.length) return;
+
+      let minP = Infinity, maxP = -Infinity;
+      for (const c of histSlice) { minP = Math.min(minP, c.low); maxP = Math.max(maxP, c.high); }
+      for (const b of bubbles) { minP = Math.min(minP, b.price); maxP = Math.max(maxP, b.price); }
+      if (icebergPrice > 0) { minP = Math.min(minP, icebergPrice); maxP = Math.max(maxP, icebergPrice); }
+      if (showBoxes && virtualSnapshot?.open_trade) {
+        const ot = virtualSnapshot.open_trade;
+        minP = Math.min(minP, ot.sl, ot.tp, ot.open_price);
+        maxP = Math.max(maxP, ot.sl, ot.tp, ot.open_price);
+      }
+      const padP = Math.max(1.4, (maxP - minP) * 0.10);
+      minP -= padP; maxP += padP;
+      const priceToY = (p) => PAD_TOP + ((maxP - p) / (maxP - minP)) * chartH;
+      const midPrice = (bid && ask) ? (bid + ask) / 2 : histSlice[histSlice.length - 1].close;
+
+      // Subtle Sonar Rings in background
+      const scx = chartW * 0.48, scy = PAD_TOP + chartH * 0.52;
+      ctx.save();
+      for (let r = 60; r <= Math.min(chartW, chartH) * 0.65; r += 75) {
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.09)';
+        ctx.beginPath(); ctx.arc(scx, scy, r, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.restore();
+
+      drawPriceGrid(minP, maxP, 0, chartW + DEPTH_W, PAD_TOP, chartH, AXIS_W, priceToY, midPrice);
+
+      const useBubbles = bubbles.length ? bubbles : histSlice.map((c, i) => ({
+        idx: i, time: c.time, price: c.close, close: c.close,
+        side: c.close >= c.open ? 'BUY' : 'SELL', size_lots: 24, is_iceberg: false,
+      }));
+      const slot = (chartW * 0.94) / Math.max(useBubbles.length, 1);
+
+      // Iceberg Wall Line
+      if (icebergPrice > 0) {
+        const iy = priceToY(icebergPrice);
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([7, 4]);
+        ctx.beginPath(); ctx.moveTo(0, iy); ctx.lineTo(chartW + DEPTH_W, iy); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 11px ui-monospace, monospace';
+        ctx.fillText(`🧊 TẢNG BĂNG CHÌM CÁ MẬP @ $${icebergPrice.toFixed(2)} (Hấp thụ ${tel.absorption_pct || 80}%)`, 12, iy - 5);
+      }
+
+      // Continuous Tick Price Line
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let i = 0; i < useBubbles.length; i++) {
+        const x = (i + 0.5) * slot;
+        const y = priceToY(useBubbles[i].close || useBubbles[i].price);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Orderflow Volume Bubbles
+      for (let i = 0; i < useBubbles.length; i++) {
+        const b = useBubbles[i];
+        const x = (i + 0.5) * slot;
+        const y = priceToY(b.price);
+        const rad = Math.max(5, Math.min(24, 4 + Math.sqrt(Number(b.size_lots || 20)) * 2.1));
+        const isBuy = b.side === 'BUY';
+        ctx.fillStyle = isBuy ? 'rgba(34, 211, 238, 0.34)' : 'rgba(251, 113, 133, 0.34)';
+        ctx.strokeStyle = b.is_iceberg ? '#facc15' : (isBuy ? '#22d3ee' : '#fb7185');
+        ctx.lineWidth = b.is_iceberg ? 2.4 : 1.3;
+        ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        if (b.is_iceberg) {
+          ctx.beginPath(); ctx.arc(x, y, rad + 4, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(250, 204, 21, 0.55)'; ctx.lineWidth = 1.2; ctx.stroke();
+        }
+      }
+
+      // Bookmap Depth Wall Histogram on Right
+      const wallX = chartW + 4;
+      ctx.fillStyle = 'rgba(8, 20, 35, 0.78)';
+      ctx.fillRect(wallX, PAD_TOP, DEPTH_W - 8, chartH);
+      ctx.fillStyle = '#7dd3fc';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('SỔ LỆNH BOOKMAP', wallX + 8, PAD_TOP + 14);
+      for (const w of depthWalls) {
+        const wy = priceToY(w.price);
+        if (wy < PAD_TOP + 18 || wy > PAD_TOP + chartH - 6) continue;
+        const barLen = Math.max(8, Math.min(DEPTH_W - 22, (Number(w.heat || 25) / 100) * (DEPTH_W - 20)));
+        ctx.fillStyle = w.is_iceberg
+          ? 'rgba(250, 204, 21, 0.85)'
+          : (w.side === 'ASK_WALL' ? 'rgba(239, 68, 68, 0.58)' : 'rgba(6, 182, 212, 0.60)');
+        ctx.fillRect(wallX + DEPTH_W - 10 - barLen, wy - 4, barLen, 8);
+      }
+
+      const sliceForBoxes = histSlice.slice(-useBubbles.length);
+      drawTradingViewBoxes(sliceForBoxes, slot, sliceForBoxes.length * slot, chartW, priceToY, 0);
+      if (virtualSnapshot?.open_trade) {
+        drawTradingViewOpenLabels(virtualSnapshot.open_trade, sliceForBoxes, slot, sliceForBoxes.length * slot, chartW, priceToY, 0);
+      }
+      drawHoverBar(0, chartW + DEPTH_W, PAD_TOP, chartH, AXIS_W, slot, sliceForBoxes, null, minP, maxP, 'LEVIATHAN');
+    }
+
+    function renderAntiCrowd(W, H) {
+      const leftW = Math.max(320, Math.min(480, Math.floor(W * 0.41)));
+      const rightX = leftW + 8;
+      const AXIS_W = 74, PAD_TOP = 38, PAD_BOT = 34;
+      const chartW = W - rightX - AXIS_W;
+      const chartH = H - PAD_TOP - PAD_BOT;
+
+      const tel = virtualSnapshot?.visual_telemetry || {};
+      const traps = tel.traps || [];
+      const crowdBias = tel.crowd_bias || 'SELL';
+      const mirrorAct = tel.mirror_action || 'BUY';
+      const mortPct = Number(tel.crowd_mortality_pct || 79);
+
+      // === LEFT PANEL: 10 TEXTBOOK RETAIL TRAPS MATRIX ===
+      ctx.fillStyle = 'rgba(23, 16, 9, 0.90)';
+      ctx.fillRect(8, PAD_TOP, leftW - 14, chartH);
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+      ctx.strokeRect(8, PAD_TOP, leftW - 14, chartH);
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`🪞 GIẢI PHẪU 10 BẪY SÁCH GIÁO KHOA (Tử vong ${mortPct}%)`, 18, PAD_TOP + 20);
+      ctx.fillStyle = mirrorAct === 'BUY' ? '#4ade80' : '#f87171';
+      ctx.font = 'bold 11px ui-monospace, monospace';
+      ctx.fillText(`ĐÁM ĐÔNG ĐANG ${crowdBias} (${tel.crowd_consensus_pct || 80}%)  ➜  BOT ĐÁNH NGƯỢC: ${mirrorAct}`, 18, PAD_TOP + 38);
+
+      const startY = PAD_TOP + 52;
+      const rowH = Math.max(20, Math.floor((chartH - 60) / Math.max(10, traps.length)));
+      for (let i = 0; i < traps.length; i++) {
+        const t = traps[i];
+        const ry = startY + i * rowH;
+        if (ry + rowH > PAD_TOP + chartH - 4) break;
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.12)';
+        ctx.fillRect(14, ry, leftW - 26, rowH - 3);
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '11px sans-serif';
+        ctx.fillText(`${t.id}. ${t.name}`, 20, ry + rowH * 0.62);
+
+        const isCrowdBuy = t.retail_action === 'BUY';
+        ctx.fillStyle = isCrowdBuy ? 'rgba(239, 68, 68, 0.22)' : 'rgba(34, 197, 94, 0.22)';
+        ctx.fillRect(leftW - 165, ry + 3, 76, rowH - 9);
+        ctx.fillStyle = isCrowdBuy ? '#fca5a5' : '#86efac';
+        ctx.font = 'bold 10px ui-monospace, monospace';
+        ctx.fillText(`BẪY ${t.retail_action}`, leftW - 158, ry + rowH * 0.60);
+
+        ctx.fillStyle = '#fb923c';
+        ctx.fillText(`Chết ${t.mortality_pct}%`, leftW - 82, ry + rowH * 0.60);
+      }
+
+      // === RIGHT PANEL: MIRROR REVERSAL CHART ===
+      const histSlice = candles.slice(-Math.min(55, visibleHistCount));
+      if (!histSlice.length) return;
+
+      let minP = Infinity, maxP = -Infinity;
+      for (const c of histSlice) { minP = Math.min(minP, c.low); maxP = Math.max(maxP, c.high); }
+      const ot = virtualSnapshot?.open_trade;
+      const targetTp = ot ? ot.tp : Number(tel.retail_sl_becomes_bot_tp || 0);
+      const entryZ = ot ? ot.open_price : Number(tel.retail_entry_zone || 0);
+      if (targetTp > 0) { minP = Math.min(minP, targetTp); maxP = Math.max(maxP, targetTp); }
+      if (showBoxes && ot) {
+        minP = Math.min(minP, ot.sl, ot.tp, ot.open_price);
+        maxP = Math.max(maxP, ot.sl, ot.tp, ot.open_price);
+      }
+      const padP = Math.max(1.4, (maxP - minP) * 0.12);
+      minP -= padP; maxP += padP;
+      const priceToY = (p) => PAD_TOP + ((maxP - p) / (maxP - minP)) * chartH;
+      const midPrice = (bid && ask) ? (bid + ask) / 2 : histSlice[histSlice.length - 1].close;
+
+      drawPriceGrid(minP, maxP, rightX, chartW, PAD_TOP, chartH, AXIS_W, priceToY, midPrice);
+
+      if (targetTp > 0) {
+        const yTpZone = priceToY(targetTp);
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.12)';
+        ctx.fillRect(rightX, yTpZone - 12, chartW, 24);
+        ctx.strokeStyle = 'rgba(34, 197, 94, 0.8)';
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.moveTo(rightX, yTpZone); ctx.lineTo(rightX + chartW, yTpZone); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#86efac';
+        ctx.font = 'bold 11px ui-monospace, monospace';
+        ctx.fillText(`🎯 Ổ STOPLOSS ĐÁM ĐÔNG = TAKE PROFIT BOT ($${targetTp.toFixed(2)})`, rightX + 10, yTpZone - 4);
+      }
+      if (entryZ > 0) {
+        const yEz = priceToY(entryZ);
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(rightX, yEz); ctx.lineTo(rightX + chartW, yEz); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      const barSlot = (chartW * 0.88) / Math.max(histSlice.length, 1);
+      const splitX = rightX + histSlice.length * barSlot;
+      drawTradingViewBoxes(histSlice, barSlot, splitX, rightX + chartW, priceToY, rightX);
+      drawCandles(histSlice, barSlot, priceToY, rightX, 0.94);
+      if (ot) {
+        drawTradingViewOpenLabels(ot, histSlice, barSlot, splitX, rightX + chartW, priceToY, rightX);
+      }
+      drawHoverBar(rightX, chartW, PAD_TOP, chartH, AXIS_W, barSlot, histSlice, null, minP, maxP, 'ANTI-CROWD');
+    }
+
+    function drawFrame() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const W = rect.width;
+      const H = rect.height;
+      ctx.fillStyle = PAGE_META.canvas_bg;
+      ctx.fillRect(0, 0, W, H);
+
+      if (!candles.length) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '14px sans-serif';
+        ctx.fillText(`Đang tải dữ liệu trực tiếp cho ${PAGE_META.short_name}...`, 20, 60);
+        return;
+      }
+
+      if (PAGE_SYSTEM_ID === 'GRAVEYARD') renderGraveyard(W, H);
+      else if (PAGE_SYSTEM_ID === 'NEXUS15') renderNexus15(W, H);
+      else if (PAGE_SYSTEM_ID === 'LEVIATHAN') renderLeviathan(W, H);
+      else if (PAGE_SYSTEM_ID === 'ANTICROWD') renderAntiCrowd(W, H);
+      else renderSilentEyes(W, H);
+    }
+
+    function renderLoop() {
+      if (needsDraw) {
+        needsDraw = false;
+        drawFrame();
+      }
+      requestAnimationFrame(renderLoop);
+    }
+
+    btnLive.onclick = startLive;
+    tfSelect.onchange = () => fetchMarketData(true);
+    horizonSelect.onchange = () => fetchMarketData(true);
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+      requestDraw();
+    });
+    canvas.addEventListener('mouseleave', () => { mouseX = -1; mouseY = -1; requestDraw(); });
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      visibleHistCount = e.deltaY > 0
+        ? Math.min(120, visibleHistCount + 8)
+        : Math.max(25, visibleHistCount - 8);
+      requestDraw();
+    }, { passive: false });
+
+    // === VIRTUAL $10K SNAPSHOT & MORPHING DOCK SYNC ===
+    const hudVirtual = document.getElementById('hudVirtual');
+    const hudVirtualCard = document.getElementById('hudVirtualCard');
+    const btnBoxes = document.getElementById('btnBoxes');
+    const btnHistory = document.getElementById('btnHistory');
+    const historyModal = document.getElementById('historyModal');
+    const btnCloseHistory = document.getElementById('btnCloseHistory');
+    const tabTradesBtn = document.getElementById('tabTradesBtn');
+    const tabOptBtn = document.getElementById('tabOptBtn');
+    const tabTradesView = document.getElementById('tabTradesView');
+    const tabOptView = document.getElementById('tabOptView');
+    const vEquity = document.getElementById('vEquity');
+    const vNetPnl = document.getElementById('vNetPnl');
+    const vWinrate = document.getElementById('vWinrate');
+    const vPf = document.getElementById('vPf');
+    const vMaxDd = document.getElementById('vMaxDd');
+    const vStratText = document.getElementById('vStratText');
+    const vTradesBody = document.getElementById('vTradesBody');
+    const vOptBody = document.getElementById('vOptBody');
+
+    function fmtShortTime(tsSec) {
+      if (!tsSec) return '--';
+      const d = new Date(tsSec * 1000);
+      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+        + ' ' + String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    }
+
+    function renderVirtualData(v) {
+      if (!v || !v.ok) return;
+      virtualSnapshot = v;
+      const acc = v.account;
+      const st = v.stats;
+      const sig = v.live_signal;
+      const tel = v.visual_telemetry || {};
+
+      // Update Morphing Dock with all 5 machines' live equity & winrate
+      if (Array.isArray(v.dock_systems)) {
+        for (const ds of v.dock_systems) {
+          const metaEl = document.getElementById(`dockMeta_${ds.system_id}`);
+          const posEl = document.getElementById(`dockPos_${ds.system_id}`);
+          if (metaEl) {
+            const sgn = ds.net_pnl_pct >= 0 ? '+' : '';
+            metaEl.style.color = ds.net_pnl_pct >= 0 ? '#86efac' : '#fca5a5';
+            metaEl.textContent = `$${Number(ds.equity).toLocaleString('en-US', { maximumFractionDigits: 0 })} (${sgn}${ds.net_pnl_pct.toFixed(1)}%) • WR ${ds.winrate}%`;
+          }
+          if (posEl) {
+            if (ds.open_side) {
+              posEl.textContent = ds.open_side;
+              posEl.style.background = ds.open_side === 'BUY' ? 'rgba(34,197,94,0.22)' : 'rgba(239,68,68,0.22)';
+              posEl.style.color = ds.open_side === 'BUY' ? '#4ade80' : '#f87171';
+            } else {
+              posEl.textContent = '';
+              posEl.style.background = 'transparent';
+            }
+          }
+        }
+      }
+
+      // Update Live Quantitative Proof in USP Box & HUD cards
+      if (sig) {
+        if (sig.trigger_note) {
+          liveTriggerProof.textContent = `⚡ Bằng chứng tín hiệu sống: ${sig.trigger_note}`;
+        }
+        if (PAGE_SYSTEM_ID !== 'SILENT_EYES') {
+          const isBull = sig.bias === 'BULLISH';
+          hudBias.className = 'hud-val ' + (isBull ? 'bull' : 'bear');
+          hudBias.textContent = `${sig.action} (${sig.confidence}%)`;
+
+          if (PAGE_SYSTEM_ID === 'GRAVEYARD') {
+            hudMetric3Label.textContent = 'Ổ SL ĐÁM ĐÔNG & ÁP LỰC QUÉT';
+            hudTarget.textContent = `$${Number(tel.swept_anchor_price || 0).toFixed(2)} • Lực ${tel.kill_zone_meter || sig.confidence}%`;
+          } else if (PAGE_SYSTEM_ID === 'NEXUS15') {
+            hudMetric3Label.textContent = 'GIÁ HỢP LÝ VĨ MÔ (ĐỘ LỆCH)';
+            const g = Number(tel.lead_lag_gap_usd || 0);
+            hudTarget.textContent = `$${Number(tel.fair_gold_price || 0).toFixed(2)} (${g >= 0 ? '+' : ''}${g.toFixed(2)}$)`;
+          } else if (PAGE_SYSTEM_ID === 'LEVIATHAN') {
+            hudMetric3Label.textContent = 'TẢNG BĂNG CHÌM & ORDERFLOW';
+            const d = Number(tel.net_delta_lots || 0);
+            hudTarget.textContent = `$${Number(tel.iceberg_wall_price || 0).toFixed(2)} • Delta ${d >= 0 ? '+' : ''}${d.toFixed(0)}L`;
+          } else if (PAGE_SYSTEM_ID === 'ANTICROWD') {
+            hudMetric3Label.textContent = 'TỶ LỆ CHẾT ĐÁM ĐÔNG';
+            hudTarget.textContent = `Bẫy ${tel.crowd_bias || 'SELL'} ${tel.crowd_consensus_pct || 80}% • Tử vong ${tel.crowd_mortality_pct || 80}%`;
+          }
+          hudCone.textContent = `SL $${Number(sig.sl).toFixed(2)} / TP $${Number(sig.tp).toFixed(2)}`;
+        }
+      }
+
+      const sign = acc.net_pnl_usd >= 0 ? '+' : '';
+      hudVirtual.className = 'hud-val ' + (acc.net_pnl_usd >= 0 ? 'bull' : 'bear');
+      hudVirtual.textContent = `$${acc.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${sign}${acc.net_pnl_pct.toFixed(2)}%) • WR ${st.winrate}%`;
+
+      vEquity.textContent = `$${acc.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      vNetPnl.className = 'v ' + (acc.net_pnl_usd >= 0 ? 'bull' : 'bear');
+      vNetPnl.textContent = `${sign}$${acc.net_pnl_usd.toFixed(2)} (${sign}${acc.net_pnl_pct.toFixed(2)}%)`;
+      vWinrate.textContent = `${st.winrate.toFixed(1)}% (${st.wins}/${st.losses})`;
+      vPf.textContent = Number(st.profit_factor || 0).toFixed(2);
+      vMaxDd.textContent = `${Number(acc.max_dd_pct || 0).toFixed(2)}%`;
+      vStratText.textContent = `${PAGE_META.name} • Magic #${PAGE_META.magic} • TF ${PAGE_META.default_tf}`;
+
+      const rows = [];
+      if (v.open_trade) {
+        const ot = v.open_trade;
+        const ps = ot.floating_usd >= 0 ? '+' : '';
+        rows.push(`
+          <tr style="background:rgba(56,189,248,0.08);">
+            <td>#${ot.id}</td>
+            <td>${fmtShortTime(ot.open_time)} → Đang chạy</td>
+            <td class="${ot.side === 'BUY' ? 'tag-buy' : 'tag-sell'}">${ot.side}</td>
+            <td>${Number(ot.lot).toFixed(2)}</td>
+            <td>${Number(ot.open_price).toFixed(2)} → ${Number(ot.mark_price).toFixed(2)}</td>
+            <td>${Number(ot.sl).toFixed(2)} / ${Number(ot.tp).toFixed(2)}</td>
+            <td><span class="tag-open">OPEN (${ot.confidence}%)</span></td>
+            <td class="${ot.floating_usd >= 0 ? 'bull' : 'bear'}">${ps}$${Number(ot.floating_usd).toFixed(2)}</td>
+            <td>$${acc.equity.toFixed(2)}</td>
+            <td style="white-space:normal; min-width:220px; color:#cbd5e1;">${ot.trigger_note || '-'}</td>
+          </tr>
+        `);
+      }
+
+      for (const tr of (v.recent_trades || [])) {
+        const ps = tr.pnl_usd >= 0 ? '+' : '';
+        const tagCls = tr.close_reason === 'TP' ? 'tag-tp' : 'tag-sl';
+        rows.push(`
+          <tr>
+            <td>#${tr.id}</td>
+            <td>${fmtShortTime(tr.open_time)} → ${fmtShortTime(tr.close_time)}</td>
+            <td class="${tr.side === 'BUY' ? 'tag-buy' : 'tag-sell'}">${tr.side}</td>
+            <td>${Number(tr.lot).toFixed(2)}</td>
+            <td>${Number(tr.open_price).toFixed(2)} → ${Number(tr.close_price).toFixed(2)}</td>
+            <td>${Number(tr.sl).toFixed(2)} / ${Number(tr.tp).toFixed(2)}</td>
+            <td><span class="${tagCls}">${tr.close_reason}</span></td>
+            <td class="${tr.pnl_usd >= 0 ? 'bull' : 'bear'}">${ps}$${Number(tr.pnl_usd).toFixed(2)}</td>
+            <td>$${Number(tr.balance_after).toFixed(2)}</td>
+            <td style="white-space:normal; min-width:220px; color:#cbd5e1;">${tr.trigger_note || '-'}</td>
+          </tr>
+        `);
+      }
+
+      vTradesBody.innerHTML = rows.length
+        ? rows.join('')
+        : '<tr><td colspan="10" style="text-align:center; color:#64748b; padding:16px;">Đang chờ tín hiệu đạt ngưỡng...</td></tr>';
+
+      const opts = v.optimization_history || [];
+      vOptBody.innerHTML = opts.length
+        ? opts.map((o) => `
+          <tr>
+            <td>${o.run_at}</td>
+            <td>${o.audit_24h_trades} lệnh • WR ${Number(o.audit_24h_wr).toFixed(1)}% • ${o.audit_24h_pnl >= 0 ? '+' : ''}$${Number(o.audit_24h_pnl).toFixed(2)}</td>
+            <td>v${o.old_version} → v${o.new_version} ${o.changed ? '<span class="tag-tp">ĐÃ ĐỔI</span>' : '<span class="tag-open">GIỮ</span>'}</td>
+            <td style="white-space:normal; max-width:340px;">${o.summary}</td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="4" style="text-align:center; color:#64748b; padding:16px;">Hệ thống tự động kiểm toán sau mỗi 24 giờ.</td></tr>';
+
+      requestDraw();
+    }
+
+    async function fetchVirtual10k() {
+      const base = await getApiBase();
+      if (!base) return;
+      try {
+        const res = await fetch(`${base}/api/silenteyes/virtual?system=${encodeURIComponent(PAGE_SYSTEM_ID)}`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          renderVirtualData(data);
+        }
+      } catch (_) {}
+    }
+
+    btnBoxes.onclick = () => {
+      showBoxes = !showBoxes;
+      btnBoxes.classList.toggle('active', showBoxes);
+      requestDraw();
+    };
+    const openHistoryModal = () => {
+      historyModal.classList.add('open');
+      fetchVirtual10k();
+    };
+    btnHistory.onclick = openHistoryModal;
+    hudVirtualCard.onclick = openHistoryModal;
+    btnCloseHistory.onclick = () => historyModal.classList.remove('open');
+    historyModal.addEventListener('click', (e) => {
+      if (e.target === historyModal) historyModal.classList.remove('open');
+    });
+    tabTradesBtn.onclick = () => {
+      tabTradesBtn.classList.add('active'); tabOptBtn.classList.remove('active');
+      tabTradesView.style.display = 'block'; tabOptView.style.display = 'none';
+    };
+    tabOptBtn.onclick = () => {
+      tabOptBtn.classList.add('active'); tabTradesBtn.classList.remove('active');
+      tabOptView.style.display = 'block'; tabTradesView.style.display = 'none';
+    };
+
+    setInterval(fetchVirtual10k, 2500);
+
+    // === PAYWALL MOMO 10.000Đ / 24H RIÊNG CHO TỪNG CỖ MÁY (.EX5) ===
+    const ORDER_STORAGE_KEY = `silent_eyes_order_code_${PAGE_SYSTEM_ID}`;
+    const copyModal = document.getElementById('copyModal');
+    const btnCopyStrat = document.getElementById('btnCopyStrat');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const payStepIntro = document.getElementById('payStepIntro');
+    const payStepQr = document.getElementById('payStepQr');
+    const payStepPaid = document.getElementById('payStepPaid');
+    const btnCreateOrder = document.getElementById('btnCreateOrder');
+    const introErr = document.getElementById('introErr');
+    const momoQrImg = document.getElementById('momoQrImg');
+    const orderCodeText = document.getElementById('orderCodeText');
+    const btnCopyCode = document.getElementById('btnCopyCode');
+    const payStatusBanner = document.getElementById('payStatusBanner');
+    const btnNewOrder = document.getElementById('btnNewOrder');
+    const paidCodeText = document.getElementById('paidCodeText');
+    const paidCountdown = document.getElementById('paidCountdown');
+    const btnDownloadEx5 = document.getElementById('btnDownloadEx5');
+    const eaApiUrlText = document.getElementById('eaApiUrlText');
+    const btnCopyApiUrl = document.getElementById('btnCopyApiUrl');
+    const btnNewOrderPaid = document.getElementById('btnNewOrderPaid');
+
+    let payPollTimer = null;
+    let activeOrderCode = localStorage.getItem(ORDER_STORAGE_KEY) || (PAGE_SYSTEM_ID === 'SILENT_EYES' ? (localStorage.getItem('silent_eyes_order_code') || '') : '');
+    let activeDownloadUrl = '';
+
+    function stopPayPoll() {
+      if (payPollTimer) { clearInterval(payPollTimer); payPollTimer = null; }
+    }
+
+    function fmtCountdown(sec) {
+      if (!sec || sec <= 0) return 'Đã hết hạn';
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${h}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+    }
+
+    function copyTextWithFeedback(btn, text) {
+      if (!text) return;
+      navigator.clipboard?.writeText(text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Đã copy ✓';
+        setTimeout(() => { btn.textContent = old; }, 1400);
+      }).catch(() => {});
+    }
+
+    document.querySelectorAll('.mini-copy[data-copy]').forEach((btn) => {
+      btn.onclick = () => copyTextWithFeedback(btn, btn.getAttribute('data-copy'));
+    });
+
+    async function getApiBase() {
+      let base = apiUrlInput.value.trim().replace(/\/+$/, '');
+      if (!base) {
+        await resolveDefaultTunnel(true);
+        base = apiUrlInput.value.trim().replace(/\/+$/, '');
+      }
+      return base;
+    }
+
+    function showPayView(view) {
+      payStepIntro.style.display = view === 'intro' ? 'block' : 'none';
+      payStepQr.style.display = view === 'qr' ? 'block' : 'none';
+      payStepPaid.style.display = view === 'paid' ? 'block' : 'none';
+    }
+
+    function renderOrderState(data, apiBase) {
+      if (!data || !data.order_code) return;
+      activeOrderCode = data.order_code;
+      localStorage.setItem(ORDER_STORAGE_KEY, activeOrderCode);
+
+      if (data.status === 'PAID') {
+        stopPayPoll();
+        paidCodeText.textContent = activeOrderCode;
+        paidCountdown.textContent = fmtCountdown(data.remaining_sec);
+        const eaBase = data.api_base_url || apiBase;
+        eaApiUrlText.textContent = eaBase;
+        btnCopyApiUrl.onclick = () => copyTextWithFeedback(btnCopyApiUrl, eaBase);
+        activeDownloadUrl = `${apiBase}/api/silenteyes/download-ex5?code=${encodeURIComponent(activeOrderCode)}`;
+        showPayView('paid');
+        return;
+      }
+
+      if (data.status === 'EXPIRED') {
+        stopPayPoll();
+        localStorage.removeItem(ORDER_STORAGE_KEY);
+        activeOrderCode = '';
+        introErr.textContent = `Mã bản quyền 24h trước của ${PAGE_META.ea_name} đã hết hạn. Bấm bên trên để tạo đơn mới (10.000đ).`;
+        showPayView('intro');
+        return;
+      }
+
+      orderCodeText.textContent = activeOrderCode;
+      momoQrImg.src = data.qr_url;
+      btnCopyCode.onclick = () => copyTextWithFeedback(btnCopyCode, activeOrderCode);
+      payStatusBanner.textContent = `⏳ Đang chờ MoMo 0977098166 xác nhận chuyển khoản 10.000đ (${PAGE_META.ea_name})...`;
+      showPayView('qr');
+    }
+
+    async function pollOrderStatus() {
+      if (!activeOrderCode) return;
+      const base = await getApiBase();
+      if (!base) return;
+      try {
+        const res = await fetch(`${base}/api/silenteyes/order-status?code=${encodeURIComponent(activeOrderCode)}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.found) {
+          renderOrderState(data, base);
+        } else {
+          stopPayPoll();
+          localStorage.removeItem(ORDER_STORAGE_KEY);
+          activeOrderCode = '';
+          showPayView('intro');
+        }
+      } catch (_) {}
+    }
+
+    function startPayPoll() {
+      stopPayPoll();
+      payPollTimer = setInterval(pollOrderStatus, 3000);
+    }
+
+    async function createNewOrder() {
+      introErr.textContent = '';
+      btnCreateOrder.disabled = true;
+      btnCreateOrder.textContent = '⏳ Đang tạo mã QR MoMo...';
+      try {
+        const base = await getApiBase();
+        if (!base) throw new Error('Chưa kết nối được máy chủ.');
+        const res = await fetch(`${base}/api/silenteyes/create-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ system_id: PAGE_SYSTEM_ID })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Không tạo được đơn.');
+        renderOrderState(data, base);
+        startPayPoll();
+      } catch (err) {
+        introErr.textContent = 'Lỗi: ' + (err.message || err);
+        showPayView('intro');
+      } finally {
+        btnCreateOrder.disabled = false;
+        btnCreateOrder.textContent = `💳 Thanh toán 10.000đ qua MoMo để tải ${PAGE_META.ea_name}.ex5`;
+      }
+    }
+
+    btnCopyStrat.onclick = async () => {
+      copyModal.classList.add('open');
+      introErr.textContent = '';
+      if (activeOrderCode) {
+        await pollOrderStatus();
+        if (activeOrderCode && payStepQr.style.display === 'block') startPayPoll();
+      } else {
+        showPayView('intro');
+      }
+    };
+    btnCloseModal.onclick = () => { copyModal.classList.remove('open'); stopPayPoll(); };
+    copyModal.addEventListener('click', (e) => {
+      if (e.target === copyModal) { copyModal.classList.remove('open'); stopPayPoll(); }
+    });
+    btnCreateOrder.onclick = createNewOrder;
+    btnNewOrder.onclick = () => {
+      stopPayPoll(); localStorage.removeItem(ORDER_STORAGE_KEY); activeOrderCode = ''; createNewOrder();
+    };
+    btnNewOrderPaid.onclick = () => {
+      stopPayPoll(); localStorage.removeItem(ORDER_STORAGE_KEY); activeOrderCode = ''; createNewOrder();
+    };
+    btnDownloadEx5.onclick = () => {
+      if (!activeDownloadUrl) return;
+      const orig = btnDownloadEx5.textContent;
+      btnDownloadEx5.textContent = `⏳ Đang đóng gói ${PAGE_META.ea_name}.ex5 (~5 giây)...`;
+      window.location.href = activeDownloadUrl;
+      setTimeout(() => { btnDownloadEx5.textContent = orig; }, 6000);
+    };
+
+    startLive();
+    requestAnimationFrame(renderLoop);
+  </script>
+</body>
+</html>
