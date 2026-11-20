@@ -1,105 +1,71 @@
-export function render(canvas, ctx, data) {
-  if (!canvas || !ctx) return;
-  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
-  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
-  if (w === 0 || h === 0) return;
+window.SilentRenderers = window.SilentRenderers || {};
+window.SilentRenderers.CHRONOS = function(ctx, w, h, st) {
+    const tel = st.snap.visual_telemetry || {};
+    const ot = st.snap.open_trade || null;
+    const safe = (v) => Number.isFinite(v) ? v : 0;
 
-  ctx.clearRect(0, 0, w, h);
-  if (!data || !data.telemetry) return;
+    ctx.clearRect(0, 0, w, h);
 
-  const tel = data.telemetry;
-  const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+    // 1. Draw Monte Carlo Cone
+    if (tel.cone && Array.isArray(tel.cone)) {
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(168, 85, 247, 0.15)";
+        tel.cone.forEach((p, i) => {
+            const x = safe(p.x);
+            const y_high = safe(p.y_high);
+            if (i === 0) ctx.moveTo(x, y_high); else ctx.lineTo(x, y_high);
+        });
+        for (let i = tel.cone.length - 1; i >= 0; i--) {
+            ctx.lineTo(safe(tel.cone[i].x), safe(tel.cone[i].y_low));
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
 
-  // Background Gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, '#0f172a');
-  grad.addColorStop(1, '#020617');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
+    // 2. Draw Prediction Path
+    if (tel.path && Array.isArray(tel.path)) {
+        ctx.beginPath();
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 2;
+        tel.path.forEach((p, i) => {
+            const x = safe(p.x);
+            const y = safe(p.y);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+    }
 
-  // Grid
-  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 10; i++) {
-    const x = safeNum((w / 10) * i);
-    const y = safeNum((h / 10) * i);
-    ctx.beginPath();
-    ctx.moveTo(x, 0); ctx.lineTo(x, h);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, y); ctx.lineTo(w, y);
-    ctx.stroke();
-  }
+    // 3. Draw Open Trade Marker
+    if (ot) {
+        const tx = safe(ot.x);
+        const ty = safe(ot.y);
+        const r = 6;
+        
+        const grad = ctx.createRadialGradient(tx, ty, 0, tx, ty, r);
+        grad.addColorStop(0, "#ef4444");
+        grad.addColorStop(1, "transparent");
+        
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(tx, ty, r * 2, 0, Math.PI * 2);
+        ctx.fill();
 
-  // Main Telemetry Display
-  const centerX = w / 2;
-  const centerY = h / 2;
-  const radius = safeNum(Math.min(w, h) * 0.35);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 10px Inter, sans-serif";
+        ctx.fillText(ot.side === "BUY" ? "B" : "S", tx + 8, ty + 4);
+    }
 
-  // Outer Ring
-  ctx.beginPath();
-  ctx.strokeStyle = '#38bdf8';
-  ctx.lineWidth = 2;
-  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-  ctx.stroke();
+    // 4. Telemetry Labels (No raw JSON)
+    if (tel.conf) {
+        ctx.fillStyle = "#a855f7";
+        ctx.font = "12px JetBrains Mono, monospace";
+        ctx.fillText(`CONF: ${safe(tel.conf)}%`, 10, 20);
+    }
 
-  // Entropy Pulse
-  const entropy = safeNum(tel.entropy, 0);
-  const pulseSize = safeNum(radius * (0.5 + entropy * 0.5));
-  const radGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseSize);
-  radGrad.addColorStop(0, 'rgba(56, 189, 248, 0.2)');
-  radGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-  ctx.fillStyle = radGrad;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, pulseSize, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Text Info
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  // Price
-  ctx.font = 'bold 32px monospace';
-  ctx.fillStyle = '#f8fafc';
-  const price = safeNum(tel.last_price, 0).toFixed(2);
-  ctx.fillText(price, centerX, centerY - 20);
-
-  // Signal / State
-  ctx.font = '14px monospace';
-  ctx.fillStyle = '#94a3b8';
-  const state = (tel.state || 'IDLE').toUpperCase();
-  ctx.fillText(`STATE: ${state}`, centerX, centerY + 20);
-
-  // Metrics Grid (Bottom)
-  const metrics = [
-    { label: 'VOL', val: safeNum(tel.volatility, 0).toFixed(4) },
-    { label: 'ENT', val: entropy.toFixed(4) },
-    { label: 'BIAS', val: safeNum(tel.bias, 0).toFixed(2) }
-  ];
-
-  const part = w / (metrics.length + 1);
-  ctx.font = '12px monospace';
-  metrics.forEach((m, i) => {
-    const mx = safeNum(part * (i + 1));
-    const my = safeNum(h - 40);
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillText(m.label, mx, my);
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillText(m.val, mx, my + 15);
-  });
-
-  // Trend Line (Simple representation)
-  if (Array.isArray(data.history) && data.history.length > 1) {
-    ctx.beginPath();
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 1.5;
-    const step = w / (data.history.length - 1);
-    data.history.forEach((p, i) => {
-      const px = safeNum(i * step);
-      const py = safeNum(h - (safeNum(p) * h)); // Normalized 0-1
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.stroke();
-  }
-}
+    // 5. Linear Gradient Background (Safe check)
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, safe(h));
+    bgGrad.addColorStop(0, "rgba(15, 23, 42, 0)");
+    bgGrad.addColorStop(1, "rgba(15, 23, 42, 0.2)");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, safe(w), safe(h));
+};

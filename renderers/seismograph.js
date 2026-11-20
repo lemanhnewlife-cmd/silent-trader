@@ -1,75 +1,58 @@
-export default function render(canvas, telemetry) {
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+window.SilentRenderers = window.SilentRenderers || {};
+window.SilentRenderers.SEISMOGRAPH = function(ctx, w, h, st) {
+    const tel = st.snap.visual_telemetry || {};
+    const ot = st.snap.open_trade || null;
+    const f = (v, fallback = 0) => (Number.isFinite(v) ? v : fallback);
 
-  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
-  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
-  ctx.clearRect(0, 0, w, h);
-  if (w === 0 || h === 0) return;
+    ctx.clearRect(0, 0, w, h);
 
-  const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
-  const data = telemetry || {};
-  const value = safeNum(data.value, 0);
-  const history = Array.isArray(data.history) ? data.history : [];
-  const color = data.color || '#38bdf8';
+    // 1. Draw Background Gradient
+    const bgGrd = ctx.createLinearGradient(0, 0, 0, f(h));
+    bgGrd.addColorStop(0, '#0f172a');
+    bgGrd.addColorStop(1, '#020617');
+    ctx.fillStyle = bgGrd;
+    ctx.fillRect(0, 0, f(w), f(h));
 
-  // Background
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0, 0, w, h);
+    // 2. Draw Seismograph Waves (Telemetry)
+    if (tel.waves && Array.isArray(tel.waves)) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        tel.waves.forEach((pt, i) => {
+            const x = f((i / tel.waves.length) * w);
+            const y = f(h / 2 + pt * (h / 4));
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+    }
 
-  // Grid
-  ctx.strokeStyle = '#1e293b';
-  ctx.lineWidth = 1;
-  for (let i = 1; i < 4; i++) {
-    const x = safeNum((w / 4) * i);
-    const y = safeNum((h / 4) * i);
-    ctx.beginPath();
-    ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-  }
+    // 3. Draw Open Trade Marker
+    if (ot && ot.entry_price) {
+        const entryY = f(h / 2);
+        const pulseRadius = f(10 + Math.sin(Date.now() / 200) * 5);
+        
+        const radGrd = ctx.createRadialGradient(f(w/2), entryY, 0, f(w/2), entryY, pulseRadius);
+        radGrd.addColorStop(0, 'rgba(245, 158, 11, 0.8)');
+        radGrd.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        
+        ctx.fillStyle = radGrd;
+        ctx.beginPath();
+        ctx.arc(f(w/2), entryY, pulseRadius, 0, Math.PI * 2);
+        ctx.fill();
 
-  // Seismograph Line
-  if (history.length > 1) {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    const step = safeNum(w / (history.length - 1));
-    history.forEach((v, i) => {
-      const x = safeNum(i * step);
-      const y = safeNum(h / 2 - (v * h / 4));
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
+        // Label instead of raw JSON
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        const label = (ot.type || 'TRADE') + ' @ ' + f(ot.entry_price).toFixed(2);
+        ctx.fillText(label, f(w/2), entryY - 20);
+    }
 
-    // Gradient Fill
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, color + '33');
-    grad.addColorStop(1, 'transparent');
-    ctx.lineTo(safeNum(w), safeNum(h));
-    ctx.lineTo(0, safeNum(h));
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
-
-  // Value Circle
-  const centerX = safeNum(w / 2);
-  const centerY = safeNum(h / 2);
-  const radius = safeNum(Math.min(w, h) * 0.15);
-  
-  const radialGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-  radialGrad.addColorStop(0, color + '44');
-  radialGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = radialGrad;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Text
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 14px Inter, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(value.toFixed(2), centerX, centerY + 5);
-}
+    // 4. Telemetry Status Indicators
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'left';
+    const statusText = 'VOL: ' + f(tel.volatility).toFixed(4) + ' | SENS: ' + f(tel.sensitivity).toFixed(2);
+    ctx.fillText(statusText, 10, f(h - 10));
+};

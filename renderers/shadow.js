@@ -1,73 +1,69 @@
-export function render(canvas, telemetry) {
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+window.SilentRenderers = window.SilentRenderers || {};
+window.SilentRenderers.SHADOW = function(ctx, w, h, st) {
+    const tel = st.snap.visual_telemetry;
+    const ot = st.snap.open_trade;
+    if (!tel) return;
 
-  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
-  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
-  if (w === 0 || h === 0) return;
+    const safeX = (val) => Number.isFinite(val) ? val : 0;
+    const safeY = (val) => Number.isFinite(val) ? val : 0;
+    const safeR = (val) => (Number.isFinite(val) && val > 0) ? val : 1;
 
-  ctx.clearRect(0, 0, w, h);
+    // Draw Shadow Zones
+    if (tel.shadow_zones && Array.isArray(tel.shadow_zones)) {
+        tel.shadow_zones.forEach(z => {
+            const x = safeX(z.x);
+            const y = safeY(z.y);
+            const rw = safeX(z.w);
+            const rh = safeY(z.h);
+            
+            ctx.save();
+            const grad = ctx.createLinearGradient(x, y, x + rw, y);
+            grad.addColorStop(0, 'rgba(168, 85, 247, 0)');
+            grad.addColorStop(0.5, z.type === 'bull' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)');
+            grad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+            
+            ctx.fillStyle = grad;
+            ctx.fillRect(x, y, rw, rh);
+            ctx.restore();
+        });
+    }
 
-  const data = telemetry || {};
-  const shadowValue = Number.isFinite(data.shadow_value) ? data.shadow_value : 0;
-  const shadowPower = Number.isFinite(data.shadow_power) ? data.shadow_power : 0;
-  const shadowTrend = Number.isFinite(data.shadow_trend) ? data.shadow_trend : 0;
+    // Draw Prediction Cone
+    if (tel.cone && Array.isArray(tel.cone.points)) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.setLineDash([5, 5]);
+        tel.cone.points.forEach((p, i) => {
+            const px = safeX(p.x);
+            const py = safeY(p.y);
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
 
-  const safeNum = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+    // Draw Open Trade Marker (No JSON debug)
+    if (ot && ot.entry_px) {
+        const ox = safeX(ot.x);
+        const oy = safeY(ot.y);
+        const or = safeR(ot.r || 5);
 
-  // Background Gradient
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, safeNum(h));
-  bgGrad.addColorStop(0, '#0f172a');
-  bgGrad.addColorStop(1, '#020617');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, safeNum(w), safeNum(h));
+        ctx.beginPath();
+        ctx.arc(ox, oy, or, 0, Math.PI * 2);
+        ctx.fillStyle = ot.side === 'buy' ? '#22c55e' : '#ef4444';
+        ctx.fill();
 
-  // Grid
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 10; i++) {
-    const x = safeNum((w / 10) * i);
-    const y = safeNum((h / 10) * i);
-    ctx.beginPath();
-    ctx.moveTo(x, 0); ctx.lineTo(x, safeNum(h));
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, y); ctx.lineTo(safeNum(w), y);
-    ctx.stroke();
-  }
+        // Compact Label
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px Arial';
+        ctx.fillText(`${ot.side.toUpperCase()} ${ot.lots}`, ox + or + 2, oy + 4);
+    }
 
-  // Shadow Core Visualization
-  const centerX = safeNum(w / 2);
-  const centerY = safeNum(h / 2);
-  const baseRadius = safeNum(Math.min(w, h) * 0.3);
-  const pulseRadius = safeNum(baseRadius + (shadowPower * 20));
-
-  const radialGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseRadius > 0 ? pulseRadius : 1);
-  const color = shadowTrend >= 0 ? 'rgba(56, 189, 248,' : 'rgba(244, 63, 94,';
-  radialGrad.addColorStop(0, color + ' 0.4)');
-  radialGrad.addColorStop(0.5, color + ' 0.1)');
-  radialGrad.addColorStop(1, 'transparent');
-
-  ctx.fillStyle = radialGrad;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, pulseRadius > 0 ? pulseRadius : 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Shadow Line
-  ctx.strokeStyle = shadowTrend >= 0 ? '#38bdf8' : '#f43f5e';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(safeNum(w * 0.2), centerY);
-  ctx.lineTo(safeNum(w * 0.8), safeNum(centerY - (shadowTrend * 50)));
-  ctx.stroke();
-
-  // Text Info
-  ctx.fillStyle = '#f8fafc';
-  ctx.font = 'bold 16px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(`SHADOW: ${shadowValue.toFixed(2)}`, centerX, safeNum(centerY - baseRadius - 20));
-  ctx.font = '12px monospace';
-  ctx.fillStyle = 'rgba(248, 250, 252, 0.7)';
-  ctx.fillText(`POWER: ${shadowPower.toFixed(2)} | TREND: ${shadowTrend.toFixed(2)}`, centerX, safeNum(centerY + baseRadius + 30));
-}
+    // Telemetry Label
+    if (tel.conf) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(`CONF: ${tel.conf}% | VOL: ${tel.vol_zscore || 0}`, 10, h - 20);
+    }
+};

@@ -1,86 +1,58 @@
-export default function render(canvas, telemetry) {
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+window.SilentRenderers = window.SilentRenderers || {};
+window.SilentRenderers.SPECTRUM = function(ctx, w, h, st) {
+    const tel = st.snap.visual_telemetry || {};
+    const ot = st.snap.open_trade || null;
+    const safeX = (val) => Number.isFinite(val) ? val : 0;
+    const safeY = (val) => Number.isFinite(val) ? val : 0;
+    const safeR = (val) => (Number.isFinite(val) && val > 0) ? val : 1;
 
-  const w = Number.isFinite(canvas.width) && canvas.width > 0 ? canvas.width : 0;
-  const h = Number.isFinite(canvas.height) && canvas.height > 0 ? canvas.height : 0;
+    ctx.clearRect(0, 0, w, h);
 
-  if (w === 0 || h === 0) return;
+    if (tel.spectrum_data && Array.isArray(tel.spectrum_data)) {
+        const data = tel.spectrum_data;
+        const step = w / Math.max(1, data.length - 1);
+        
+        const grad = ctx.createLinearGradient(0, 0, safeX(w), 0);
+        grad.addColorStop(0, 'rgba(168, 85, 247, 0.2)');
+        grad.addColorStop(1, 'rgba(56, 189, 248, 0.2)');
+        
+        ctx.beginPath();
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < data.length; i++) {
+            const x = safeX(i * step);
+            const y = safeY(h - (data[i] * h));
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
 
-  ctx.clearRect(0, 0, w, h);
+        if (ot) {
+            const otX = safeX(w * 0.5);
+            const otY = safeY(h * 0.5);
+            const otR = safeR(20);
+            
+            const radial = ctx.createRadialGradient(otX, otY, 0, otX, otY, otR);
+            radial.addColorStop(0, 'rgba(239, 68, 68, 0.8)');
+            radial.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            
+            ctx.fillStyle = radial;
+            ctx.beginPath();
+            ctx.arc(otX, otY, otR, 0, Math.PI * 2);
+            ctx.fill();
 
-  const data = telemetry || {};
-  const points = Array.isArray(data.spectrum) ? data.spectrum : [];
-  const signalStrength = Number.isFinite(data.signal_strength) ? data.signal_strength : 0;
-  const frequency = Number.isFinite(data.frequency) ? data.frequency : 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px monospace';
+            ctx.fillText(`ID:${ot.ticket || 'N/A'} P:${ot.profit || 0}`, otX + 25, otY);
+        }
+    }
 
-  // Background Gradient
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-  bgGrad.addColorStop(0, '#0f172a');
-  bgGrad.addColorStop(1, '#020617');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, w, h);
-
-  if (points.length === 0) {
-    ctx.fillStyle = '#475569';
-    ctx.font = '12px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('WAITING FOR SPECTRUM DATA...', w / 2, h / 2);
-    return;
-  }
-
-  // Draw Spectrum Waves
-  ctx.beginPath();
-  ctx.strokeStyle = '#38bdf8';
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-
-  const step = w / (points.length - 1 || 1);
-  points.forEach((val, i) => {
-    const x = Number.isFinite(i * step) ? i * step : 0;
-    const normalizedVal = Number.isFinite(val) ? val : 0;
-    const y = Number.isFinite(h - (normalizedVal * h)) ? h - (normalizedVal * h) : h;
-    
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  // Fill Area
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
-  const fillGrad = ctx.createLinearGradient(0, 0, 0, h);
-  fillGrad.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
-  fillGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-  ctx.fillStyle = fillGrad;
-  ctx.fill();
-
-  // Draw Signal Indicator
-  const centerX = w * 0.85;
-  const centerY = h * 0.2;
-  const radius = Number.isFinite(h * 0.1) ? h * 0.1 : 0;
-
-  if (radius > 0) {
-    const radGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-    const glowColor = signalStrength > 0.7 ? 'rgba(34, 197, 94, 0.5)' : 'rgba(249, 115, 22, 0.5)';
-    radGrad.addColorStop(0, glowColor);
-    radGrad.addColorStop(1, 'transparent');
-
-    ctx.fillStyle = radGrad;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Text Info
-  ctx.fillStyle = '#f8fafc';
-  ctx.font = 'bold 14px Inter, sans-serif';
-  ctx.textAlign = 'right';
-  const displayFreq = frequency.toFixed(2);
-  const displayStrength = (signalStrength * 100).toFixed(1);
-  ctx.fillText(`${displayFreq} Hz`, w - 20, h - 40);
-  ctx.font = '11px monospace';
-  ctx.fillStyle = '#94a3b8';
-  ctx.fillText(`STRENGTH: ${displayStrength}%`, w - 20, h - 20);
-}
+    if (tel.signal_strength) {
+        const barW = safeX(w * 0.1);
+        const barH = safeY(h * (tel.signal_strength / 100));
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(10, h - barH - 10, barW, barH);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(`${Math.round(tel.signal_strength)}%`, 10, h - barH - 15);
+    }
+};

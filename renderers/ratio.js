@@ -1,65 +1,68 @@
-export function renderRatio(canvas, telemetry) {
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width || 0;
-  const h = canvas.height || 0;
-  ctx.clearRect(0, 0, w, h);
-  if (w <= 0 || h <= 0) return;
+window.SilentRenderers = window.SilentRenderers || {};
+window.SilentRenderers.RATIO = function(ctx, w, h, st) {
+    const tel = st.snap.visual_telemetry;
+    const ot = st.snap.open_trade;
+    if (!tel) return;
 
-  const safe = (val, fallback = 0) => (Number.isFinite(val) ? val : fallback);
+    const safeX = (val) => Number.isFinite(val) ? val : 0;
+    const safeY = (val) => Number.isFinite(val) ? val : 0;
+    const safeR = (val) => (Number.isFinite(val) && val > 0) ? val : 1;
 
-  const ratio = safe(telemetry?.ratio, 0);
-  const label = telemetry?.label || 'Ratio';
-  const color = telemetry?.color || '#38bdf8';
+    // Background
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, w, h);
 
-  const centerX = safe(w / 2);
-  const centerY = safe(h / 2);
-  const radius = safe(Math.min(w, h) * 0.35);
+    // Draw Telemetry Data
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const radius = Math.min(w, h) * 0.35;
 
-  // Background Circle
-  ctx.beginPath();
-  ctx.strokeStyle = '#334155';
-  ctx.lineWidth = safe(radius * 0.15);
-  ctx.arc(centerX, centerY, radius, 0, safe(Math.PI * 2));
-  ctx.stroke();
+    // Ratio Circle
+    ctx.beginPath();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.arc(safeX(centerX), safeY(centerY), safeR(radius), 0, Math.PI * 2);
+    ctx.stroke();
 
-  // Progress Arc
-  const startAngle = safe(-Math.PI / 2);
-  const endAngle = safe(startAngle + (Math.PI * 2 * (Math.min(Math.max(ratio, 0), 100) / 100)));
-  
-  ctx.beginPath();
-  const grad = ctx.createLinearGradient(safe(centerX - radius), centerY, safe(centerX + radius), centerY);
-  grad.addColorStop(0, color);
-  grad.addColorStop(1, '#ffffff');
-  ctx.strokeStyle = grad;
-  ctx.lineCap = 'round';
-  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-  ctx.stroke();
+    // Signal Strength Gradient
+    const strength = tel.signal_strength || 0;
+    const grad = ctx.createRadialGradient(safeX(centerX), safeY(centerY), 0, safeX(centerX), safeY(centerY), safeR(radius));
+    grad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+    grad.addColorStop(1, `rgba(56, 189, 248, ${Math.min(strength / 100, 0.3)})`);
+    
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(safeX(centerX), safeY(centerY), safeR(radius), 0, Math.PI * 2);
+    ctx.fill();
 
-  // Text Rendering
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  
-  const fontSizeValue = safe(radius * 0.5);
-  ctx.font = `bold ${fontSizeValue}px Inter, sans-serif`;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText(`${ratio.toFixed(1)}%`, centerX, safe(centerY - radius * 0.05));
+    // Text Info
+    ctx.font = '14px monospace';
+    ctx.fillStyle = '#38bdf8';
+    ctx.textAlign = 'center';
+    
+    const label = `STR: ${strength.toFixed(1)} | VOL: ${(tel.volume_ratio || 0).toFixed(2)}`;
+    ctx.fillText(label, safeX(centerX), safeY(centerY + radius + 25));
 
-  const fontSizeLabel = safe(radius * 0.18);
-  ctx.font = `${fontSizeLabel}px Inter, sans-serif`;
-  ctx.fillStyle = '#94a3b8';
-  ctx.fillText(label.toUpperCase(), centerX, safe(centerY + radius * 0.4));
+    // Open Trade Indicator
+    if (ot && ot.ticket) {
+        ctx.fillStyle = ot.type === 'buy' ? '#22c55e' : '#ef4444';
+        ctx.beginPath();
+        ctx.arc(safeX(centerX), safeY(centerY), 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`#${ot.ticket} (${ot.profit > 0 ? '+' : ''}${ot.profit.toFixed(2)})`, safeX(centerX), safeY(centerY - 15));
+    }
 
-  // Bottom Bar Indicator
-  const barW = safe(w * 0.6);
-  const barH = safe(4);
-  const barX = safe((w - barW) / 2);
-  const barY = safe(h - 10);
-  
-  ctx.fillStyle = '#1e293b';
-  ctx.fillRect(barX, barY, barW, barH);
-  
-  ctx.fillStyle = color;
-  const fillW = safe(barW * (Math.min(Math.max(ratio, 0), 100) / 100));
-  ctx.fillRect(barX, barY, fillW, barH);
-}
+    // Visual Line to current price ratio
+    const angle = ((tel.sentiment_pct || 50) / 100) * Math.PI * 2 - Math.PI / 2;
+    const lx = centerX + Math.cos(angle) * radius;
+    const ly = centerY + Math.sin(angle) * radius;
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 3;
+    ctx.moveTo(safeX(centerX), safeY(centerY));
+    ctx.lineTo(safeX(lx), safeY(ly));
+    ctx.stroke();
+};
