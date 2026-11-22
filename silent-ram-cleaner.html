@@ -98,7 +98,7 @@
 
   <script>
     // Khi deploy Cloudflare Worker thật (file cloudflare_worker_momo.js), điền URL vào đây:
-    const VERIFY_WORKER_URL = "";
+    const VERIFY_WORKER_URL = "https://silent-momo-worker.silent-trader.workers.dev";
 
     const qs = new URLSearchParams(window.location.search);
     const deviceId = (qs.get('device_id') || 'SL-GUEST').toUpperCase();
