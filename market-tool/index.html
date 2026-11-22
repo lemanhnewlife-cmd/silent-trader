@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SILENT Market Tool — Kho Công Cụ Tối Ưu & Tự Động Hóa</title>
+  <meta name="description" content="Kho công cụ PC, tối ưu Windows, tiện ích thông minh từ SILENT Studio." />
+  <style>
+    :root {
+      --bg: #070d18;
+      --card: #0e1829;
+      --border: rgba(0, 229, 255, 0.22);
+      --accent: #00e5ff;
+      --accent2: #2ee58c;
+      --text: #eaf4ff;
+      --muted: #8ea4c2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top center, #10203a 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px 16px 60px;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; }
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    h1 { font-size: clamp(26px, 5vw, 40px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .sub { color: var(--muted); font-size: 15px; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 26px 0 28px;
+    }
+    .search-box {
+      flex: 1 1 280px;
+      max-width: 420px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+    .search-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15); }
+    .cats { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .cat-btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .cat-btn:hover, .cat-btn.active {
+      background: rgba(0, 229, 255, 0.15);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(16, 28, 48, 0.96), rgba(10, 18, 32, 0.98));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(46, 229, 140, 0.14);
+      color: var(--accent2);
+      border: 1px solid rgba(46, 229, 140, 0.35);
+    }
+    .price { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .card h2 { font-size: 19px; font-weight: 700; line-height: 1.3; }
+    .card p { font-size: 14px; color: var(--muted); line-height: 1.55; flex: 1; }
+    .cta {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 16px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .empty { text-align: center; color: var(--muted); padding: 40px 16px; grid-column: 1 / -1; }
+    footer { text-align: center; margin-top: 48px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge"><span class="dot"></span> SILENT MARKET TOOL</div>
+      <h1>Kho Công Cụ & Phần Mềm SILENT</h1>
+      <p class="sub">Tất cả công cụ tối ưu máy tính, tự động hóa và tiện ích Windows chính chủ — tải nhanh, gọn nhẹ, an toàn.</p>
+    </header>
+
+    <div class="controls">
+      <input id="searchInput" class="search-box" type="search" placeholder="Tìm công cụ (VD: RAM, Windows, dọn rác...)..." />
+      <div class="cats" id="catBar"></div>
+    </div>
+
+    <div class="grid" id="productGrid"></div>
+
+    <footer>© 2026 SILENT Studio · Mọi công cụ đều được kiểm duyệt trước khi phát hành.</footer>
+  </div>
+
+  <script>
+    // Sau nay them san pham moi chi can them 1 object vao mang PRODUCTS ben duoi
+    const PRODUCTS = [
+      {
+        id: "silent-ram-cleaner",
+        name: "SILENT RAM & Process Studio",
+        category: "Tối ưu PC",
+        tag: "HOT • FREE / PRO",
+        price: "Free · Pro 49K",
+        desc: "Phân loại tiến trình Đỏ / Vàng / Xanh chống tắt nhầm hệ thống, nén RAM mềm Smart Boost 1 chạm không văng tab.",
+        url: "./silent-ram-cleaner.html"
+      }
+    ];
+
+    let activeCat = "Tất cả";
+    const cats = ["Tất cả", ...new Set(PRODUCTS.map(p => p.category))];
+    const catBar = document.getElementById("catBar");
+    const grid = document.getElementById("productGrid");
+    const searchInput = document.getElementById("searchInput");
+
+    function renderCats() {
+      catBar.innerHTML = cats.map(c =>
+        `<button class="cat-btn ${c === activeCat ? 'active' : ''}" data-cat="${c}">${c}</button>`
+      ).join("");
+      catBar.querySelectorAll(".cat-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeCat = btn.dataset.cat;
+          renderCats();
+          renderProducts();
+        });
+      });
+    }
+
+    function renderProducts() {
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const filtered = PRODUCTS.filter(p => {
+        const matchCat = activeCat === "Tất cả" || p.category === activeCat;
+        const matchQ = !q || (p.name + " " + p.desc + " " + p.category).toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty">Không tìm thấy công cụ phù hợp với từ khóa "${searchInput.value}".</div>`;
+        return;
+      }
+      grid.innerHTML = filtered.map(p => `
+        <a class="card" href="${p.url}">
+          <div class="card-top">
+            <span class="tag">${p.tag}</span>
+            <span class="price">${p.price}</span>
+          </div>
+          <h2>${p.name}</h2>
+          <p>${p.desc}</p>
+          <div class="cta">Xem chi tiết & Tải ngay →</div>
+        </a>
+      `).join("");
+    }
+
+    searchInput.addEventListener("input", renderProducts);
+    renderCats();
+    renderProducts();
+  </script>
+</body>
+</html>
