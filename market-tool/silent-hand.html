@@ -458,7 +458,7 @@
 
     checkStatusBtn.addEventListener("click", async () => {
       const mid = (midInput.value || "").trim().toUpperCase();
-      if (!/^SH-[A-Z0-9-]+$/.test(mid) || mid === "SH-XXXX-XXXX") {
+      if (!/^SH-[A-F0-9]{4}-[A-F0-9]{4}$/.test(mid) || mid === "SH-XXXX-XXXX") {
         statusOut.style.display = "block";
         statusOut.innerHTML = "⚠️ Vui lòng nhập đúng mã máy thật dạng <b>SH-XXXX-XXXX</b> lấy từ ứng dụng Silent Hand.";
         return;
