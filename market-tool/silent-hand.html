@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silent Hand v1.1 — Trợ Lý Thực Thi Lệnh Tự Động Từ Mọi AI</title>
+  <style>
+    :root {
+      --bg: #07101f;
+      --card: rgba(13, 25, 45, 0.88);
+      --border: rgba(0, 229, 255, 0.22);
+      --accent: #00e5ff;
+      --accent2: #38bdf8;
+      --green: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --momo: #d82d8b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top center, #10203a 0%, var(--bg) 58%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 64px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .back-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid var(--border);
+    }
+    .back-link:hover { background: rgba(0, 229, 255, 0.16); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 26px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+    h1 {
+      font-size: clamp(26px, 4.6vw, 42px);
+      font-weight: 800;
+      margin: 14px 0 10px;
+      background: linear-gradient(90deg, #ffffff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0 auto 22px;
+      font-size: 15.5px;
+    }
+    .cta-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.95; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #0284c7);
+      color: #04101f;
+    }
+    .btn-momo {
+      background: linear-gradient(135deg, #d82d8b, #a50064);
+      color: #fff;
+    }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .pill-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .pill {
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 28px 0 14px;
+      color: #fff;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .card h3 { font-size: 16px; color: var(--accent); margin-bottom: 8px; }
+    .card p { font-size: 14px; color: var(--muted); }
+    .shield-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .shield-card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .shield-card.kill { border-color: rgba(239, 68, 68, 0.45); }
+    .shield-card h3 { font-size: 16px; margin-bottom: 6px; }
+    .shield-card p { font-size: 14px; color: var(--muted); }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .plan {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+      position: relative;
+    }
+    .plan:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .plan.active {
+      border-color: var(--momo);
+      background: rgba(216, 45, 139, 0.14);
+      box-shadow: 0 0 0 2px rgba(216, 45, 139, 0.28);
+    }
+    .plan-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.15);
+      color: var(--accent);
+    }
+    .plan-dur { font-size: 15px; font-weight: 700; color: #fff; }
+    .plan-price { font-size: 26px; font-weight: 800; color: var(--accent); margin: 6px 0 4px; }
+    .plan-sub { font-size: 13px; color: var(--muted); }
+    .momo-panel {
+      background: #1a1025;
+      border: 1.5px solid rgba(216, 45, 139, 0.55);
+      border-radius: 20px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+    @media (max-width: 720px) {
+      .momo-panel { grid-template-columns: 1fr; text-align: center; }
+    }
+    .qr-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      color: #111827;
+    }
+    .qr-box img { width: 100%; max-width: 210px; border-radius: 8px; display: block; margin: 0 auto 8px; }
+    .qr-caption { font-size: 12.5px; font-weight: 700; color: #a50064; }
+    .field-label { font-size: 13px; color: #f5d0fe; font-weight: 600; margin-bottom: 6px; display: block; }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .input-mid {
+      flex: 1;
+      min-width: 190px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(216, 45, 139, 0.45);
+      background: rgba(9, 13, 28, 0.85);
+      color: #fff;
+      font-family: Consolas, monospace;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+    }
+    .memo-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px dashed rgba(216, 45, 139, 0.6);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .memo-code {
+      font-family: Consolas, monospace;
+      font-size: 18px;
+      font-weight: 800;
+      color: #f472b6;
+    }
+    .status-out {
+      margin-top: 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid var(--border);
+      display: none;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .step b { color: #fff; display: block; margin-bottom: 6px; }
+    footer {
+      text-align: center;
+      margin-top: 36px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="back-link" href="./index.html">← Quay lại Market Tool</a>
+      <span class="badge"><span class="dot"></span> SILENT HAND v1.1 • SERVER TIME SYNC</span>
+    </div>
+
+    <section class="hero">
+      <span class="badge">Tặng sẵn 2 giờ dùng thử miễn phí theo giờ server</span>
+      <h1>SILENT HAND v1.1</h1>
+      <p class="subtitle">
+        Cánh tay tự động hóa chạy lệnh nhanh từ <b>mọi AI</b> (Gemini, ChatGPT, Claude...) trực tiếp trên Windows,
+        tích hợp mở nhanh <b>Edge CDP cổng 9222</b>, được bảo vệ bởi <b>Khiên duyệt lệnh nhạy cảm (Safety Guard)</b>
+        và nút <b>Dừng khẩn cấp (Kill Switch)</b>.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="../downloads/SILENT_Hand_v1.1.zip" download>⬇ Tải Silent Hand v1.1 (.ZIP)</a>
+        <a class="btn btn-momo" href="#momoCheckout">⚡ Thuê gói giờ từ 10.000đ</a>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Windows 10 / 11 (64-bit)</span>
+        <span class="pill">Mã máy định danh SH-XXXX-XXXX</span>
+        <span class="pill">Tự động cộng dồn giờ qua SePay + Cloudflare KV</span>
+      </div>
+    </section>
+
+    <h2 class="section-title">Tính năng cốt lõi trên bản v1.1</h2>
+    <div class="grid-3">
+      <div class="card">
+        <h3>⚡ Chạy nhanh lệnh từ mọi AI</h3>
+        <p>Copy &amp; thực thi trực tiếp script Python, PowerShell, CLI từ bất kỳ khung chat AI nào và trả về báo cáo sạch gọn trong vài giây.</p>
+      </div>
+      <div class="card">
+        <h3>🌐 Mở nhanh Edge CDP cổng 9222</h3>
+        <p>Một chạm khởi chạy Microsoft Edge chế độ Remote Debugging cổng 9222, giúp AI thao tác trình duyệt mà giữ nguyên hồ sơ đăng nhập.</p>
+      </div>
+      <div class="card">
+        <h3>⏱ Đồng bộ giờ chuẩn Server</h3>
+        <p>Cấp sẵn 2 giờ dùng thử miễn phí ngay lần mở đầu tiên. Nạp gói mới tự động cộng dồn vào quỹ giờ hiện tại trên Cloudflare KV.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Lớp bảo vệ an toàn chủ động</h2>
+    <div class="shield-box">
+      <div class="shield-card">
+        <h3 style="color: var(--warn);">🛡 Khiên duyệt lệnh nhạy cảm (Safety Guard)</h3>
+        <p>Tự động quét và chặn các lệnh có rủi ro cao (xóa tệp hàng loạt, chỉnh registry, tắt tiến trình hệ thống) để yêu cầu bạn xác nhận tay trước khi chạy.</p>
+      </div>
+      <div class="shield-card kill">
+        <h3 style="color: var(--danger);">⛔ Nút Dừng khẩn cấp (Kill Switch)</h3>
+        <p>Ngắt lập tức mọi tiến trình con đang chạy chỉ với 1 cú bấm trên giao diện hoặc khay hệ thống khi phát hiện tác vụ đi chệch hướng.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title" id="momoCheckout">Chọn gói thuê giờ linh hoạt (Tự động cộng dồn)</h2>
+    <div class="pricing-grid" id="planGrid">
+      <div class="plan" data-amount="10000" data-label="10.000đ" data-hours="+24 giờ">
+        <div class="plan-dur">Gói 24 Giờ</div>
+        <div class="plan-price">10.000đ</div>
+        <div class="plan-sub">Cộng ngay <b>+24 giờ</b> dùng toàn bộ tính năng</div>
+      </div>
+      <div class="plan" data-amount="25000" data-label="25.000đ" data-hours="+72 giờ">
+        <span class="plan-badge">Tiết kiệm</span>
+        <div class="plan-dur">Gói 72 Giờ (3 Ngày)</div>
+        <div class="plan-price">25.000đ</div>
+        <div class="plan-sub">Cộng ngay <b>+72 giờ</b> chuẩn giờ server</div>
+      </div>
+      <div class="plan active" data-amount="59000" data-label="59.000đ" data-hours="+7 ngày">
+        <span class="plan-badge">Phổ biến</span>
+        <div class="plan-dur">Gói 7 Ngày</div>
+        <div class="plan-price">59.000đ</div>
+        <div class="plan-sub">Cộng ngay <b>+7 ngày</b> (~8.400đ/ngày)</div>
+      </div>
+      <div class="plan" data-amount="149000" data-label="149.000đ" data-hours="+30 ngày">
+        <span class="plan-badge">Tối ưu nhất</span>
+        <div class="plan-dur">Gói 30 Ngày</div>
+        <div class="plan-price">149.000đ</div>
+        <div class="plan-sub">Cộng ngay <b>+30 ngày</b> (~4.900đ/ngày)</div>
+      </div>
+    </div>
+
+    <div class="momo-panel">
+      <div class="qr-box">
+        <img src="../momo_qr.png" alt="Mã QR MoMo 0977098166" />
+        <div class="qr-caption">MOMO: 0977098166</div>
+        <div style="font-size:12px; color:#475569;" id="qrAmountText">59.000 VNĐ (+7 ngày)</div>
+      </div>
+      <div>
+        <h3 style="font-size:19px; color:#fff; margin-bottom:6px;">Thanh toán MoMo &amp; Tự động cộng giờ tức thì</h3>
+        <p style="font-size:14px; color:#e9d5ff; margin-bottom:14px;">
+          Nhập đúng <b>Mã máy (SH-XXXX-XXXX)</b> hiển thị trong ứng dụng Silent Hand, sau đó quét mã QR bên trái và giữ nguyên nội dung chuyển khoản.
+          Hệ thống SePay + Cloudflare Worker tự động cộng giờ trong 5–15 giây.
+        </p>
+
+        <label class="field-label" for="midInput">Mã máy Silent Hand của bạn:</label>
+        <div class="input-row">
+          <input id="midInput" class="input-mid" type="text" placeholder="SH-XXXX-XXXX" value="SH-XXXX-XXXX" />
+          <button class="btn btn-momo" id="copyMemoBtn" type="button">📋 Copy nội dung CK</button>
+          <button class="btn btn-ghost" id="checkStatusBtn" type="button">🔍 Kiểm tra giờ còn lại</button>
+        </div>
+
+        <div class="memo-box">
+          <div>Số tiền gói đang chọn: <b style="color:#00e5ff;" id="selectedAmt">59.000đ</b> (<span id="selectedHrs">+7 ngày</span>)</div>
+          <div>Nội dung chuyển khoản bắt buộc: <span class="memo-code" id="memoPreview">SH-XXXX-XXXX</span></div>
+        </div>
+
+        <div class="status-out" id="statusOut"></div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Hướng dẫn bắt đầu trong 1 phút</h2>
+    <div class="steps">
+      <div class="step"><b>Bước 1: Tải &amp; Giải nén</b>Tải file <code>SILENT_Hand_v1.1.zip</code> và giải nén vào thư mục cố định (ví dụ <code>D:\SilentHand</code>).</div>
+      <div class="step"><b>Bước 2: Dùng thử 2 giờ</b>Chạy <code>SILENT_Hand.exe</code> — hệ thống tự cấp mã máy <code>SH-XXXX-XXXX</code> và 2 giờ dùng thử chuẩn server.</div>
+      <div class="step"><b>Bước 3: Gia hạn tự động</b>Chọn gói 10K / 25K / 59K / 149K, chuyển khoản ghi đúng mã <code>SH-XXXX-XXXX</code> để tự cộng dồn giờ.</div>
+      <div class="step"><b>Bước 4: Chạy cùng mọi AI</b>Dán kịch bản từ AI, duyệt lệnh qua Safety Guard và sẵn sàng dùng Kill Switch bất cứ lúc nào.</div>
+    </div>
+
+    <footer>© 2026 Silent Trader Market Tool • Hệ thống License tự động qua SePay &amp; Cloudflare KV</footer>
+  </div>
+
+  <script>
+    const WORKER_BASE = "https://silent-momo-worker.silent-trader.workers.dev";
+    const STATUS_PARAM = "hwid";
+    const midInput = document.getElementById("midInput");
+    const memoPreview = document.getElementById("memoPreview");
+    const selectedAmt = document.getElementById("selectedAmt");
+    const selectedHrs = document.getElementById("selectedHrs");
+    const qrAmountText = document.getElementById("qrAmountText");
+    const statusOut = document.getElementById("statusOut");
+    const copyMemoBtn = document.getElementById("copyMemoBtn");
+    const checkStatusBtn = document.getElementById("checkStatusBtn");
+
+    const params = new URLSearchParams(window.location.search);
+    const urlMid = params.get("mid") || params.get("machine_id") || params.get("id");
+    if (urlMid) {
+      midInput.value = urlMid.trim().toUpperCase();
+    }
+
+    function syncMemo() {
+      const clean = (midInput.value || "SH-XXXX-XXXX").trim().toUpperCase();
+      memoPreview.textContent = clean || "SH-XXXX-XXXX";
+    }
+    midInput.addEventListener("input", syncMemo);
+    syncMemo();
+
+    document.querySelectorAll(".plan").forEach((el) => {
+      el.addEventListener("click", () => {
+        document.querySelectorAll(".plan").forEach((p) => p.classList.remove("active"));
+        el.classList.add("active");
+        selectedAmt.textContent = el.dataset.label;
+        selectedHrs.textContent = el.dataset.hours;
+        qrAmountText.textContent = `${el.dataset.label.replace("đ", " VNĐ")} (${el.dataset.hours})`;
+      });
+    });
+
+    copyMemoBtn.addEventListener("click", async () => {
+      const txt = memoPreview.textContent.trim();
+      try {
+        await navigator.clipboard.writeText(txt);
+        copyMemoBtn.textContent = "✅ Đã copy: " + txt;
+        setTimeout(() => (copyMemoBtn.textContent = "📋 Copy nội dung CK"), 2000);
+      } catch {
+        alert("Nội dung chuyển khoản: " + txt);
+      }
+    });
+
+    checkStatusBtn.addEventListener("click", async () => {
+      const mid = (midInput.value || "").trim().toUpperCase();
+      if (!/^SH-[A-Z0-9-]+$/.test(mid) || mid === "SH-XXXX-XXXX") {
+        statusOut.style.display = "block";
+        statusOut.innerHTML = "⚠️ Vui lòng nhập đúng mã máy thật dạng <b>SH-XXXX-XXXX</b> lấy từ ứng dụng Silent Hand.";
+        return;
+      }
+      statusOut.style.display = "block";
+      statusOut.textContent = "⏳ Đang đồng bộ trạng thái giờ với máy chủ...";
+      try {
+        const res = await fetch(`${WORKER_BASE}/hand/status?${STATUS_PARAM}=${encodeURIComponent(mid)}`);
+        const data = await res.json();
+        const pretty = JSON.stringify(data);
+        statusOut.innerHTML = `✅ <b>Kết nối Server OK</b> (${mid}): <code>${pretty}</code>`;
+      } catch (err) {
+        statusOut.innerHTML = "❌ Không thể kết nối máy chủ kiểm tra giờ lúc này: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
