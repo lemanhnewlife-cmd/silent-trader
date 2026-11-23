@@ -3,190 +3,453 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hướng dẫn sử dụng — SILENT HAND v1.1</title>
+  <title>Hướng dẫn sử dụng SILENT HAND — Từng bước cho người mới</title>
   <style>
     :root {
-      --bg: #080e1a;
+      --bg: #070d18;
       --card: #0f1b2e;
-      --border: #1e3a5f;
+      --card-soft: #13233b;
+      --border: #224066;
       --cyan: #00e5ff;
-      --sky: #38bdf8;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --green: #22c55e;
-      --red: #ef4444;
+      --sky: #7dd3fc;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      padding: 28px 16px 48px;
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at top, #0d2038 0%, var(--bg) 60%);
+      padding: 28px 16px 64px;
+      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      background: radial-gradient(circle at top, #102542 0%, var(--bg) 55%);
       color: var(--text);
-      line-height: 1.65;
+      font-size: 17px;
+      line-height: 1.75;
     }
-    .wrap { max-width: 860px; margin: 0 auto; }
+    .wrap { max-width: 880px; margin: 0 auto; }
+
     .hero {
-      background: linear-gradient(135deg, #0d223d, #0a1526);
-      border: 1px solid var(--cyan);
-      border-radius: 16px;
-      padding: 24px 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 28px rgba(0, 229, 255, 0.12);
+      background: linear-gradient(135deg, #10294a, #0b1629);
+      border: 2px solid var(--cyan);
+      border-radius: 20px;
+      padding: 28px 30px;
+      margin-bottom: 22px;
+      box-shadow: 0 0 32px rgba(0, 229, 255, 0.14);
     }
     .badge {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 6px 14px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      color: var(--cyan);
-      border: 1px solid rgba(0, 229, 255, 0.5);
-      background: rgba(0, 229, 255, 0.08);
-      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #041322;
+      background: var(--cyan);
+      margin-bottom: 12px;
     }
-    h1 { margin: 0 0 6px; font-size: 26px; color: #fff; }
-    .sub { margin: 0; color: var(--muted); font-size: 15px; }
+    h1 { margin: 0 0 10px; font-size: 30px; line-height: 1.3; color: #fff; }
+    .lead { margin: 0; color: var(--muted); font-size: 18px; }
+
+    .analogy {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: rgba(0, 229, 255, 0.09);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      font-size: 17px;
+    }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+    .toc-title {
+      font-weight: 800;
+      color: var(--sky);
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+    }
+    .toc a {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .toc a:hover { border-color: var(--cyan); transform: translateY(-1px); }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 24px;
-      margin-bottom: 16px;
+      border-radius: 18px;
+      padding: 24px 26px;
+      margin-bottom: 20px;
     }
-    h2 {
-      margin: 0 0 12px;
-      font-size: 18px;
-      color: var(--cyan);
+    .step-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
     }
-    ol, ul { margin: 0; padding-left: 20px; }
-    li { margin-bottom: 8px; }
-    code {
-      background: #081324;
-      border: 1px solid #1e3a5f;
-      color: var(--sky);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 13px;
+    .step-pill {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
     }
+    h2 { margin: 0; font-size: 22px; color: #fff; line-height: 1.35; }
+
+    .big-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .big-steps li {
+      position: relative;
+      padding: 12px 16px 12px 54px;
+      margin-bottom: 12px;
+      background: var(--card-soft);
+      border-radius: 12px;
+      border: 1px solid rgba(125, 211, 252, 0.16);
+    }
+    .num {
+      position: absolute;
+      left: 14px;
+      top: 13px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--cyan);
+      color: #051324;
+      font-weight: 900;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ui-btn {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      vertical-align: baseline;
+      white-space: nowrap;
+    }
+    .ui-cyan { background: rgba(0, 229, 255, 0.18); border: 1px solid var(--cyan); color: var(--cyan); }
+    .ui-green { background: rgba(74, 222, 128, 0.18); border: 1px solid var(--green); color: var(--green); }
+    .ui-red { background: rgba(248, 113, 113, 0.2); border: 1px solid var(--red); color: #fecaca; }
+    .ui-gray { background: #1e293b; border: 1px solid #475569; color: #f1f5f9; }
+
     .tip {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: rgba(0, 229, 255, 0.07);
-      border-left: 3px solid var(--cyan);
-      font-size: 14px;
+      margin-top: 14px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(74, 222, 128, 0.1);
+      border-left: 4px solid var(--green);
+      font-size: 16px;
     }
-    .warn {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: rgba(239, 68, 68, 0.09);
-      border-left: 3px solid var(--red);
-      font-size: 14px;
+    .note {
+      margin-top: 14px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(251, 191, 36, 0.1);
+      border-left: 4px solid var(--amber);
+      font-size: 16px;
     }
+    .danger {
+      margin-top: 14px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(248, 113, 113, 0.11);
+      border-left: 4px solid var(--red);
+      font-size: 16px;
+    }
+
+    .sample-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .sample-box {
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sample-box b { color: var(--sky); display: block; margin-bottom: 4px; font-size: 17px; }
+
+    .prompt-box {
+      background: #06101f;
+      border: 2px dashed var(--cyan);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin: 12px 0;
+      font-size: 16.5px;
+      color: #e0f2fe;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      padding: 11px 20px;
+      border: none;
+      border-radius: 10px;
+      background: var(--cyan);
+      color: #041322;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { filter: brightness(1.08); }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 14px;
+      margin: 14px 0;
+      font-size: 16.5px;
     }
     th, td {
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border);
       text-align: left;
     }
-    th { color: var(--sky); background: rgba(56, 189, 248, 0.06); }
-    .price { color: var(--green); font-weight: 700; }
+    th { color: var(--sky); background: rgba(125, 211, 252, 0.08); }
+    .price { color: var(--green); font-weight: 800; font-size: 18px; }
+
+    .faq-item {
+      padding: 14px 16px;
+      background: var(--card-soft);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(125, 211, 252, 0.16);
+    }
+    .faq-q { color: var(--amber); font-weight: 800; margin-bottom: 6px; font-size: 17.5px; }
+
     .footer {
       text-align: center;
       color: var(--muted);
-      font-size: 13px;
-      margin-top: 26px;
+      font-size: 15px;
+      margin-top: 30px;
     }
-    a { color: var(--cyan); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    .footer a { color: var(--cyan); text-decoration: none; font-weight: 700; }
+    code {
+      background: #081324;
+      border: 1px solid #264973;
+      color: var(--sky);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="hero">
-      <div class="badge">SILENT HAND v1.1 • USER GUIDE</div>
-      <h1>Hướng dẫn sử dụng SILENT HAND</h1>
-      <p class="sub">Cánh tay thực thi lệnh AI trực tiếp trên Windows — An toàn với Khiên Bảo Vệ &amp; Dừng Khẩn Cấp.</p>
+      <div class="badge">HƯỚNG DẪN CẦM TAY CHỈ VIỆC • AI CŨNG LÀM ĐƯỢC</div>
+      <h1>Cách dùng SILENT HAND từ con số 0</h1>
+      <p class="lead">Dành cho người mới hoàn toàn — không cần biết công nghệ, không cần biết tiếng Anh hay lập trình.</p>
+      <div class="analogy">
+        <b>Hiểu trong 10 giây:</b> ChatGPT hay Gemini giống như một <b>người trợ lý rất thông minh</b>, nhưng chỉ biết nói chuyện qua màn hình chứ không có tay để bấm chuột trên máy tính của bạn.
+        <b>SILENT HAND chính là "đôi tay"</b> giúp trợ lý đó dọn gọn máy tính, gom ảnh, sắp xếp giấy tờ... ngay trên máy tính Windows của bạn.
+      </div>
     </div>
 
-    <div class="card">
-      <h2>1. Cài đặt &amp; Khởi động (Tặng sẵn 2 giờ dùng thử)</h2>
-      <ol>
-        <li>Giải nén tệp <code>SILENT_Hand_v1.1.zip</code> vào một thư mục riêng (ví dụ <code>D:\SILENT_Hand\</code>).</li>
-        <li>Chạy <code>SILENT_Hand.exe</code>. Nếu Windows SmartScreen hiện cảnh báo tệp mới, chọn <b>More info</b> &rarr; <b>Run anyway</b>.</li>
-        <li>Ứng dụng tự mở bảng điều khiển trên trình duyệt và ghim biểu tượng <b>SILENT HAND</b> ở khay hệ thống (góc dưới phải thanh Taskbar).</li>
-        <li>Hệ thống tự cấp mã máy dạng <code>SH-XXXX-XXXX</code> và mở sẵn <b>2 giờ dùng thử miễn phí</b> chuẩn giờ máy chủ.</li>
+    <div class="toc">
+      <div class="toc-title">Chọn nhanh bước bạn đang cần xem:</div>
+      <div class="toc-grid">
+        <a href="#buoc1">1. Mở phần mềm lên (1 phút)</a>
+        <a href="#buoc2">2. Thử 1 việc có sẵn (Chưa cần AI)</a>
+        <a href="#buoc3">3. Nhờ AI làm theo ý riêng (4 bước)</a>
+        <a href="#buoc4">4. Hai nút bảo vệ an toàn máy</a>
+        <a href="#buoc5">5. Gia hạn khi hết 2 giờ miễn phí</a>
+        <a href="#buoc6">6. Lỡ tắt màn hình thì mở lại ở đâu?</a>
+      </div>
+    </div>
+
+    <div class="card" id="buoc1">
+      <div class="step-header">
+        <span class="step-pill">BƯỚC 1</span>
+        <h2>Mở phần mềm lên (Chỉ mất 1 phút)</h2>
+      </div>
+      <ol class="big-steps">
+        <li><span class="num">1</span>Tải tệp <code>SILENT_Hand_v1.1.zip</code> về máy tính (máy thường tự lưu vào thư mục <b>Downloads / Tải xuống</b>).</li>
+        <li><span class="num">2</span>Bấm <b>chuột phải</b> vào tệp vừa tải &rarr; chọn dòng <b>Extract All (Giải nén tất cả)</b> &rarr; bấm nút <b>Extract (Giải nén)</b>.</li>
+        <li><span class="num">3</span>Mở thư mục vừa giải nén ra, tìm biểu tượng có tên <code>SILENT_Hand.exe</code> rồi <b>nhấp đúp chuột trái</b> (2 lần liên tiếp) để chạy.</li>
+        <li><span class="num">4</span><b>Nếu thấy bảng màu xanh của Windows hiện lên báo cảnh báo</b> (chuyện rất bình thường với phần mềm mới tải từ mạng về): hãy bấm vào dòng chữ nhỏ <b>More info (Thông tin thêm)</b> &rarr; rồi bấm nút <b>Run anyway (Vẫn chạy)</b>.</li>
+        <li><span class="num">5</span>Chờ 3 giây, màn hình bảng điều khiển <b>SILENT HAND</b> sẽ tự mở ra trên trình duyệt.</li>
+      </ol>
+      <div class="tip">
+        <b>Tin vui:</b> Bạn được <b>tặng sẵn 2 giờ dùng thử miễn phí</b> ngay khi mở lên. Không cần tạo tài khoản, không cần nhớ mật khẩu!
+      </div>
+    </div>
+
+    <div class="card" id="buoc2">
+      <div class="step-header">
+        <span class="step-pill">BƯỚC 2</span>
+        <h2>Làm thử việc đầu tiên KHÔNG CẦN BIẾT AI (Chỉ 1 cú bấm!)</h2>
+      </div>
+      <p style="margin-top:0">Đừng vội mở ChatGPT hay Gemini ngay! Để quen tay trong 10 giây, hãy kéo xuống mục <b>Kho Kịch Bản Mẫu 1-Click</b> ngay trên màn hình Silent Hand — ở đây đã làm sẵn 4 việc ai cũng hay dùng:</p>
+      <div class="sample-grid">
+        <div class="sample-box"><b>1. Dọn thư mục Downloads</b>Tự phân loại ảnh vào ngăn ảnh, tài liệu vào ngăn tài liệu cho gọn gàng.</div>
+        <div class="sample-box"><b>2. Đổi tên file hàng loạt</b>Sửa tên hàng trăm tệp lộn xộn cho ngăn nắp, dễ tìm.</div>
+        <div class="sample-box"><b>3. Nén &amp; đổi cỡ ảnh</b>Làm nhẹ dung lượng ảnh để gửi qua Zalo hoặc Email nhanh hơn.</div>
+        <div class="sample-box"><b>4. Quét dung lượng ổ đĩa</b>Tìm xem tệp nào đang chiếm nặng bộ nhớ máy tính của bạn.</div>
+      </div>
+      <ol class="big-steps">
+        <li><span class="num">1</span>Bấm chuột chọn <b>1 trong 4 ô việc có sẵn</b> ở trên.</li>
+        <li><span class="num">2</span>Đoạn lệnh sẽ tự động điền sẵn vào khung trống ở giữa màn hình (bạn không cần gõ gì).</li>
+        <li><span class="num">3</span>Bấm nút <span class="ui-btn ui-cyan">&#9654; Thực thi ngay</span> và nhìn kết quả hiện ra ở khung <b>Nhật Ký Thực Thi Trực Tiếp</b> bên dưới.</li>
       </ol>
     </div>
 
-    <div class="card">
-      <h2>2. Quy trình chạy lệnh với mọi AI (ChatGPT, Gemini, Claude...)</h2>
-      <ol>
-        <li>Yêu cầu AI viết đoạn mã Python cho tác vụ bạn cần (dọn file, đổi tên hàng loạt, xử lý ảnh, xuất báo cáo Excel...).</li>
-        <li>Dán đoạn mã vào khung <b>Chạy Nhanh Lệnh AI</b> trên Silent Hand &rarr; bấm <b>&#9654; Thực thi ngay</b>.</li>
-        <li>Theo dõi kết quả trực tiếp tại khung <b>Nhật Ký Thực Thi Trực Tiếp</b>.</li>
-        <li>Bấm <b>&#128203; Copy báo cáo trả AI</b> rồi dán ngược lại khung chat để AI kiểm tra kết quả hoặc tối ưu bước kế tiếp.</li>
+    <div class="card" id="buoc3">
+      <div class="step-header">
+        <span class="step-pill">BƯỚC 3</span>
+        <h2>Nhờ AI làm việc theo ý riêng của bạn (4 thao tác: Hỏi &rarr; Chép &rarr; Dán &rarr; Bấm)</h2>
+      </div>
+      <p style="margin-top:0">Khi bạn muốn máy tính làm một việc riêng theo ý mình, cứ làm đúng 4 bước chậm rãi sau:</p>
+      <ol class="big-steps">
+        <li>
+          <span class="num">1</span>
+          <b>Hỏi AI bằng tiếng Việt bình thường:</b> Mở trang trò chuyện AI (ChatGPT hoặc Gemini). Bấm nút xanh dưới đây để sao chép sẵn câu mẫu, dán vào khung chat AI rồi sửa phần trong ngoặc vuông <code>[...]</code> thành việc bạn muốn:
+          <div class="prompt-box" id="samplePrompt">Hãy viết cho tôi 1 đoạn mã Python hoàn chỉnh, chạy trực tiếp trên máy tính Windows để [ví dụ: tìm tất cả ảnh chụp trong thư mục Desktop rồi gom vào 1 thư mục mới tên là Anh_Cua_Toi]. Chỉ cần đưa ra 1 khung mã đầy đủ để tôi sao chép và dán vào Silent Hand chạy ngay.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">&#128203; Bấm để sao chép câu mẫu này</button>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <b>Sao chép đoạn chữ AI trả về:</b> AI sẽ hiện ra một khung chữ tiếng Anh dài. Bạn <b>không cần đọc hay hiểu</b>, chỉ cần bấm nút <b>Copy (Sao chép)</b> ở góc trên khung đó.
+        </li>
+        <li>
+          <span class="num">3</span>
+          <b>Dán vào Silent Hand rồi bấm chạy:</b> Quay lại màn hình <b>SILENT HAND</b> &rarr; bấm chuột vào ô trống lớn ở mục <b>Chạy Nhanh Lệnh AI</b> &rarr; bấm chuột phải chọn <b>Paste (Dán)</b> (hoặc nhấn phím <code>Ctrl + V</code>) &rarr; bấm nút <span class="ui-btn ui-cyan">&#9654; Thực thi ngay</span>.
+        </li>
+        <li>
+          <span class="num">4</span>
+          <b>Gửi kết quả lại cho AI (nếu muốn làm tiếp hoặc bị lỗi):</b> Chờ vài giây thấy máy chạy xong, bấm nút <span class="ui-btn ui-gray">&#128203; Copy báo cáo trả AI</span> rồi quay lại khung chat AI dán vào gửi đi. AI sẽ tự kiểm tra xem làm xong chưa; nếu có trục trặc, AI sẽ tự sửa và viết lại đoạn mới cho bạn dán chạy tiếp!
+        </li>
+      </ol>
+      <div class="note">
+        <b>Còn nút <span class="ui-btn ui-gray">&#127760; Mở Trình Duyệt AI (CDP)</span> dùng khi nào?</b><br>
+        Bình thường bạn chưa cần bấm nút này. Chỉ khi nào bạn nhờ AI tự mở trang web làm việc hộ thì mới bấm 1 lần vào nút đó để mở sẵn trình duyệt hỗ trợ.
+      </div>
+    </div>
+
+    <div class="card" id="buoc4">
+      <div class="step-header">
+        <span class="step-pill">BƯỚC 4</span>
+        <h2>Hai nút giúp bạn hoàn toàn yên tâm không sợ hỏng máy</h2>
+      </div>
+      <ol class="big-steps">
+        <li>
+          <span class="num">1</span>
+          <b>Khiên Bảo Vệ (Luôn để trạng thái BẬT):</b> Giống như một người gác cổng. Hễ AI lỡ viết lệnh có động tới việc xóa ảnh hay xóa giấy tờ, Silent Hand sẽ <b>tự dừng lại và hỏi bạn trước</b>:
+          <div style="margin-top:8px">
+            &bull; Nếu đúng ý bạn muốn làm &rarr; bấm <span class="ui-btn ui-green">Cho phép chạy lệnh này</span>.<br>
+            &bull; Nếu thấy lạ hoặc chưa yên tâm &rarr; bấm <span class="ui-btn ui-red">Từ chối (Hủy lệnh)</span>. Không có gì trên máy bị xóa cả!
+          </div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <b>Nút đỏ <span class="ui-btn ui-red">DỪNG KHẨN CẤP</span> (góc trên bên phải):</b> Giống như phanh xe. Bất cứ lúc nào thấy máy chạy lâu quá hoặc muốn ngừng ngang, bấm ngay nút đỏ này là mọi thứ dừng lại tức khắc.
+        </li>
       </ol>
     </div>
 
-    <div class="card">
-      <h2>3. Kho Kịch Bản Mẫu 1-Click &amp; Trình Duyệt AI (CDP)</h2>
-      <ul>
-        <li><b>Kho Kịch Bản Mẫu 1-Click:</b> Chọn nhanh 4 công cụ dựng sẵn (<i>Dọn thư mục Downloads</i>, <i>Đổi tên file hàng loạt</i>, <i>Nén &amp; đổi cỡ ảnh</i>, <i>Quét dung lượng ổ đĩa</i>) để dùng ngay không cần viết code.</li>
-        <li><b>&#127760; Mở Trình Duyệt AI (CDP):</b> Khởi chạy Microsoft Edge kèm cổng điều khiển từ xa (CDP 9222) cho các tác vụ tự động hóa trình duyệt.</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h2>4. An toàn chủ động: Khiên Bảo Vệ &amp; Dừng Khẩn Cấp</h2>
-      <ul>
-        <li><b>Khiên Bảo Vệ (Safety Guard):</b> Luôn giữ ở trạng thái <b>BẬT</b>. Khi phát hiện lệnh nhạy cảm (xóa dữ liệu, chỉnh hệ thống...), ứng dụng sẽ tạm dừng để bạn duyệt <b>Cho phép chạy lệnh này</b> hoặc <b>Từ chối (Hủy lệnh)</b>.</li>
-        <li><b>DỪNG KHẨN CẤP (Kill Switch):</b> Bấm nút đỏ để ngắt ngay lập tức tiến trình đang chạy nếu cần dừng giữa chừng.</li>
-      </ul>
-      <div class="warn">Lưu ý an toàn: Luôn đọc nhanh mô tả cảnh báo của Khiên Bảo Vệ trước khi bấm <b>Cho phép chạy lệnh này</b> với các đoạn mã có thao tác xóa hoặc ghi đè tệp.</div>
-    </div>
-
-    <div class="card">
-      <h2>5. Gia hạn giờ thuê tự động (3 giây — Chuẩn giờ máy chủ)</h2>
-      <p style="margin-top:0">Bấm <b>+ Gia hạn 24h</b> trên giao diện, quét mã QR và giữ nguyên nội dung chuyển khoản chứa mã máy <code>SILENT SH-XXXX-XXXX</code>:</p>
+    <div class="card" id="buoc5">
+      <div class="step-header">
+        <span class="step-pill">BƯỚC 5</span>
+        <h2>Hết 2 giờ dùng thử thì gia hạn thế nào? (Tự động trong 3 giây)</h2>
+      </div>
+      <ol class="big-steps">
+        <li><span class="num">1</span>Bấm nút <span class="ui-btn ui-cyan">+ Gia hạn 24h</span> ở góc trên bên phải màn hình Silent Hand.</li>
+        <li><span class="num">2</span>Một bảng mã QR ngân hàng sẽ hiện ra kèm sẵn <b>Mã máy riêng của bạn</b> (ví dụ <code>SILENT SH-02F3-1940</code>).</li>
+        <li><span class="num">3</span>Mở ứng dụng ngân hàng trên điện thoại để quét mã QR, chọn số tiền tương ứng với thời gian bạn muốn dùng thêm:</li>
+      </ol>
       <table>
         <thead>
-          <tr><th>Gói sử dụng</th><th>Chi phí</th><th>Thời lượng cộng dồn</th></tr>
+          <tr><th>Gói bạn chọn</th><th>Số tiền chuyển</th><th>Thời gian cộng thêm vào máy</th></tr>
         </thead>
         <tbody>
-          <tr><td>Dùng thử lần đầu</td><td class="price">Miễn phí</td><td>2 giờ đầu tiên (tự kích hoạt)</td></tr>
-          <tr><td>Gói 24 giờ</td><td class="price">10.000đ</td><td>+24 giờ</td></tr>
-          <tr><td>Gói 72 giờ</td><td class="price">25.000đ</td><td>+72 giờ</td></tr>
-          <tr><td>Gói 7 ngày</td><td class="price">59.000đ</td><td>+7 ngày</td></tr>
-          <tr><td>Gói 30 ngày</td><td class="price">149.000đ</td><td>+30 ngày</td></tr>
+          <tr><td>Dùng thử lần đầu</td><td class="price">Miễn phí</td><td>2 giờ đầu tiên (tự động có sẵn)</td></tr>
+          <tr><td>Gói dùng theo ngày</td><td class="price">10.000đ</td><td>+24 giờ (1 ngày)</td></tr>
+          <tr><td>Gói 3 ngày</td><td class="price">25.000đ</td><td>+72 giờ (3 ngày)</td></tr>
+          <tr><td>Gói 1 tuần</td><td class="price">59.000đ</td><td>+7 ngày</td></tr>
+          <tr><td>Gói trọn tháng</td><td class="price">149.000đ</td><td>+30 ngày</td></tr>
         </tbody>
       </table>
-      <div class="tip">Thời gian thuê được cộng dồn tự động trong 3–10 giây sau khi chuyển khoản. Bấm <b>Kiểm tra đã cộng giờ</b> hoặc <b>Làm mới giờ thuê</b> để cập nhật ngay.</div>
+      <div class="danger">
+        <b>Lưu ý quan trọng khi chuyển khoản:</b> Giữ nguyên dòng <b>Nội dung chuyển khoản</b> có mã máy <code>SILENT SH-XXXX-XXXX</code> (không xóa hay viết thêm chữ). Chuyển xong chờ 5 giây rồi bấm nút <span class="ui-btn ui-cyan">Kiểm tra đã cộng giờ</span> là máy tự mở khóa dùng tiếp ngay!
+      </div>
     </div>
 
-    <div class="card">
-      <h2>6. Xử lý nhanh tình huống thường gặp</h2>
-      <ul>
-        <li><b>Lỡ tắt tab trình duyệt:</b> Nhấp chuột phải vào biểu tượng <b>SILENT HAND</b> dưới khay hệ thống (Taskbar) &rarr; chọn <b>Mở bảng điều khiển</b>.</li>
-        <li><b>Tắt hoàn toàn ứng dụng:</b> Nhấp chuột phải biểu tượng khay hệ thống &rarr; chọn <b>Thoát Silent Hand</b>.</li>
-        <li><b>Chuyển khoản xong chưa thấy cộng giờ:</b> Kiểm tra kết nối Internet và đối chiếu đúng nội dung chứa mã <code>SH-XXXX-XXXX</code>, sau đó bấm <b>Làm mới giờ thuê</b>.</li>
-      </ul>
+    <div class="card" id="buoc6">
+      <div class="step-header">
+        <span class="step-pill">BƯỚC 6</span>
+        <h2>Gặp tình huống lạ thì bấm ở đâu? (Hỏi nhanh &mdash; Đáp gọn)</h2>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">1. Tôi lỡ tay bấm dấu X tắt mất màn hình Silent Hand rồi, mở lại ở đâu?</div>
+        Đừng lo, phần mềm vẫn đang nằm gọn ở <b>góc dưới cùng bên phải màn hình máy tính</b> (chỗ gần đồng hồ, bạn có thể bấm mũi tên nhỏ <code>^</code> hướng lên để thấy). Thấy biểu tượng <b>SILENT HAND</b> &rarr; bấm <b>chuột phải</b> vào nó &rarr; chọn <b>Mở bảng điều khiển</b>.
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">2. Tôi dùng xong rồi, muốn tắt hẳn Silent Hand đi thì làm sao?</div>
+        Bấm <b>chuột phải</b> vào biểu tượng <b>SILENT HAND</b> ở góc dưới bên phải màn hình (chỗ gần đồng hồ) &rarr; chọn <b>Thoát Silent Hand</b>.
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">3. Tôi chuyển khoản xong rồi mà chưa thấy cộng thêm giờ?</div>
+        Hãy kiểm tra xem máy tính có đang kết nối mạng Wifi/Internet chưa và nội dung chuyển khoản đã đúng mã <code>SH-XXXX-XXXX</code> chưa, sau đó bấm nút <span class="ui-btn ui-gray">Làm mới giờ thuê</span> trên màn hình.
+      </div>
     </div>
 
     <div class="footer">
-      SILENT TRADER &bull; <a href="https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/silent-hand.html" target="_blank">Trang sản phẩm Silent Hand v1.1</a>
+      SILENT TRADER &bull; <a href="https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/silent-hand.html" target="_blank">Quay lại trang sản phẩm SILENT HAND v1.1</a>
     </div>
   </div>
+
+  <script>
+    function copyPrompt(btn) {
+      var el = document.getElementById("samplePrompt");
+      var text = el ? el.innerText.trim() : "";
+      if (!text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          var old = btn.innerHTML;
+          btn.innerHTML = "✅ Đã sao chép! Giờ bạn chỉ cần dán vào ChatGPT hoặc Gemini";
+          setTimeout(function() { btn.innerHTML = old; }, 3000);
+        });
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        btn.innerHTML = "✅ Đã sao chép!";
+      }
+    }
+  </script>
 </body>
 </html>
