@@ -1825,15 +1825,94 @@
   </div>
 
   <script>
+    const GIST_ID = "2bf53bd09bbb0594b5f9440c059b0a88";
+    const GIST_API_URL = `https://api.github.com/gists/${GIST_ID}`;
+    const GIST_RAW_URL = `https://gist.githubusercontent.com/lemanhnewlife-cmd/${GIST_ID}/raw/silent_trader_endpoint.json`;
+    const IS_HOSTED_ON_BACKEND =
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname.endsWith(".trycloudflare.com");
+    const URL_PARAM_API = new URLSearchParams(window.location.search).get("api") || "";
+    let apiBaseUrl = URL_PARAM_API ? URL_PARAM_API.replace(/\/+$/, "") : "";
+    let tunnelResolvePromise = null;
+    let arenaFailStreak = 0;
+
+    function apiUrl(path) {
+      if (!path) return apiBaseUrl;
+      if (/^https?:\/\//i.test(path)) return path;
+      const cleanPath = path.startsWith("/") ? path : `/${path}`;
+      return apiBaseUrl ? `${apiBaseUrl}${cleanPath}` : cleanPath;
+    }
+
+    function syncDownloadLinks() {
+      const btn = document.querySelector('a.btn-download[href*="/api/download_copier"]');
+      if (btn) {
+        btn.setAttribute("href", apiUrl("/api/download_copier"));
+      }
+    }
+
+    async function resolveBackendTunnel(forceRefresh = false) {
+      if (IS_HOSTED_ON_BACKEND || URL_PARAM_API) {
+        syncDownloadLinks();
+        return apiBaseUrl;
+      }
+      if (apiBaseUrl && !forceRefresh) return apiBaseUrl;
+      if (tunnelResolvePromise && !forceRefresh) return tunnelResolvePromise;
+
+      tunnelResolvePromise = (async () => {
+        const candidates = [
+          async () => {
+            const r = await fetch(GIST_RAW_URL + "?t=" + Date.now(), { cache: "no-store" });
+            if (!r.ok) return "";
+            const j = await r.json();
+            return j && j.public_url ? String(j.public_url).trim() : "";
+          },
+          async () => {
+            const r = await fetch(GIST_API_URL + "?t=" + Date.now(), { cache: "no-store" });
+            if (!r.ok) return "";
+            const j = await r.json();
+            const raw = j && j.files && j.files["silent_trader_endpoint.json"] && j.files["silent_trader_endpoint.json"].content;
+            if (!raw) return "";
+            const parsed = JSON.parse(raw);
+            return parsed && parsed.public_url ? String(parsed.public_url).trim() : "";
+          },
+          async () => {
+            const r = await fetch("./tunnel_info.json?t=" + Date.now(), { cache: "no-store" });
+            if (!r.ok) return "";
+            const j = await r.json();
+            return j && j.public_url ? String(j.public_url).trim() : "";
+          }
+        ];
+
+        for (const fn of candidates) {
+          try {
+            const found = await fn();
+            if (found) {
+              apiBaseUrl = found.replace(/\/+$/, "");
+              syncDownloadLinks();
+              return apiBaseUrl;
+            }
+          } catch (_) {}
+        }
+        return apiBaseUrl;
+      })();
+
+      try {
+        return await tunnelResolvePromise;
+      } finally {
+        tunnelResolvePromise = null;
+      }
+    }
+
     let allBots = [];
     let livePrices = {};
     let currentSort = { key: "growth", asc: false };
     let discoveredMainEndpoint = null;
 
     const MAIN_ENDPOINTS = [
+      "/api/leaderboard",
       "/api/strategies",
       "/api/arena",
-      "/api/leaderboard",
       "/api/bots",
       "/api/state",
       "/api/data",
@@ -2212,7 +2291,8 @@
     async function requestAndCopyKey(btn, botId, defaultKey) {
       let finalKey = defaultKey;
       try {
-        const res = await fetch("/api/generate_key", {
+        await resolveBackendTunnel();
+        const res = await fetch(apiUrl("/api/generate_key"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ bot_id: botId, strategy_id: botId, key: defaultKey })
@@ -2363,7 +2443,7 @@
         if (!window._topKeyInitialized && topKeyBox && (!topKeyBox.value || topKeyBox.value.startsWith("ST-PRO-"))) {
           window._topKeyInitialized = true;
           const leaderSid = leader.strategy_id || `ST-PRO-${String(getBotIdNum(leader, 1)).padStart(4, "0")}`;
-          fetch("/api/generate_key", {
+          fetch(apiUrl("/api/generate_key"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ bot_id: leaderSid, days: 7 })
@@ -2466,7 +2546,13 @@
 
     async function tryFetchJson(url) {
       try {
-        const res = await fetch(url, { cache: "no-store" });
+        if (!IS_HOSTED_ON_BACKEND && !apiBaseUrl) {
+          await resolveBackendTunnel();
+        }
+        if (!IS_HOSTED_ON_BACKEND && !apiBaseUrl && url.startsWith("/")) {
+          return null;
+        }
+        const res = await fetch(apiUrl(url), { cache: "no-store" });
         if (!res.ok) return null;
         const text = await res.text();
         if (!text || text.trim().startsWith("<")) return null;
@@ -2476,84 +2562,103 @@
       }
     }
 
+    let isFetchingArena = false;
     async function fetchArenaData() {
-      let payload = null;
+      if (isFetchingArena) return;
+      isFetchingArena = true;
+      try {
+        if (!IS_HOSTED_ON_BACKEND && !apiBaseUrl) {
+          await resolveBackendTunnel(true);
+        }
 
-      if (discoveredMainEndpoint) {
-        payload = await tryFetchJson(discoveredMainEndpoint);
-      }
+        let payload = null;
 
-      if (!payload) {
-        for (const ep of MAIN_ENDPOINTS) {
-          const data = await tryFetchJson(ep);
-          if (data) {
-            const bots = extractBotsArray(data);
-            if (bots.length > 0) {
-              discoveredMainEndpoint = ep;
-              payload = data;
-              break;
+        if (discoveredMainEndpoint) {
+          payload = await tryFetchJson(discoveredMainEndpoint);
+        }
+
+        if (!payload) {
+          for (const ep of MAIN_ENDPOINTS) {
+            const data = await tryFetchJson(ep);
+            if (data) {
+              const bots = extractBotsArray(data);
+              if (bots.length > 0) {
+                discoveredMainEndpoint = ep;
+                payload = data;
+                break;
+              }
             }
           }
         }
-      }
 
-      if (payload) {
-        const bots = extractBotsArray(payload);
-        if (bots.length > 0) allBots = bots;
+        if (payload) {
+          arenaFailStreak = 0;
+          const bots = extractBotsArray(payload);
+          if (bots.length > 0) allBots = bots;
 
-        const extractedPrices = extractLivePrices(payload);
-        if (Object.keys(extractedPrices).length > 0) {
-          livePrices = { ...livePrices, ...extractedPrices };
-        }
+          const extractedPrices = extractLivePrices(payload);
+          if (Object.keys(extractedPrices).length > 0) {
+            livePrices = { ...livePrices, ...extractedPrices };
+          }
 
-        // Harvest live prices embedded inside bots if present
-        for (const b of allBots) {
-          const s = cleanSymbol(b.symbol || b.pair);
-          const p = Number(b.live_price ?? b.current_price ?? b.bid ?? 0);
-          if (s && p > 0 && !livePrices[s]) {
-            livePrices[s] = p;
+          // Harvest live prices embedded inside bots if present
+          for (const b of allBots) {
+            const s = cleanSymbol(b.symbol || b.pair);
+            const p = Number(b.live_price ?? b.current_price ?? b.bid ?? 0);
+            if (s && p > 0 && !livePrices[s]) {
+              livePrices[s] = p;
+            }
+          }
+
+          const statsSrc = payload.stats || payload.meta || payload.arena_stats || payload;
+          const elim = Number(statsSrc.eliminated_count ?? statsSrc.eliminated ?? 0);
+          const spawned = Number(statsSrc.respawned_count ?? statsSrc.spawned_count ?? statsSrc.spawned ?? 0);
+          const totalDna = Number(statsSrc.total_unique_dna ?? statsSrc.total_dna ?? (1000 + spawned));
+          const aliveCnt = Number(statsSrc.alive_count ?? 1000);
+
+          document.getElementById("stat-eliminated").textContent = elim;
+          document.getElementById("stat-spawned").textContent = spawned;
+          document.getElementById("stat-total-dna").textContent = totalDna.toLocaleString();
+          const activeEl = document.getElementById("stat-active-count");
+          if (activeEl) activeEl.textContent = `(${aliveCnt.toLocaleString()} Active)`;
+        } else if (!IS_HOSTED_ON_BACKEND) {
+          arenaFailStreak += 1;
+          if (arenaFailStreak >= 2) {
+            arenaFailStreak = 0;
+            discoveredMainEndpoint = null;
+            await resolveBackendTunnel(true);
           }
         }
 
-        const statsSrc = payload.stats || payload.meta || payload.arena_stats || payload;
-        const elim = Number(statsSrc.eliminated_count ?? statsSrc.eliminated ?? 0);
-        const spawned = Number(statsSrc.respawned_count ?? statsSrc.spawned_count ?? statsSrc.spawned ?? 0);
-        const totalDna = Number(statsSrc.total_unique_dna ?? statsSrc.total_dna ?? (1000 + spawned));
-        const aliveCnt = Number(statsSrc.alive_count ?? 1000);
-
-        document.getElementById("stat-eliminated").textContent = elim;
-        document.getElementById("stat-spawned").textContent = spawned;
-        document.getElementById("stat-total-dna").textContent = totalDna.toLocaleString();
-        const activeEl = document.getElementById("stat-active-count");
-        if (activeEl) activeEl.textContent = `(${aliveCnt.toLocaleString()} Active)`;
-      }
-
-      if (Object.keys(livePrices).length === 0) {
-        for (const pep of PRICE_ENDPOINTS) {
-          const pData = await tryFetchJson(pep);
-          if (pData) {
-            const found = extractLivePrices(pData);
-            if (Object.keys(found).length > 0) {
-              livePrices = { ...livePrices, ...found };
-              break;
+        if (Object.keys(livePrices).length === 0) {
+          for (const pep of PRICE_ENDPOINTS) {
+            const pData = await tryFetchJson(pep);
+            if (pData) {
+              const found = extractLivePrices(pData);
+              if (Object.keys(found).length > 0) {
+                livePrices = { ...livePrices, ...found };
+                break;
+              }
             }
           }
         }
-      }
 
-      const gotFreshData = Boolean(payload || Object.keys(livePrices).length > 0);
-      const metaObj = (payload && (payload.mt5_bridge || payload.bridge || payload.mt5 || payload.meta || payload)) || {};
-      renderTickerBar({
-        online: metaObj.online !== false && gotFreshData,
-        account: metaObj.account || metaObj.mt5_account || "443050867",
-        updated_at: metaObj.updated_at_vn || metaObj.updated_at || metaObj.timestamp,
-        syncedAt: gotFreshData ? Date.now() : 0,
-        active_symbols_count: payload && payload.active_symbols_count
-      });
+        const gotFreshData = Boolean(payload || Object.keys(livePrices).length > 0);
+        const metaObj = (payload && (payload.mt5_bridge || payload.bridge || payload.mt5 || payload.meta || payload)) || {};
+        renderTickerBar({
+          online: metaObj.online !== false && gotFreshData,
+          account: metaObj.account || metaObj.mt5_account || "443050867",
+          updated_at: metaObj.updated_at_vn || metaObj.updated_at || metaObj.timestamp,
+          syncedAt: gotFreshData ? Date.now() : 0,
+          active_symbols_count: payload && payload.active_symbols_count
+        });
 
-      if (allBots.length > 0) {
-        populateSymbolFilter();
-        renderLeaderboard();
+        if (allBots.length > 0) {
+          populateSymbolFilter();
+          renderLeaderboard();
+        }
+      } finally {
+        isFetchingArena = false;
       }
     }
 
@@ -2954,7 +3059,8 @@
       }
 
       try {
-        const res = await fetch("/api/chat/register", {
+        await resolveBackendTunnel();
+        const res = await fetch(apiUrl("/api/chat/register"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -3060,7 +3166,8 @@
       renderChatMessages();
 
       try {
-        const res = await fetch("/api/chat/send", {
+        await resolveBackendTunnel();
+        const res = await fetch(apiUrl("/api/chat/send"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -3158,9 +3265,13 @@
       renderChatViewState();
     }
 
-    initSupportChat();
-    fetchArenaData();
-    setInterval(fetchArenaData, 2000);
+    (async () => {
+      await resolveBackendTunnel();
+      syncDownloadLinks();
+      initSupportChat();
+      fetchArenaData();
+      setInterval(fetchArenaData, 2000);
+    })();
   </script>
 </body>
 </html>
