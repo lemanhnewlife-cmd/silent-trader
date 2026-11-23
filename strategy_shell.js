@@ -128,6 +128,35 @@
         <div class="stage-legend">${legendHtml}</div>
       </div>
 
+      <div class="hist-card" id="novelStrategiesSection" style="margin-bottom:14px;border:1px solid #ea580c;background:#140b07;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid rgba(234,88,12,0.3);">
+          <div>
+            <strong style="font-size:14px;color:#f97316;">⚡ 5 CHIẾN LƯỢC HAWKES ĐỘC LẠ & TỐI ƯU 23:00 HẰNG NGÀY (/CEO & /SEP)</strong>
+            <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;">Tự động lọc âm đưa Profit về dương, sinh 5 mô hình dư chấn động đất vi cấu trúc mới mỗi 23h.</div>
+          </div>
+          <span class="live-pill" id="dynStrategyBadge" style="background:#ea580c;color:#fff;">● CẬP NHẬT 23:00 HÀNG NGÀY</span>
+        </div>
+        <div class="hist-scroll" style="max-height:260px;margin-top:10px;">
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Hạng</th>
+                <th>Tên Chiến Lược & Đặc Sắc</th>
+                <th>Huy Hiệu</th>
+                <th>Winrate</th>
+                <th>Lợi Nhuận ($)</th>
+                <th>Lệnh Khảo Sát</th>
+                <th>Tham Số Lõi (μ, α, β)</th>
+                <th>Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody id="dynStrategyTableBody">
+              <tr><td colspan="8" style="text-align:center;color:#64748b;padding:12px;">Đang kết nối API nạp danh sách chiến lược Hawkes tối ưu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="hist-card" id="histSection">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
           <strong style="font-size:13px;">📜 Lịch sử lệnh thật 100% ($10,000 Virtual Engine — Không lệnh ảo)</strong>
@@ -367,6 +396,32 @@
     document.getElementById('histTableBody').innerHTML = rows.length
       ? rows.join('')
       : '<tr><td colspan="10" style="text-align:center;color:#64748b;padding:16px;">Chưa có lệnh đóng — Tài khoản $10,000.00 đang chờ tín hiệu thật từ thị trường.</td></tr>';
+
+    // Render Bảng Chiến Lược Độc Lạ Hawkes Cập Nhật 23h
+    const dynTable = document.getElementById('dynStrategyTableBody');
+    if (dynTable && Array.isArray(v.dynamic_strategies) && v.dynamic_strategies.length > 0) {
+      const dynRows = v.dynamic_strategies.map((ds, idx) => {
+        const p = ds.params || {};
+        const pnlCls = Number(ds.profit) >= 0 ? 'pos' : 'neg';
+        const isTop = idx === 0 ? 'color:#facc15;font-weight:bold;' : '';
+        return `
+          <tr style="${idx === 0 ? 'background:rgba(250,204,21,0.08);' : ''}">
+            <td style="${isTop}">#${idx + 1} ${idx === 0 ? '👑 TOP 1' : ''}</td>
+            <td>
+              <strong style="color:#f8fafc;">${esc(ds.name)}</strong>
+              <div style="font-size:10.5px;color:#94a3b8;margin-top:2px;">${esc(ds.desc || '')}</div>
+            </td>
+            <td><span class="badge-pill" style="font-size:10px;">${esc(ds.badge || 'HAWKES')}</span></td>
+            <td style="color:#4ade80;font-weight:600;">${fmtNum(ds.winrate, 1)}%</td>
+            <td class="${pnlCls}" style="font-weight:600;">${fmtSignedUsd(ds.profit)}</td>
+            <td>${ds.trades_count || 0} lệnh</td>
+            <td style="font-size:11px;color:#cbd5e1;">μ:${p.mu} | α:${p.alpha} | β:${p.beta}</td>
+            <td><span class="badge-open" style="background:${ds.status === 're-optimized' ? '#3b82f6' : '#22c55e'};color:#fff;">${esc(String(ds.status || 'ACTIVE').toUpperCase())}</span></td>
+          </tr>
+        `;
+      });
+      dynTable.innerHTML = dynRows.join('');
+    }
   }
 
   async function pollVirtual() {
