@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn sử dụng — SILENT HAND v1.1</title>
+  <style>
+    :root {
+      --bg: #080e1a;
+      --card: #0f1b2e;
+      --border: #1e3a5f;
+      --cyan: #00e5ff;
+      --sky: #38bdf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px 16px 48px;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top, #0d2038 0%, var(--bg) 60%);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; }
+    .hero {
+      background: linear-gradient(135deg, #0d223d, #0a1526);
+      border: 1px solid var(--cyan);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 28px rgba(0, 229, 255, 0.12);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: var(--cyan);
+      border: 1px solid rgba(0, 229, 255, 0.5);
+      background: rgba(0, 229, 255, 0.08);
+      margin-bottom: 10px;
+    }
+    h1 { margin: 0 0 6px; font-size: 26px; color: #fff; }
+    .sub { margin: 0; color: var(--muted); font-size: 15px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    ol, ul { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    code {
+      background: #081324;
+      border: 1px solid #1e3a5f;
+      color: var(--sky);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .tip {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(0, 229, 255, 0.07);
+      border-left: 3px solid var(--cyan);
+      font-size: 14px;
+    }
+    .warn {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.09);
+      border-left: 3px solid var(--red);
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    th { color: var(--sky); background: rgba(56, 189, 248, 0.06); }
+    .price { color: var(--green); font-weight: 700; }
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 26px;
+    }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="badge">SILENT HAND v1.1 • USER GUIDE</div>
+      <h1>Hướng dẫn sử dụng SILENT HAND</h1>
+      <p class="sub">Cánh tay thực thi lệnh AI trực tiếp trên Windows — An toàn với Khiên Bảo Vệ &amp; Dừng Khẩn Cấp.</p>
+    </div>
+
+    <div class="card">
+      <h2>1. Cài đặt &amp; Khởi động (Tặng sẵn 2 giờ dùng thử)</h2>
+      <ol>
+        <li>Giải nén tệp <code>SILENT_Hand_v1.1.zip</code> vào một thư mục riêng (ví dụ <code>D:\SILENT_Hand\</code>).</li>
+        <li>Chạy <code>SILENT_Hand.exe</code>. Nếu Windows SmartScreen hiện cảnh báo tệp mới, chọn <b>More info</b> &rarr; <b>Run anyway</b>.</li>
+        <li>Ứng dụng tự mở bảng điều khiển trên trình duyệt và ghim biểu tượng <b>SILENT HAND</b> ở khay hệ thống (góc dưới phải thanh Taskbar).</li>
+        <li>Hệ thống tự cấp mã máy dạng <code>SH-XXXX-XXXX</code> và mở sẵn <b>2 giờ dùng thử miễn phí</b> chuẩn giờ máy chủ.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>2. Quy trình chạy lệnh với mọi AI (ChatGPT, Gemini, Claude...)</h2>
+      <ol>
+        <li>Yêu cầu AI viết đoạn mã Python cho tác vụ bạn cần (dọn file, đổi tên hàng loạt, xử lý ảnh, xuất báo cáo Excel...).</li>
+        <li>Dán đoạn mã vào khung <b>Chạy Nhanh Lệnh AI</b> trên Silent Hand &rarr; bấm <b>&#9654; Thực thi ngay</b>.</li>
+        <li>Theo dõi kết quả trực tiếp tại khung <b>Nhật Ký Thực Thi Trực Tiếp</b>.</li>
+        <li>Bấm <b>&#128203; Copy báo cáo trả AI</b> rồi dán ngược lại khung chat để AI kiểm tra kết quả hoặc tối ưu bước kế tiếp.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>3. Kho Kịch Bản Mẫu 1-Click &amp; Trình Duyệt AI (CDP)</h2>
+      <ul>
+        <li><b>Kho Kịch Bản Mẫu 1-Click:</b> Chọn nhanh 4 công cụ dựng sẵn (<i>Dọn thư mục Downloads</i>, <i>Đổi tên file hàng loạt</i>, <i>Nén &amp; đổi cỡ ảnh</i>, <i>Quét dung lượng ổ đĩa</i>) để dùng ngay không cần viết code.</li>
+        <li><b>&#127760; Mở Trình Duyệt AI (CDP):</b> Khởi chạy Microsoft Edge kèm cổng điều khiển từ xa (CDP 9222) cho các tác vụ tự động hóa trình duyệt.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>4. An toàn chủ động: Khiên Bảo Vệ &amp; Dừng Khẩn Cấp</h2>
+      <ul>
+        <li><b>Khiên Bảo Vệ (Safety Guard):</b> Luôn giữ ở trạng thái <b>BẬT</b>. Khi phát hiện lệnh nhạy cảm (xóa dữ liệu, chỉnh hệ thống...), ứng dụng sẽ tạm dừng để bạn duyệt <b>Cho phép chạy lệnh này</b> hoặc <b>Từ chối (Hủy lệnh)</b>.</li>
+        <li><b>DỪNG KHẨN CẤP (Kill Switch):</b> Bấm nút đỏ để ngắt ngay lập tức tiến trình đang chạy nếu cần dừng giữa chừng.</li>
+      </ul>
+      <div class="warn">Lưu ý an toàn: Luôn đọc nhanh mô tả cảnh báo của Khiên Bảo Vệ trước khi bấm <b>Cho phép chạy lệnh này</b> với các đoạn mã có thao tác xóa hoặc ghi đè tệp.</div>
+    </div>
+
+    <div class="card">
+      <h2>5. Gia hạn giờ thuê tự động (3 giây — Chuẩn giờ máy chủ)</h2>
+      <p style="margin-top:0">Bấm <b>+ Gia hạn 24h</b> trên giao diện, quét mã QR và giữ nguyên nội dung chuyển khoản chứa mã máy <code>SILENT SH-XXXX-XXXX</code>:</p>
+      <table>
+        <thead>
+          <tr><th>Gói sử dụng</th><th>Chi phí</th><th>Thời lượng cộng dồn</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Dùng thử lần đầu</td><td class="price">Miễn phí</td><td>2 giờ đầu tiên (tự kích hoạt)</td></tr>
+          <tr><td>Gói 24 giờ</td><td class="price">10.000đ</td><td>+24 giờ</td></tr>
+          <tr><td>Gói 72 giờ</td><td class="price">25.000đ</td><td>+72 giờ</td></tr>
+          <tr><td>Gói 7 ngày</td><td class="price">59.000đ</td><td>+7 ngày</td></tr>
+          <tr><td>Gói 30 ngày</td><td class="price">149.000đ</td><td>+30 ngày</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">Thời gian thuê được cộng dồn tự động trong 3–10 giây sau khi chuyển khoản. Bấm <b>Kiểm tra đã cộng giờ</b> hoặc <b>Làm mới giờ thuê</b> để cập nhật ngay.</div>
+    </div>
+
+    <div class="card">
+      <h2>6. Xử lý nhanh tình huống thường gặp</h2>
+      <ul>
+        <li><b>Lỡ tắt tab trình duyệt:</b> Nhấp chuột phải vào biểu tượng <b>SILENT HAND</b> dưới khay hệ thống (Taskbar) &rarr; chọn <b>Mở bảng điều khiển</b>.</li>
+        <li><b>Tắt hoàn toàn ứng dụng:</b> Nhấp chuột phải biểu tượng khay hệ thống &rarr; chọn <b>Thoát Silent Hand</b>.</li>
+        <li><b>Chuyển khoản xong chưa thấy cộng giờ:</b> Kiểm tra kết nối Internet và đối chiếu đúng nội dung chứa mã <code>SH-XXXX-XXXX</code>, sau đó bấm <b>Làm mới giờ thuê</b>.</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      SILENT TRADER &bull; <a href="https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/silent-hand.html" target="_blank">Trang sản phẩm Silent Hand v1.1</a>
+    </div>
+  </div>
+</body>
+</html>
