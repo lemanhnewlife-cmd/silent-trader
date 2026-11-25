@@ -49,7 +49,6 @@
     <h1>SILENT RAM &amp; Process Studio</h1>
     <p class="sub">Tải miễn phí kèm 3 ngày dùng thử PRO. Đăng ký thuê bao chỉ <strong>10.000đ/tháng</strong> (hoặc 49.000đ trọn đời) để mở khóa bộ công cụ nén RAM mềm &amp; Smart Boost không giới hạn.</p>
 
-    <!-- SILENT_MOBILE_APK_BTN --><div style="margin:14px 0;padding:14px 18px;background:rgba(16,185,129,0.12);border:1.5px solid #10b981;border-radius:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div><b style="color:#6ee7b7">📱 Đã có bản cài đặt trên Điện Thoại Android (.APK)</b><div style="font-size:13px;color:#cbd5e1">Cài trực tiếp trên điện thoại • Tặng sẵn 3 ngày dùng thử miễn phí</div></div><a href="https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-ram-cleaner-v1.0.0/Silent_RAM_Process_Studio_v1.0.0_Mobile.apk" style="background:linear-gradient(135deg,#10b981,#059669);color:#022c22;font-weight:800;padding:10px 18px;border-radius:10px;text-decoration:none">📱 Tải Bản Điện Thoại (.APK)</a></div>
     <div class="grid3">
       <div class="card" style="border-top:4px solid #3b82f6;">
         <div>
@@ -79,6 +78,22 @@
 
     <div style="margin:0 0 20px;border:1px solid #23304a;border-radius:14px;overflow:hidden;">
       <img src="preview_app_pro.png" alt="SILENT RAM Studio Preview" style="width:100%;display:block;" onerror="this.style.display='none'" />
+    </div>
+
+    <div id="giftRedeemPanel" style="background:linear-gradient(135deg,#0c1e24,#111827);border:1.5px solid #10b981;border-radius:16px;padding:18px 20px;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <h2 style="margin:0;font-size:18px;color:#6ee7b7;">🎁 Đổi Mã Quà Tặng TikTok — Nhận Bản Full PRO Trọn Đời (0đ)</h2>
+        <span style="background:#065f46;color:#a7f3d0;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;">GIVEAWAY VIP</span>
+      </div>
+      <p style="margin:6px 0 12px;font-size:13px;color:#cbd5e1;">
+        Dành cho bạn trúng quà trên kênh TikTok: Tải bản cài đặt phía trên, mở App để xem <strong>Mã thiết bị (SL-XXXX-YYYY)</strong> rồi nhập cùng Mã quà tặng bên dưới để kích hoạt vĩnh viễn 100% tính năng PRO.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;">
+        <input id="giftDevInput" type="text" placeholder="Mã thiết bị trên App (VD: SL-1A2B-3C4D)" style="padding:11px 12px;border-radius:9px;border:1px solid #334155;background:#0b1120;color:#fff;font-family:Consolas,monospace;font-size:13.5px;text-transform:uppercase;" />
+        <input id="giftCodeInput" type="text" placeholder="Mã quà tặng (VD: GIFT-HOCTIENGANH-PRO)" style="padding:11px 12px;border-radius:9px;border:1px solid #334155;background:#0b1120;color:#fde68a;font-family:Consolas,monospace;font-size:13.5px;text-transform:uppercase;" />
+        <button id="btnRedeemGift" type="button" class="btn btn-lifetime" style="width:auto;white-space:nowrap;padding:11px 18px;" onclick="redeemGiftCode()">NHẬN BẢN FULL TRỌN ĐỜI</button>
+      </div>
+      <div id="giftResultBox" style="display:none;margin-top:12px;padding:12px;border-radius:10px;background:#052e16;border:1px solid #10b981;font-size:13.5px;color:#ecfdf5;"></div>
     </div>
 
     <div id="momoCheckout" class="momo-panel">
@@ -131,9 +146,65 @@
     const qs = new URLSearchParams(window.location.search);
     const deviceId = (qs.get('device_id') || 'SL-GUEST').toUpperCase();
     const callbackUrl = qs.get('callback') || '';
+    const presetGift = (qs.get('gift') || qs.get('code') || '').trim().toUpperCase();
 
     document.getElementById('devLabel').textContent = deviceId;
     document.getElementById('memoBox').textContent = 'SILENTPRO ' + deviceId;
+    if (deviceId !== 'SL-GUEST') {
+      document.getElementById('giftDevInput').value = deviceId;
+    }
+    if (presetGift) {
+      document.getElementById('giftCodeInput').value = presetGift;
+    }
+
+    async function redeemGiftCode() {
+      const devVal = (document.getElementById('giftDevInput').value || '').trim().toUpperCase();
+      const codeVal = (document.getElementById('giftCodeInput').value || '').trim().toUpperCase();
+      const out = document.getElementById('giftResultBox');
+      const btn = document.getElementById('btnRedeemGift');
+      out.style.display = 'block';
+      if (!/^SL-[A-F0-9]{4}-[A-F0-9]{4}$/.test(devVal)) {
+        out.style.background = '#3f1d2e';
+        out.style.borderColor = '#f43f5e';
+        out.innerHTML = '⚠️ Vui lòng mở App <strong>SILENT RAM Studio</strong> trên máy tính để lấy đúng <strong>Mã thiết bị (dạng SL-XXXX-YYYY)</strong> rồi nhập vào ô đầu tiên.';
+        return;
+      }
+      if (!codeVal) {
+        out.style.background = '#3f1d2e';
+        out.style.borderColor = '#f43f5e';
+        out.innerHTML = '⚠️ Vui lòng nhập Mã quà tặng TikTok.';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Đang kích hoạt...';
+      try {
+        const res = await fetch(`${VERIFY_WORKER_URL}/redeem-gift`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ device_id: devVal, gift_code: codeVal })
+        });
+        const d = await res.json();
+        if (d.ok && d.token) {
+          out.style.background = '#052e16';
+          out.style.borderColor = '#10b981';
+          out.innerHTML = `✅ <strong>Kích hoạt thành công ${d.plan}!</strong><br/>Mã kích hoạt Trọn Đời của máy <code>${d.device_id}</code>:<br/><div style="margin:8px 0;padding:8px 10px;background:#022c22;border-radius:8px;font-family:Consolas,monospace;font-size:15px;color:#6ee7b7;user-select:all;">${d.token}</div>👉 Bấm <strong>Đồng bộ bản quyền</strong> trong App SILENT RAM (hoặc dán mã trên vào mục Kích hoạt PRO) là mở khóa vĩnh viễn!`;
+          if (callbackUrl && devVal === deviceId) {
+            setTimeout(() => redirectToUnlock(d.token, d.tx_ref || codeVal, 0), 1200);
+          }
+        } else {
+          out.style.background = '#3f1d2e';
+          out.style.borderColor = '#f43f5e';
+          out.innerHTML = `❌ ${d.error || 'Không thể kích hoạt mã quà tặng.'}`;
+        }
+      } catch (err) {
+        out.style.background = '#3f1d2e';
+        out.style.borderColor = '#f43f5e';
+        out.innerHTML = '❌ Lỗi kết nối máy chủ kích hoạt. Vui lòng thử lại sau giây lát.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'NHẬN BẢN FULL TRỌN ĐỜI';
+      }
+    }
 
     let currentSelectedPlan = 'monthly';
 
