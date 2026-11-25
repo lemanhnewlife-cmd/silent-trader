@@ -1,8 +1,8 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-25T23:27:43",
-  "total_products": 10,
+  "updated_at": "2026-11-25T23:51:58",
+  "total_products": 9,
   "products": [
     {
       "id": "silent-hand",
@@ -247,30 +247,6 @@
           "version": "1.0.0",
           "date": "2026-11-25",
           "note": "Phát hành phiên bản v1.0.0 của Silent Affiliate Studio."
-        }
-      ]
-    },
-    {
-      "id": "silent-biz-tool-36",
-      "name": "Silent_BizTool_36",
-      "version": "1.0.0",
-      "category": "Tiện Ích Doanh Nghiệp",
-      "tag": "v1.0.0 • FREE 3 NGÀY",
-      "price": "199.000đ / Năm",
-      "desc": "Công cụ tự động hóa nghiệp vụ doanh nghiệp Silent BizTool #36.",
-      "url": "./silent-biz-tool-36.html",
-      "guide_url": "./silent-biz-tool-36-guide.html",
-      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-biz-tool-36-v1.0.0/Silent_BizTool_36_v1.0.0.zip",
-      "apk_download_url": "",
-      "apk_size_mb": 0.0,
-      "zip_size_mb": 0.01,
-      "zip_sha256": "74186b416828254b6da3a7fbe3705d6a0386c3f0f002bce1aed99d9afc15a018",
-      "updated_at": "2026-11-25",
-      "changelog": [
-        {
-          "version": "1.0.0",
-          "date": "2026-11-25",
-          "note": "Phát hành phiên bản v1.0.0 của Silent_BizTool_36."
         }
       ]
     }
