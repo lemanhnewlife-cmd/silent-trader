@@ -1,7 +1,7 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-25T13:11:26",
+  "updated_at": "2026-11-25T13:11:42",
   "total_products": 7,
   "products": [
     {
@@ -134,7 +134,7 @@
       "name": "Silent AgroVN Pro",
       "version": "1.0.1",
       "category": "Nông nghiệp & Thương mại",
-      "tag": "v1.0.1 • FREE 3 NGÀY",
+      "tag": "v1.0.1 • PC + APK",
       "price": "Free 3 ngày · Từ 69K",
       "desc": "Tra cứu công dụng, hướng dẫn sử dụng chuẩn 4 Đúng, tính liều pha bình/phuy & săn giá Vật Tư Nông Nghiệp (Thuốc BVTV, Phân bón, Cây giống) rẻ nhất trên Internet kèm SĐT/Zalo người bán. Có sẵn bản máy tính Windows Pure-Rust (.EXE) và bản điện thoại Android (.APK).",
       "url": "./silent-agrovn-pro.html",
