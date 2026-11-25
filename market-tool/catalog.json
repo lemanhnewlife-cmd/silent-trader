@@ -1,7 +1,7 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-25T08:08:13",
+  "updated_at": "2026-11-25T08:11:59",
   "total_products": 5,
   "products": [
     {
@@ -81,14 +81,14 @@
       "name": "Silent Voice Agent — Zalo AI Call",
       "version": "4.0.0",
       "category": "Tự động hóa AI",
-      "tag": "v4.0.0 • FREE 3 NGÀY",
+      "tag": "v4.0.0 • PC + APK",
       "price": "Free 3 ngày · Từ 99K",
       "desc": "Tổng đài viên AI tự động hóa cuộc gọi Zalo PC 6 bước khép kín: đọc tin nhắn, gọi thoại lắng nghe khách hàng, tóm tắt nhu cầu bằng Gemini Multimodal và gọi lại chốt phương án.",
       "url": "./silent-voice-agent.html",
       "guide_url": "./silent-voice-agent-guide.html",
       "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-voice-agent-v4.0.0/Silent_Voice_Agent_v4.0.0_Portable.zip",
-      "apk_download_url": "",
-      "apk_size_mb": 0,
+      "apk_download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-voice-agent-v4.0.0/Silent_Voice_Agent_Zalo_AI_Call_v4.0.0_Mobile.apk",
+      "apk_size_mb": 0.15,
       "zip_size_mb": 78.17,
       "zip_sha256": "a5bd6ee5cb43612c00a7a73f29e2c202de38896119542074045382489797a230",
       "updated_at": "2026-11-25",
