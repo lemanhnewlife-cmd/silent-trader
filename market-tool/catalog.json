@@ -1,0 +1,118 @@
+{
+  "brand": "Silent",
+  "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
+  "updated_at": "2026-11-25T07:26:17",
+  "total_products": 5,
+  "products": [
+    {
+      "id": "silent-hand",
+      "name": "Silent Hand v1.1 — AI Runner",
+      "version": "1.1.0",
+      "category": "Tự động hóa AI",
+      "tag": "MỚI • TRIAL FREE",
+      "price": "Từ 10K / 24h",
+      "desc": "Chạy lệnh nhanh từ mọi AI, mở Edge CDP 9222, tích hợp Khiên duyệt lệnh Safety Guard & nút Dừng khẩn cấp Kill Switch.",
+      "url": "./silent-hand.html",
+      "guide_url": "./silent-hand-guide.html",
+      "download_url": "../downloads/SILENT_Hand_v1.1.zip",
+      "zip_size_mb": 0,
+      "zip_sha256": "",
+      "updated_at": "2026-11-24",
+      "changelog": [
+        {
+          "version": "1.1.0",
+          "date": "2026-11-24",
+          "note": "Tích hợp Safety Guard, Kill Switch và đồng bộ giờ Server."
+        }
+      ]
+    },
+    {
+      "id": "silent-ram-cleaner",
+      "name": "SILENT RAM & Process Studio",
+      "version": "1.0.0",
+      "category": "Tối ưu PC",
+      "tag": "HOT • FREE / PRO",
+      "price": "Free · Pro 49K",
+      "desc": "Phân loại tiến trình Đỏ / Vàng / Xanh chống tắt nhầm hệ thống, nén RAM mềm Smart Boost 1 chạm không văng tab.",
+      "url": "./silent-ram-cleaner.html",
+      "guide_url": "./silent-ram-cleaner.html",
+      "download_url": "../downloads/SILENT_RAM_STUDIO_FREE.zip",
+      "zip_size_mb": 0,
+      "zip_sha256": "",
+      "updated_at": "2026-11-24",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-24",
+          "note": "Phát hành bản Smart Boost nén RAM 1 chạm an toàn."
+        }
+      ]
+    },
+    {
+      "id": "silent-fasttax-pro",
+      "name": "Silent FastTax Pro",
+      "version": "2.1.0",
+      "category": "Kế toán & Doanh nghiệp",
+      "tag": "v2.1.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 79K",
+      "desc": "Tự động đồng bộ hóa đơn điện tử Tổng Cục Thuế (GDT), kiểm toán lá chắn rủi ro thuế (30 tính năng F01–F30) và kết xuất chuẩn 22 phần mềm kế toán Việt Nam không giới hạn số lượng hóa đơn.",
+      "url": "./silent-fasttax-pro.html",
+      "guide_url": "./silent-fasttax-pro-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-fasttax-pro-v2.1.0/Silent_FastTax_Pro_v2.1_Portable.zip",
+      "zip_size_mb": 0.19,
+      "zip_sha256": "29dfbd35c1ddf220ce9a212078baaad63a9181b8cde4c4b19bf55e3f933d1826",
+      "updated_at": "2026-11-25",
+      "changelog": [
+        {
+          "version": "2.1.0",
+          "date": "2026-11-25",
+          "note": "Phát hành Silent FastTax Pro v2.1 hỗ trợ 22 chuẩn PMKT và kiểm toán rủi ro thuế SQLite WAL."
+        }
+      ]
+    },
+    {
+      "id": "silent-voice-agent",
+      "name": "Silent Voice Agent — Zalo AI Call",
+      "version": "4.0.0",
+      "category": "Tự động hóa AI",
+      "tag": "v4.0.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 99K",
+      "desc": "Tổng đài viên AI tự động hóa cuộc gọi Zalo PC 6 bước khép kín: đọc tin nhắn, gọi thoại lắng nghe khách hàng, tóm tắt nhu cầu bằng Gemini Multimodal và gọi lại chốt phương án.",
+      "url": "./silent-voice-agent.html",
+      "guide_url": "./silent-voice-agent-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-voice-agent-v4.0.0/Silent_Voice_Agent_v4.0.0_Portable.zip",
+      "zip_size_mb": 78.17,
+      "zip_sha256": "a5bd6ee5cb43612c00a7a73f29e2c202de38896119542074045382489797a230",
+      "updated_at": "2026-11-25",
+      "changelog": [
+        {
+          "version": "4.0.0",
+          "date": "2026-11-25",
+          "note": "Phát hành Silent Voice Agent v4.0.0 tích hợp OpenCV Vision định vị Zalo Call và quy trình CSKH 6 bước."
+        }
+      ]
+    },
+    {
+      "id": "silent-ceo-suite",
+      "name": "Silent CEO Suite — Văn Phòng AI 3 Cấp",
+      "version": "1.0.0",
+      "category": "Tự động hóa AI",
+      "tag": "v1.0.0 • FREE 3 NGÀY",
+      "price": "Free · Từ 99K",
+      "desc": "Hệ điều hành doanh nghiệp tự hành 3 tầng (CEO Chiến lược · Sếp Điều hành · Lính Thực thi xoay tua đa API Key miễn phí) giúp vận hành công việc 24/7 ngay trên máy tính cá nhân.",
+      "url": "./silent-ceo-suite.html",
+      "guide_url": "./silent-ceo-suite-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-ceo-suite-v1.0.0/Silent_CEO_Suite_v1.0_Portable.zip",
+      "zip_size_mb": 28.63,
+      "zip_sha256": "80a3c6515371f5f3df41ed1bd25631d492b38a8bc996213b9fab3b1bc88fc20d",
+      "updated_at": "2026-11-25",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-25",
+          "note": "Phát hành Silent CEO Suite v1.0 Portable hỗ trợ xoay tua đa API Key 0đ."
+        }
+      ]
+    }
+  ]
+}
