@@ -1,7 +1,7 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-25T18:28:49",
+  "updated_at": "2026-11-25T18:29:09",
   "total_products": 8,
   "products": [
     {
@@ -134,7 +134,7 @@
       "name": "Silent AgroVN Pro",
       "version": "2.1.0",
       "category": "Nông nghiệp & Thương mại",
-      "tag": "v2.1.0 • FREE 3 NGÀY",
+      "tag": "v2.1.0 • PC + APK",
       "price": "Free 3 ngày · Từ 69K",
       "desc": "Bản v2.0: Phân loại 86+ sản phẩm theo 10 Công ty lớn (xem đủ công dụng kể cả chưa có giá), lọc chặn 100% link chết HTTP 200, định vị 63 tỉnh/GPS tìm đại lý gần nhất và mô phỏng phí ship thực tế về tận vườn (.EXE & .APK).",
       "url": "./silent-agrovn-pro.html",
