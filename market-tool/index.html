@@ -102,12 +102,14 @@
             "name": "Silent Hand v1.1 — AI Runner",
             "version": "1.1.0",
             "category": "Tự động hóa AI",
-            "tag": "MỚI • TRIAL FREE",
+            "tag": "v1.1.0 • PC + APK",
             "price": "Từ 10K / 24h",
             "desc": "Chạy lệnh nhanh từ mọi AI, mở Edge CDP 9222, tích hợp Khiên duyệt lệnh Safety Guard & nút Dừng khẩn cấp Kill Switch.",
             "url": "./silent-hand.html",
             "guide_url": "./silent-hand-guide.html",
             "download_url": "../downloads/SILENT_Hand_v1.1.zip",
+            "apk_download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-hand-v1.1.0/Silent_Hand_v1_1_AI_Runner_v1.1.0_Mobile.apk",
+            "apk_size_mb": 0.06,
             "zip_size_mb": 0,
             "zip_sha256": "",
             "updated_at": "2026-11-24",
@@ -130,6 +132,8 @@
             "url": "./silent-ram-cleaner.html",
             "guide_url": "./silent-ram-cleaner.html",
             "download_url": "../downloads/SILENT_RAM_STUDIO_FREE.zip",
+            "apk_download_url": "",
+            "apk_size_mb": 0,
             "zip_size_mb": 0,
             "zip_sha256": "",
             "updated_at": "2026-11-24",
@@ -152,6 +156,8 @@
             "url": "./silent-fasttax-pro.html",
             "guide_url": "./silent-fasttax-pro-guide.html",
             "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-fasttax-pro-v2.1.0/Silent_FastTax_Pro_v2.1_Portable.zip",
+            "apk_download_url": "",
+            "apk_size_mb": 0,
             "zip_size_mb": 0.19,
             "zip_sha256": "29dfbd35c1ddf220ce9a212078baaad63a9181b8cde4c4b19bf55e3f933d1826",
             "updated_at": "2026-11-25",
@@ -174,6 +180,8 @@
             "url": "./silent-voice-agent.html",
             "guide_url": "./silent-voice-agent-guide.html",
             "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-voice-agent-v4.0.0/Silent_Voice_Agent_v4.0.0_Portable.zip",
+            "apk_download_url": "",
+            "apk_size_mb": 0,
             "zip_size_mb": 78.17,
             "zip_sha256": "a5bd6ee5cb43612c00a7a73f29e2c202de38896119542074045382489797a230",
             "updated_at": "2026-11-25",
@@ -196,6 +204,8 @@
             "url": "./silent-ceo-suite.html",
             "guide_url": "./silent-ceo-suite-guide.html",
             "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-ceo-suite-v1.0.0/Silent_CEO_Suite_v1.0_Portable.zip",
+            "apk_download_url": "",
+            "apk_size_mb": 0,
             "zip_size_mb": 28.63,
             "zip_sha256": "80a3c6515371f5f3df41ed1bd25631d492b38a8bc996213b9fab3b1bc88fc20d",
             "updated_at": "2026-11-25",
@@ -252,7 +262,8 @@
           </div>
           <p>${p.desc}</p>
           <div class="btn-row">
-            <a class="cta" href="${p.download_url || p.url}">⬇ Tải về ngay</a>
+            <a class="cta" href="${p.download_url || p.url}">⬇ Tải PC</a>
+            ${p.apk_download_url ? `<a class="cta" style="background:linear-gradient(90deg,#10b981,#059669);color:#022c22" href="${p.apk_download_url}">📱 Tải APK</a>` : ''}
             <a class="btn-sub" href="${p.guide_url || p.url}">📖 HDSD</a>
             <a class="btn-sub" href="${p.url}">Chi tiết →</a>
           </div>
