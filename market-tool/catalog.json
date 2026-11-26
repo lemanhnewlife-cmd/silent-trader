@@ -1,8 +1,8 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-26T06:54:59",
-  "total_products": 10,
+  "updated_at": "2026-11-26T09:57:04",
+  "total_products": 11,
   "products": [
     {
       "id": "silent-hand",
@@ -84,24 +84,29 @@
     {
       "id": "silent-voice-agent",
       "name": "Silent Voice Agent — Zalo AI Call",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "category": "Tự động hóa AI",
-      "tag": "v4.0.0 • FREE 3 NGÀY",
+      "tag": "v4.0.1 • FREE 3 NGÀY",
       "price": "Free 3 ngày · Từ 99K",
       "desc": "Tổng đài viên AI tự động hóa cuộc gọi Zalo PC 6 bước khép kín: đọc tin nhắn, gọi thoại lắng nghe khách hàng, tóm tắt nhu cầu bằng Gemini Multimodal và gọi lại chốt phương án.",
       "url": "./silent-voice-agent.html",
       "guide_url": "./silent-voice-agent-guide.html",
-      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-voice-agent-v4.0.0/Silent_Voice_Agent_v4.0.0_Portable.zip",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-voice-agent-v4.0.1/Silent_Voice_Agent_v4.1.0_Portable.zip",
       "apk_download_url": "",
-      "apk_size_mb": 0,
-      "zip_size_mb": 78.17,
-      "zip_sha256": "a5bd6ee5cb43612c00a7a73f29e2c202de38896119542074045382489797a230",
-      "updated_at": "2026-11-25",
+      "apk_size_mb": 0.0,
+      "zip_size_mb": 78.18,
+      "zip_sha256": "5023645d713f5cca1289791677215109eaca0c627a0209b811f96af5acbf36ee",
+      "updated_at": "2026-11-26",
       "changelog": [
         {
           "version": "4.0.0",
           "date": "2026-11-25",
           "note": "Phát hành Silent Voice Agent v4.0.0 tích hợp OpenCV Vision định vị Zalo Call và quy trình CSKH 6 bước."
+        },
+        {
+          "version": "4.0.1",
+          "date": "2026-11-26",
+          "note": "Cập nhật bản nâng cấp tự động v4.0.1 từ mã nguồn gốc đã chỉnh sửa."
         }
       ]
     },
@@ -271,6 +276,30 @@
           "version": "1.0.0",
           "date": "2026-11-26",
           "note": "Phát hành chính thức Silent ShopeeProfit Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
+        }
+      ]
+    },
+    {
+      "id": "silent-scrap-audit-pro",
+      "name": "Silent Scrap Audit Pro",
+      "version": "1.0.0",
+      "category": "Quản trị Thu mua & Phế liệu",
+      "tag": "v1.0.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 79K",
+      "desc": "Giải quyết nỗi đau thất thoát trọng lượng và sai lệch đơn giá trong thu mua phế liệu công nghiệp, đồng thời kiểm soát rủi ro thuế đầu vào không hóa đơn.",
+      "url": "./silent-scrap-audit-pro.html",
+      "guide_url": "./silent-scrap-audit-pro-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-scrap-audit-pro-v1.0.0/Silent_Scrap_Audit_Pro_v1.0_Portable.zip",
+      "apk_download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-scrap-audit-pro-v1.0.0/Silent_Scrap_Audit_Pro_v1.0.0_Mobile.apk",
+      "apk_size_mb": 0.05,
+      "zip_size_mb": 31.82,
+      "zip_sha256": "b515395ec87df28a6cb83f1363058ec44494f7ff335a24624040a47a087f975b",
+      "updated_at": "2026-11-26",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-26",
+          "note": "Phát hành chính thức Silent Scrap Audit Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
         }
       ]
     }
