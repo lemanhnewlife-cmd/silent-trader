@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silent QR Standee, WiFi &amp; vCard Pro (v1.0.0) — SILENT Market Tool</title>
+  <meta name="description" content="Thiết kế bảng mica để bàn Quét Mã Vào WiFi Không Cần Hỏi Mật Khẩu, Danh thiếp điện tử vCard lưu danh bạ 1 chạm và dàn trang tem mã QR hàng loạt chuẩn khổ in A4." />
+  <style>
+    :root {
+      --bg:#07101f; --card:rgba(13,25,45,0.92); --border:rgba(0,229,255,0.24);
+      --accent:#00e5ff; --green:#22c55e; --momo:#d82d8b; --text:#eaf4ff; --muted:#94a3b8;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'Segoe UI',system-ui,sans-serif;
+      background:radial-gradient(circle at top center,#10203a 0%,var(--bg) 58%);
+      color:var(--text); min-height:100vh; padding:24px 16px 64px; line-height:1.58;
+    }
+    .wrap { max-width:1040px; margin:0 auto; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:22px; }
+    .back-link {
+      color:var(--accent); text-decoration:none; font-weight:600; font-size:14px;
+      padding:8px 14px; border-radius:10px; background:rgba(0,229,255,0.08); border:1px solid var(--border);
+    }
+    .badge {
+      display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px;
+      background:rgba(0,229,255,0.1); border:1px solid var(--border); color:var(--accent); font-size:13px; font-weight:700;
+    }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
+    .hero {
+      background:var(--card); border:1px solid var(--border); border-radius:20px;
+      padding:34px 26px; text-align:center; margin-bottom:26px; box-shadow:0 20px 50px rgba(0,0,0,0.35);
+    }
+    h1 {
+      font-size:clamp(26px,4.6vw,40px); font-weight:800; margin:14px 0 10px;
+      background:linear-gradient(90deg,#ffffff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .subtitle { color:var(--muted); max-width:740px; margin:0 auto 22px; font-size:15.5px; }
+    .cta-row { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:13px 22px; border-radius:12px; font-weight:700; font-size:15px; text-decoration:none; transition:transform 0.15s ease;
+    }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-primary { background:linear-gradient(135deg,var(--accent),#0284c7); color:#04101f; }
+    .btn-apk { background:linear-gradient(135deg,#22c55e,#059669); color:#022c22; }
+    .btn-guide { background:rgba(0,229,255,0.09); color:var(--accent); border:1px solid var(--accent); }
+    .btn-momo { background:linear-gradient(135deg,#d82d8b,#a50064); color:#fff; }
+    .pill-row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:18px; font-size:12.5px; color:#cbd5e1; }
+    .pill { padding:5px 12px; border-radius:999px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); }
+    .section-title { font-size:20px; font-weight:800; margin:28px 0 14px; color:#fff; }
+    .grid-3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
+    .card h3 { font-size:16px; color:var(--accent); margin-bottom:8px; }
+    .card p { font-size:14px; color:var(--muted); }
+    .plans { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; }
+    .plan { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; position:relative; }
+    .plan-best { border:2px solid #ec4899; box-shadow:0 10px 28px rgba(236,72,153,0.2); }
+    .plan-badge { display:inline-block; background:#be185d; color:#fff; font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; margin-bottom:8px; }
+    .plan-name { font-weight:700; font-size:15px; color:#fff; }
+    .plan-price { font-size:26px; font-weight:800; color:var(--green); margin:8px 0; }
+    .plan-desc { font-size:13px; color:var(--muted); }
+    .changelog { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
+    .cl-item { display:flex; gap:12px; flex-wrap:wrap; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.07); font-size:14px; }
+    .cl-item:last-child { border-bottom:none; }
+    .cl-ver { font-weight:800; color:var(--accent); min-width:68px; }
+    .cl-date { color:var(--muted); min-width:95px; font-family:Consolas,monospace; }
+    .cl-note { color:var(--text); flex:1; }
+    footer { text-align:center; margin-top:42px; font-size:13px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="back-link" href="./index.html">← Quay lại Kho SILENT Market Tool</a>
+      <span class="badge"><span class="dot"></span> NHÀ HÀNG, KHÁCH SẠN, SỰ KIỆN &AMP; IN ẤN • BẢN v1.0.0</span>
+    </div>
+
+    <section class="hero">
+      <span class="badge">🎁 Dùng thử miễn phí 03 ngày (72 giờ) • Mở khóa qua Ví MoMo 0977098166</span>
+      <h1>Silent QR Standee, WiFi &amp; vCard Pro</h1>
+      <p class="subtitle">Thiết kế bảng mica để bàn Quét Mã Vào WiFi Không Cần Hỏi Mật Khẩu, Danh thiếp điện tử vCard lưu danh bạ 1 chạm và dàn trang tem mã QR hàng loạt chuẩn khổ in A4.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-qr-wifi-card-pro-v1.0.0/Silent_QR_WiFi_Card_Pro_v1.0_Portable.zip">⬇ Tải Bản PC v1.0.0 (.ZIP)</a>
+        <a class="btn btn-apk" href="https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-qr-wifi-card-pro-v1.0.0/Silent_QR_Standee_WiFi_vCard_Pro_v1.0.0_Mobile.apk">📱 Tải Bản Điện Thoại (.APK)</a>
+        <a class="btn btn-guide" href="./silent-qr-wifi-card-pro-guide.html">📖 Xem Hướng Dẫn Sử Dụng</a>
+        <a class="btn btn-momo" href="#bangGiaMoMo">⚡ Bảng Giá Mở Khóa MoMo</a>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Windows 10 / 11 (64-bit)</span>
+        <span class="pill" style="border-color:#22c55e;color:#86efac">📱 Hỗ trợ Android (.APK 0.05 MB)</span>
+        <span class="pill">Phiên bản: v1.0.0</span>
+        <span class="pill">Dung lượng PC: 30.90 MB</span>
+        <span class="pill">SHA-256: a2c1592ef52a61bd...</span>
+      </div>
+    </section>
+
+    <h2 class="section-title">Điểm mạnh nổi bật của Silent QR Standee, WiFi &amp; vCard Pro</h2>
+    <div class="grid-3"><div class="card"><h3>📶 Tạo Bảng Quét QR Kết Nối WiFi Tự Động</h3><p>Khách tới quán cafe, khách sạn, văn phòng chỉ cần đưa camera lên quét là tự vào WiFi không cần hỏi hay gõ mật khẩu dài.</p></div><div class="card"><h3>🪪 Danh Thiếp Số vCard Lưu Thẳng Vào Danh Bạ</h3><p>Mã hóa Họ tên, Chức vụ, Công ty, SĐT, Email, Website thành mã QR sang trọng in lên card visit hoặc màn hình khóa.</p></div><div class="card"><h3>🖨️ Xuất File Ảnh Độ Phân Giải Cao &amp; Dàn Tem Hàng Loạt</h3><p>Tạo hàng chục mã QR bảo hành, mã sản phẩm xếp đều trên trang A4 sẵn sàng mang ra tiệm in hoặc in văn phòng.</p></div></div>
+
+    <h2 class="section-title" id="bangGiaMoMo">Bảng giá mở khóa qua Ví MoMo 0977098166 (NGUYEN THE MANH)</h2>
+    <div class="plans"><div class="plan"><div class="plan-name">Gói Cửa Hàng 30 Ngày</div><div class="plan-price">39.000đ</div><div class="plan-desc">Bản quyền thương mại 30 ngày</div></div><div class="plan plan-best"><span class="plan-badge">KHUYÊN DÙNG</span><div class="plan-name">Gói Thiết Kế 1 Năm</div><div class="plan-price">129.000đ</div><div class="plan-desc">Bản quyền thương mại 365 ngày</div></div><div class="plan"><div class="plan-name">Gói Trọn Đời VIP</div><div class="plan-price">249.000đ</div><div class="plan-desc">Sử dụng vĩnh viễn • Cập nhật miễn phí</div></div></div>
+
+    <h2 class="section-title">🔄 Lịch sử phiên bản &amp; Cập nhật tự động</h2>
+    <div class="changelog"><div class="cl-item"><span class="cl-ver">v1.0.0</span><span class="cl-date">2026-11-27</span><span class="cl-note">Phát hành chính thức Silent QR Standee, WiFi &amp; vCard Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử).</span></div></div>
+
+    <footer>© 2026 Tập Đoàn SILENT • Mọi bản nâng cấp của Silent QR Standee, WiFi &amp; vCard Pro đều được đồng bộ tự động lên trang này.</footer>
+  </div>
+</body>
+</html>

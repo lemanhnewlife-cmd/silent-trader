@@ -1,8 +1,8 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-27T01:03:50",
-  "total_products": 16,
+  "updated_at": "2026-11-27T01:11:20",
+  "total_products": 17,
   "products": [
     {
       "id": "silent-hand",
@@ -420,6 +420,30 @@
           "version": "1.0.0",
           "date": "2026-11-27",
           "note": "Phát hành chính thức Silent Smart Thumbnail & Frame Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
+        }
+      ]
+    },
+    {
+      "id": "silent-qr-wifi-card-pro",
+      "name": "Silent QR Standee, WiFi & vCard Pro",
+      "version": "1.0.0",
+      "category": "Nhà Hàng, Khách Sạn, Sự Kiện & In Ấn",
+      "tag": "v1.0.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 39K",
+      "desc": "Thiết kế bảng mica để bàn Quét Mã Vào WiFi Không Cần Hỏi Mật Khẩu, Danh thiếp điện tử vCard lưu danh bạ 1 chạm và dàn trang tem mã QR hàng loạt chuẩn khổ in A4.",
+      "url": "./silent-qr-wifi-card-pro.html",
+      "guide_url": "./silent-qr-wifi-card-pro-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-qr-wifi-card-pro-v1.0.0/Silent_QR_WiFi_Card_Pro_v1.0_Portable.zip",
+      "apk_download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-qr-wifi-card-pro-v1.0.0/Silent_QR_Standee_WiFi_vCard_Pro_v1.0.0_Mobile.apk",
+      "apk_size_mb": 0.05,
+      "zip_size_mb": 30.9,
+      "zip_sha256": "a2c1592ef52a61bd28a5d10434e26bc3b89dba7763e2782bd2a9592cc0ed3157",
+      "updated_at": "2026-11-27",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-27",
+          "note": "Phát hành chính thức Silent QR Standee, WiFi & vCard Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
         }
       ]
     }
