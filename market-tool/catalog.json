@@ -1,8 +1,8 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-27T00:53:13",
-  "total_products": 15,
+  "updated_at": "2026-11-27T01:03:50",
+  "total_products": 16,
   "products": [
     {
       "id": "silent-hand",
@@ -396,6 +396,30 @@
           "version": "1.0.0",
           "date": "2026-11-27",
           "note": "Phát hành chính thức Silent Teleprompter & Livestream Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
+        }
+      ]
+    },
+    {
+      "id": "silent-thumbnail-maker-pro",
+      "name": "Silent Smart Thumbnail & Frame Pro",
+      "version": "1.0.0",
+      "category": "Thiết Kế Ảnh Bìa YouTube, TikTok & BĐS",
+      "tag": "v1.0.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 49K",
+      "desc": "Dùng thị giác máy tính OpenCV tự động lọc khung hình sắc nét nhất từ video (loại bỏ cảnh nhòe) và đóng chữ tiêu đề viền nổi bắt mắt chuẩn ảnh bìa YouTube 16:9 & TikTok 9:16.",
+      "url": "./silent-thumbnail-maker-pro.html",
+      "guide_url": "./silent-thumbnail-maker-pro-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-thumbnail-maker-pro-v1.0.0/Silent_Thumbnail_Maker_Pro_v1.0_Portable.zip",
+      "apk_download_url": "",
+      "apk_size_mb": 0.0,
+      "zip_size_mb": 85.02,
+      "zip_sha256": "a1f1fe5dfdb5d6e1542492a4f7a06ebb94cba649fdb511c27000c497bfa0cdaf",
+      "updated_at": "2026-11-27",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-27",
+          "note": "Phát hành chính thức Silent Smart Thumbnail & Frame Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
         }
       ]
     }
