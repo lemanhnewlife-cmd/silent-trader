@@ -1,8 +1,8 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-27T00:46:05",
-  "total_products": 14,
+  "updated_at": "2026-11-27T00:53:13",
+  "total_products": 15,
   "products": [
     {
       "id": "silent-hand",
@@ -372,6 +372,30 @@
           "version": "1.0.0",
           "date": "2026-11-27",
           "note": "Phát hành chính thức Silent Duplicate & BigFile Hunter (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
+        }
+      ]
+    },
+    {
+      "id": "silent-teleprompter-live",
+      "name": "Silent Teleprompter & Livestream Pro",
+      "version": "1.0.0",
+      "category": "Livestream Bán Hàng & Quay Video",
+      "tag": "v1.0.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 49K",
+      "desc": "Máy nhắc chữ nổi trong suốt ghim sát Webcam máy tính & điện thoại kèm kho kịch bản tung Deal Flash Sale TikTok/Shopee giúp chủ shop nói trôi chảy mắt vẫn nhìn thẳng ống kính.",
+      "url": "./silent-teleprompter-live.html",
+      "guide_url": "./silent-teleprompter-live-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-teleprompter-live-v1.0.0/Silent_Teleprompter_Live_v1.0_Portable.zip",
+      "apk_download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-teleprompter-live-v1.0.0/Silent_Teleprompter_Livestream_Pro_v1.0.0_Mobile.apk",
+      "apk_size_mb": 0.05,
+      "zip_size_mb": 30.9,
+      "zip_sha256": "8ad9d6903f51d170c6f1e67e94ca962f6c88c92b9dc3fb4316c973fd55be635a",
+      "updated_at": "2026-11-27",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-27",
+          "note": "Phát hành chính thức Silent Teleprompter & Livestream Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
         }
       ]
     }
