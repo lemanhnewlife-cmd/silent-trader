@@ -1,8 +1,8 @@
 {
   "brand": "Silent",
   "storefront_url": "https://lemanhnewlife-cmd.github.io/silent-trader/market-tool/",
-  "updated_at": "2026-11-26T09:57:04",
-  "total_products": 11,
+  "updated_at": "2026-11-26T10:06:43",
+  "total_products": 12,
   "products": [
     {
       "id": "silent-hand",
@@ -300,6 +300,30 @@
           "version": "1.0.0",
           "date": "2026-11-26",
           "note": "Phát hành chính thức Silent Scrap Audit Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
+        }
+      ]
+    },
+    {
+      "id": "silent-pawnshop-audit-pro",
+      "name": "Silent PawnShop Audit Pro",
+      "version": "1.0.0",
+      "category": "Quản trị Tiệm Cầm đồ & Vàng bạc",
+      "tag": "v1.0.0 • FREE 3 NGÀY",
+      "price": "Free 3 ngày · Từ 79K",
+      "desc": "Giải quyết triệt để nỗi đau thất thoát tiền lãi, quản lý kho tài sản cầm cố và cảnh báo nợ quá hạn cho chủ tiệm cầm đồ.",
+      "url": "./silent-pawnshop-audit-pro.html",
+      "guide_url": "./silent-pawnshop-audit-pro-guide.html",
+      "download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-pawnshop-audit-pro-v1.0.0/Silent_PawnShop_Audit_Pro_v1.0_Portable.zip",
+      "apk_download_url": "https://github.com/lemanhnewlife-cmd/silent-trader/releases/download/market-silent-pawnshop-audit-pro-v1.0.0/Silent_PawnShop_Audit_Pro_v1.0.0_Mobile.apk",
+      "apk_size_mb": 0.05,
+      "zip_size_mb": 31.83,
+      "zip_sha256": "ef015ff7e4380138b7d7df0166a903104439dac5dfe427a8077cee43ebd2f889",
+      "updated_at": "2026-11-26",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-26",
+          "note": "Phát hành chính thức Silent PawnShop Audit Pro (Windows C-Native .EXE + Android .APK, miễn phí 3 ngày dùng thử)."
         }
       ]
     }
